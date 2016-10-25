@@ -20,11 +20,6 @@
         /// </summary>
         /// <param name="solt">Buffer that contains solt. Length must be 8 bytes.</param>
         void SetSolt(byte[] solt);
-        /// <summary>
-        /// Clears encryption key and all decrypted data. This function automatically
-        /// calling when Dispose() function is calling.  
-        /// </summary>
-        void ClearKey();
     }
 
     /// <summary>

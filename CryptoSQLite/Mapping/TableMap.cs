@@ -17,5 +17,10 @@ namespace CryptoSQLite.Mapping
         }
 
         public List<ColumnMap> Columns { get; set; }
+
+        public IEnumerable<string> GetColumnsName()
+        {
+            return Columns.Select(col => $"\"{col.Name}\"");
+        }
     }
 }

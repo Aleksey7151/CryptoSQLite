@@ -3,8 +3,16 @@ using System.Reflection;
 
 namespace CryptoSQLite.Mapping
 {
+    internal struct SqlColumnInfo
+    {
+        public string Name { get; set; }
+        public string SqlType { get; set; }
+    }
+
     internal class ColumnMap
     {
+        public const string SoltColumnName = "ColSolt";
+
         public string Name { get; }
 
         public Type ColumnType { get; }

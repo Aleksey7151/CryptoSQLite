@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
@@ -11,9 +8,9 @@ namespace CryptoSQLite
     {
         public static string CmdCreateTable(this TableMap table)
         {
-            var cmd = $"CREATE TABLE IF NOT EXISTS \"{table.Name}\"(";
+            var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
 
-            var cols = table.Columns.Select(c => c.CmdMapColumn());
+            var cols = table.Columns.Select(col => col.CmdMapColumn());
 
             var columns = string.Join(",\n", cols);
 
@@ -22,7 +19,16 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdInsertOrReplace(string tableName, IEnumerable<string> columns, IEnumerable<string> values)
+        {
+            var cols = string.Join(",", columns.Select(x => x));
 
+            var vals = string.Join(",", values.Select(x => x));
+
+            var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({vals})";
+
+            return cmd;
+        }
 
         /// <summary>
         /// Maps the column to SQL command, that uses in Table creation
@@ -31,14 +37,17 @@ namespace CryptoSQLite
         /// <returns>string with column map</returns>
         public static string CmdMapColumn(this ColumnMap column)
         {
-            string clmnMap = $"\"{column.Name}\" {OrmUtils.GetSqlType(column.ColumnType)}";
+            string clmnMap = $"{column.Name} {column.ColumnType.GetSqlType()}";
 
             if (column.IsPrimaryKey)
                 clmnMap += " PRIMARY KEY";
+
             if (column.IsAutoIncrement)
                 clmnMap += " AUTOINCREMENT";
+
             if (column.IsNotNull)
                 clmnMap += " NOT NULL";
+
             if (column.HasDefaultValue)
                 clmnMap += $" DEFAULT \"{column.DefaultValue}\"";
 
@@ -47,6 +56,11 @@ namespace CryptoSQLite
         public static string CmdDeleteTable(string tableName)
         {
             return $"DROP TABLE IF EXISTS \"{tableName}\"";
+        }
+
+        public static string CmdGetTableInfo(string tableName)
+        {
+            return $"PRAGMA TABLE_INFO(\"{tableName}\")";
         }
     }
 }

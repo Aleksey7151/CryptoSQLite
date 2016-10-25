@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Attributes.cs" />
     <Compile Include="CryptoProviders\ICryptoProvider.cs" />
+    <Compile Include="CryptoProviders\SoltGenerator.cs" />
     <Compile Include="Mapping\ColumnMap.cs" />
     <Compile Include="CryptoProviders\AesExternalCryptoProvider.cs" />
     <Compile Include="CryptoProviders\GostExternalCryptoProvider.cs" />
