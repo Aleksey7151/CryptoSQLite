@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CryptoSQLite.Mapping
 {
@@ -10,17 +11,16 @@ namespace CryptoSQLite.Mapping
 
         public Type TableType { get; }
 
-        public TableMap(string name, Type tableType)
+        public bool HasEncryptedColumns { get; }
+
+        public TableMap(string name, Type tableType, IEnumerable<PropertyInfo> columns, bool hasEncryptedColumns)
         {
             Name = name;
             TableType = tableType;
+            Columns = columns;
+            HasEncryptedColumns = hasEncryptedColumns;
         }
 
-        public List<ColumnMap> Columns { get; set; }
-
-        public IEnumerable<string> GetColumnsName()
-        {
-            return Columns.Select(col => $"\"{col.Name}\"");
-        }
+        public IEnumerable<PropertyInfo> Columns { get; }
     }
 }
