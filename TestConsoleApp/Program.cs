@@ -48,18 +48,23 @@ namespace TestConsoleApp
 
                 var item = new Jobs
                 {
-                    Id = 71,
-                    JobName = "I am having lunch",
-                    Description = "I am eating meat with potato",
-                    IsCompleted = true
+                    Id = 15,
+                    JobName = "I want to buy BMV",
+                    Description = "I will be very cool",
+                    IsCompleted = false
                 };
-                db.InsertOrReplaceItem(item);
+                db.InsertItem(item);
 
-                var item2 = db.GetItem<Jobs, int>("id", 71);
+                item.Id = 17;
+                item.IsCompleted = false;
+                item.Description = "She will be very glad";
+                item.JobName = "I must buy a car for my wife";
 
-                var item3 = db.GetItem<Jobs>(71);
+                db.InsertItem(item);
 
-                var name = item2.JobName;
+                var table = db.Table<Jobs>().ToList();
+
+                var i = table[0];
             }
            
         }

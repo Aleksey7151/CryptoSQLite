@@ -52,9 +52,9 @@ namespace CryptoSQLite
 
         TTable GetItem<TTable>(int id) where TTable : new();
 
-        int DeleteItem<TTable>(TTable item);
+        void DeleteItem<TTable>(TTable item);
 
-        IQueryable<TTable> Table<TTable>() where TTable : new();
+        IEnumerable<TTable> Table<TTable>() where TTable : new();
     }
 
     public class CryptoSQLite : IDisposable, ICryptoSQLite
@@ -195,18 +195,18 @@ namespace CryptoSQLite
         }
 
 
-        public int DeleteItem<TTable>(TTable item)
+        public void DeleteItem<TTable>(TTable item)
         {
             CheckTable<TTable>();
 
-            return 0;
+
         }
 
-        public IQueryable<TTable> Table<TTable>() where TTable : new()
+        public IEnumerable<TTable> Table<TTable>() where TTable : new()
         {
             CheckTable<TTable>();
 
-            return null;
+            return GetAllTable<TTable>();
         }
 
         #endregion
@@ -351,6 +351,33 @@ namespace CryptoSQLite
             DecryptRow(properties, columnsFromFile, item);
 
             return item;
+        }
+
+        private IEnumerable<TTable> GetAllTable<TTable>() where TTable : new()
+        {
+            var table = new List<List<SqlColumnInfo>>();
+            var tableName = GetTableName<TTable>();
+            var cmd = SqlCmds.CmdSelectAllTable(tableName);
+            var queryable = _connection.Query(cmd);
+            foreach (var row in queryable)
+            {
+                var columnsFromFile = new List<SqlColumnInfo>();
+                foreach (var column in row)
+                {
+                    columnsFromFile.Add(new SqlColumnInfo { Name = column.ColumnInfo.Name, SqlValue = column.ToString() });
+                }
+                table.Add(columnsFromFile);
+            }
+
+            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
+            var items = new List<TTable>(); 
+            foreach (var row in table)
+            {
+                var item = new TTable();
+                DecryptRow(properties, row, item);
+                items.Add(item);
+            }
+            return items;
         }
 
         private string ToSqlValue<TTable>(PropertyInfo property, TTable row, byte[] solt)
