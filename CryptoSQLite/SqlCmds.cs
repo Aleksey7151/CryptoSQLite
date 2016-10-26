@@ -53,6 +53,11 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdSelectAllTable(string tableName)
+        {
+            return $"SELECT * FROM {tableName}";
+        }
+
         /// <summary>
         /// Maps the PropertyInfo to SQL column, that uses in Table creation
         /// </summary>
