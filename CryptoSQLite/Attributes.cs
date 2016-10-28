@@ -8,22 +8,25 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Class)]
     public class CryptoTableAttribute : Attribute
     {
-        public string Name { get; }
-
-        public CryptoTableAttribute(string name)
+        public string TableName { get; }
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        public CryptoTableAttribute(string tableName)
         {
-            if(name == null)
+            if(tableName == null)
                 throw new ArgumentException("Table name can't be null");
 
-            if(string.IsNullOrEmpty(name))
+            if(string.IsNullOrEmpty(tableName))
                 throw new ArgumentException("Table name can't be empty");
 
-            Name = name;
+            TableName = tableName;
         }
     }
 
     /// <summary>
-    /// This attribute used to specify column, that will be encrypted before writting into SQL file.
+    /// This attribute used to specify column, that will be encrypted before writting into SQL database file.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class EncryptedAttribute : Attribute

@@ -41,11 +41,15 @@ namespace CryptoSQLite.CryptoProviders
 
         public void SetKey(byte[] key)
         {
+            if(key == null)
+                throw new ArgumentNullException(nameof(key));
             _key = key;
         }
 
         public void SetSolt(byte[] solt)
         {
+            if(solt == null)
+                throw new ArgumentNullException(nameof(solt));
             _solt = solt;
         }
     }
