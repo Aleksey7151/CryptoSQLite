@@ -48,7 +48,7 @@ namespace CryptoSQLite
 
         public static string CmdSelect(string tableName, string columnName, object value, Type valueType)
         {
-            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = {valueType.GetSqlValue(value)}";
+            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlView(valueType, value)}";
 
             return cmd;
         }
@@ -56,6 +56,13 @@ namespace CryptoSQLite
         public static string CmdSelectAllTable(string tableName)
         {
             return $"SELECT * FROM {tableName}";
+        }
+
+        public static string CmdDeleteRow(string tableName, string columnName, object value, Type valueType)
+        {
+            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlView(valueType, value)}";
+
+            return cmd;
         }
 
         /// <summary>

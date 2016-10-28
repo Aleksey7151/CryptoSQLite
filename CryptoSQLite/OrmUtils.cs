@@ -85,18 +85,7 @@ namespace CryptoSQLite
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
 
-        public static string GetSqlValue(this Type type, object value)
-        {
-            if (type == typeof(int) || type == typeof(short) || type == typeof(long) ||
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(ulong) ||
-                type == typeof(byte) || type == typeof(bool) || type == typeof(DateTime) || 
-                type == typeof(double) || type == typeof(float))
-                return $"{value}";
-            if (type == typeof(string))
-                return $"\'{value}\'";
-
-            throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
-        }
+        
 
         public static IEnumerable<PropertyInfo> GetCompatibleProperties<TTable>()
         {
@@ -150,8 +139,7 @@ namespace CryptoSQLite
             var i = 0;
             foreach (var property in properties)
             {
-                columnsMapping[i].Name = property.GetColumnName();
-                columnsMapping[i].SqlType = property.GetSqlType();
+                columnsMapping[i] = new SqlColumnInfo {Name = property.GetColumnName(), SqlType = property.GetSqlType()};
                 i++;
             }
             return columnsMapping;
@@ -173,6 +161,31 @@ namespace CryptoSQLite
             }
 
             return true;
+        }
+
+        public static string GetSqlView(Type type, object value)
+        {
+            if (type == typeof(int) || type == typeof(short) || type == typeof(long) ||
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(ulong) ||
+                type == typeof(byte) || type == typeof(DateTime) ||
+                type == typeof(double) || type == typeof(float))
+                return $"{value}";
+            if (type == typeof(string))
+            {
+                var str = value as string;
+                if (str == null)
+                    throw new ArgumentException("Value of object is not corresponds to it type");
+
+                var forbidden = new[] { '\'', '\"' };
+                if (str.IndexOfAny(forbidden, 0) >= 0)
+                    throw new CryptoSQLiteException("Strings that will not be encrypted can't contain symbols like: \' and \". Strings, that will be encrypted can contain any symbols.");
+
+                return $"\'{value}\'";
+            }
+            if(type == typeof(bool))
+                return $"{Convert.ToByte(value)}";
+
+            throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite.");
         }
 
         

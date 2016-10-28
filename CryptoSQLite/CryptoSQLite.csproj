@@ -39,7 +39,7 @@
     <Compile Include="CryptoProviders\SoltGenerator.cs" />
     <Compile Include="CryptoProviders\AesExternalCryptoProvider.cs" />
     <Compile Include="CryptoProviders\GostExternalCryptoProvider.cs" />
-    <Compile Include="CryptoSQLite.cs" />
+    <Compile Include="CryptoSQLiteConnection.cs" />
     <Compile Include="OrmUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mapping\TableMap.cs" />
