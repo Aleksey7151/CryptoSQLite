@@ -132,6 +132,8 @@ namespace CryptoSQLite
             return toRet;
         }
 
+
+
         public static SqlColumnInfo[] GetColumnsMappingWithSqlTypes(IList<PropertyInfo> properties)
         {
             var columnsMapping = new SqlColumnInfo[properties.Count];

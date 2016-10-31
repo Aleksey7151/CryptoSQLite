@@ -26,7 +26,7 @@ namespace CryptoSQLite.CryptoProviders
             var tmp = new uint[2];
             for (var t = 0; t < takts; t++)
             {
-                _gost.GostSimpleReplacement(_solt, tmp, CryptoMode.Encrypt);    // get gamma from gost
+                _gost.GostSimpleReplacement(_solt, tmp);    // get gamma from gost
                 _solt[0] ^= tmp[0];
                 _solt[1] ^= tmp[1];
 
@@ -38,6 +38,8 @@ namespace CryptoSQLite.CryptoProviders
                 gamma[8 * t + 5] = BitConverter.GetBytes(tmp[1])[1];
                 gamma[8 * t + 6] = BitConverter.GetBytes(tmp[1])[2];
                 gamma[8 * t + 7] = BitConverter.GetBytes(tmp[1])[3];
+
+                tmp.ZeroMemory();
             }
             return gamma;
         }
@@ -91,7 +93,7 @@ namespace CryptoSQLite.CryptoProviders
 
         public void Dispose()
         {
-            _key = null;
+            _key?.ZeroMemory(); // TODO think about it.
             _gost.Dispose();
         }
     }
@@ -117,15 +119,7 @@ namespace CryptoSQLite.CryptoProviders
             {0xB0000000, 0x50000000, 0x20000000, 0xE0000000, 0x80000000, 0x10000000, 0xC0000000, 0x30000000, 0x40000000, 0xF0000000, 0xD0000000, 0xA0000000, 0x00000000, 0x60000000, 0x70000000, 0x90000000}
         };
 
-        private readonly uint[] _key = { 0x14827B01, 0x54F0045A, 0xFC736A3C, 0xEAD484E3, 0xCA5D8E5C, 0x7106FFEF, 0xB13AF9D3, 0x51912531 };
-
         private readonly uint[] _roundKeysForEncrypt =
-        {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0
-        };
-
-        private readonly uint[] _roundKeysForDecrypt =
         {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0
@@ -133,12 +127,6 @@ namespace CryptoSQLite.CryptoProviders
 
         private uint _n1, _n2;
 
-        
-
-        public Gost28147()
-        {
-            
-        }
 
         private void GostTakt(uint key)
         {
@@ -160,29 +148,20 @@ namespace CryptoSQLite.CryptoProviders
             _n1 |= _table[6, a & 0x0F];
             a >>= 4;
             _n1 |= _table[7, a & 0x0F];
-            _n1 = ((_n1) << 11) | (((_n1) & 0xFFE00000) >> 21);
+            _n1 = (_n1 << 11) | ((_n1 & 0xFFE00000) >> 21);
 
             _n1 ^= _n2;
             _n2 = b;
         }
 
-        public void GostSimpleReplacement(uint[] inputData, uint[] outputData, CryptoMode mode)
+        public void GostSimpleReplacement(uint[] inputData, uint[] outputData)
         {
             if (inputData.Length % 2 != 0 || inputData.Length < 2 || outputData.Length % 2 != 0 || outputData.Length < 2)
                 return;
 
             for (var i = 0; i < inputData.Length; i += 2)
             {
-                switch (mode)
-                {
-                    case CryptoMode.Encrypt:
-                        GostSimpleReplacementEncrypt(inputData[i], inputData[i + 1], 32);
-                        break;
-
-                    case CryptoMode.Decrypt:
-                        GostSimpleReplacementDecrypt(inputData[i], inputData[i + 1], 32);
-                        break;
-                }
+                GostSimpleReplacementEncrypt(inputData[i], inputData[i + 1], 32);
                 outputData[i] = _n2;
                 outputData[i + 1] = _n1;
             }
@@ -197,77 +176,35 @@ namespace CryptoSQLite.CryptoProviders
                 GostTakt(_roundKeysForEncrypt[i]);
         }
 
-        private void GostSimpleReplacementDecrypt(uint block1, uint block2, uint countOfTakts)
-        {
-            _n1 = block1;
-            _n2 = block2;
-
-            for (var i = 0; i < countOfTakts; i++)
-                GostTakt(_roundKeysForDecrypt[i]);
-        }
-
         public void InitKey(byte[] key)
         {
             if (key.Length < 32) throw new ArgumentException("Gost key len incorrect");
 
-            for (var i = 0; i < _key.Length; i++)
-            {
-                _key[i] = BitConverter.ToUInt32(key, 4 * i);
-            }
+            var tmp = new uint[8];
+
+            for (var i = 0; i < tmp.Length; i++)
+                tmp[i] = BitConverter.ToUInt32(key, 4 * i);
+            
 
             //keys schedule
             for (var i = 0; i < 24; i++)
-                _roundKeysForEncrypt[i] = _key[i % 8];
-            _roundKeysForEncrypt[24] = _key[7];
-            _roundKeysForEncrypt[25] = _key[6];
-            _roundKeysForEncrypt[26] = _key[5];
-            _roundKeysForEncrypt[27] = _key[4];
-            _roundKeysForEncrypt[28] = _key[3];
-            _roundKeysForEncrypt[29] = _key[2];
-            _roundKeysForEncrypt[30] = _key[1];
-            _roundKeysForEncrypt[31] = _key[0];
+                _roundKeysForEncrypt[i] = tmp[i % 8];
 
-            for (var i = 0; i < 8; i++)
-                _roundKeysForDecrypt[i] = _key[i];
+            _roundKeysForEncrypt[24] = tmp[7];
+            _roundKeysForEncrypt[25] = tmp[6];
+            _roundKeysForEncrypt[26] = tmp[5];
+            _roundKeysForEncrypt[27] = tmp[4];
+            _roundKeysForEncrypt[28] = tmp[3];
+            _roundKeysForEncrypt[29] = tmp[2];
+            _roundKeysForEncrypt[30] = tmp[1];
+            _roundKeysForEncrypt[31] = tmp[0];
 
-            _roundKeysForDecrypt[8] = _key[7];
-            _roundKeysForDecrypt[9] = _key[6];
-            _roundKeysForDecrypt[10] = _key[5];
-            _roundKeysForDecrypt[11] = _key[4];
-            _roundKeysForDecrypt[12] = _key[3];
-            _roundKeysForDecrypt[13] = _key[2];
-            _roundKeysForDecrypt[14] = _key[1];
-            _roundKeysForDecrypt[15] = _key[0];
-
-            _roundKeysForDecrypt[16] = _key[7];
-            _roundKeysForDecrypt[17] = _key[6];
-            _roundKeysForDecrypt[18] = _key[5];
-            _roundKeysForDecrypt[19] = _key[4];
-            _roundKeysForDecrypt[20] = _key[3];
-            _roundKeysForDecrypt[21] = _key[2];
-            _roundKeysForDecrypt[22] = _key[1];
-            _roundKeysForDecrypt[23] = _key[0];
-
-            _roundKeysForDecrypt[24] = _key[7];
-            _roundKeysForDecrypt[25] = _key[6];
-            _roundKeysForDecrypt[26] = _key[5];
-            _roundKeysForDecrypt[27] = _key[4];
-            _roundKeysForDecrypt[28] = _key[3];
-            _roundKeysForDecrypt[29] = _key[2];
-            _roundKeysForDecrypt[30] = _key[1];
-            _roundKeysForDecrypt[31] = _key[0];
+            tmp.ZeroMemory();
         }
 
         public void Dispose()
         {
-            for (var i = 0; i < _key.Length; i++)
-                _key[i] = 0;
-
-            for (var i = 0; i < _roundKeysForDecrypt.Length; i++)
-                _roundKeysForDecrypt[i] = 0;
-
-            for (var i = 0; i < _roundKeysForEncrypt.Length; i++)
-                _roundKeysForEncrypt[i] = 0;
+            _roundKeysForEncrypt.ZeroMemory();
         }
     }
     #endregion
