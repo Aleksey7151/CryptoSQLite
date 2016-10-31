@@ -34,7 +34,7 @@ namespace CryptoSQLite
         /// <summary>
         /// USA encryption algoritm. It uses the 256 bit encryption key. 
         /// </summary>
-        Aes256With256BitsKey
+        AesWith256BitsKey
     }
 
     public interface ICryptoSQLiteConnection
@@ -48,6 +48,14 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Creates a new table in database, that can contain encrypted columns.
+        /// 
+        /// Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing one more column: "SoltColumn". This column 
+        /// is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// 
+        /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
+        /// to decrypt data too. Properties order in table type is importent thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -374,7 +382,7 @@ namespace CryptoSQLite
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             switch (cryptoAlgoritm)
             {
-                case CryptoAlgoritms.Aes256With256BitsKey:
+                case CryptoAlgoritms.AesWith256BitsKey:
                     _internalEncryptor = new AesExternalCryptoProvider();
                     break;
 

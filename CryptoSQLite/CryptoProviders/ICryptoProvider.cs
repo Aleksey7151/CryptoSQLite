@@ -29,17 +29,17 @@
     public interface IEncryptor
     {
         /// <summary>
-        /// Encrypts the open data <paramref name="data"/>
+        /// Encrypts the open data <paramref name="openData"/>
         /// </summary>
-        /// <param name="data">Data that must be encrypted</param>
+        /// <param name="openData">Data that must be encrypted</param>
         /// <returns>Encrypted (closed) data</returns>
-        byte[] Encrypt(byte[] data);
+        byte[] Encrypt(byte[] openData);
 
         /// <summary>
-        /// Decrypts the closed data <paramref name="data"/>
+        /// Decrypts the closed data <paramref name="closedData"/>
         /// </summary>
-        /// <param name="data">Data that must be decrypted</param>
+        /// <param name="closedData">Data that must be decrypted</param>
         /// <returns>Decrypted (open) data</returns>
-        byte[] Decrypt(byte[] data);
+        byte[] Decrypt(byte[] closedData);
     }
 }

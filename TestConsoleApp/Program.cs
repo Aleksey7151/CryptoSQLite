@@ -45,36 +45,35 @@ namespace TestConsoleApp
                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
                 29, 30, 31, 32
             };
-            using (var db = new CryptoSQLiteConnection("myDb.db3"))
+            using (var db = new CryptoSQLiteConnection("myDb.db3", CryptoAlgoritms.Gost28147With256BitsKey))
             {
                 try
                 {
                     db.CreateTable<Jobs>();
+
                     db.SetEncryptionKey(key);
-
-                    db.DeleteItem<Jobs, int>("JobName", 123);
-
                     /*
+                    
                     var item = new Jobs
                     {
                         Id = 32,
-                        JobName = "Frodo Beggins",
-                        Description = "He is ring master",
+                        JobName = "ITransition is eating your brain",
+                        Description = "Arturio",
                         IsCompleted = false
                     };
                     db.InsertItem(item);
 
                     item.Id = 27;
                     item.IsCompleted = false;
-                    item.Description = "Bilbo Beggins";
-                    item.JobName = "He was a ring master";
+                    item.Description = "Hello everyone";
+                    item.JobName = "Glad to see you!!!";
 
                     db.InsertItem(item);
-
+                    */
                     var table = db.Table<Jobs>().ToList();
 
                     var i = table[0];
-                    */
+                    
                 }
                 catch (Exception ex)
                 {
