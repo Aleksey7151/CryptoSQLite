@@ -27,10 +27,10 @@ namespace CryptoSQLite.CryptoProviders
             for (var t = 0; t < takts; t++)
             {
                 _gost.GostSimpleReplacement(_solt, tmp);    // get gamma from gost
-                _solt[0] ^= tmp[0];
-                _solt[1] ^= tmp[1];
 
-                gamma[8 * t] = BitConverter.GetBytes(tmp[0])[0];
+                _solt.Xor(tmp, 2);
+
+                gamma[8 * t]     = BitConverter.GetBytes(tmp[0])[0];
                 gamma[8 * t + 1] = BitConverter.GetBytes(tmp[0])[1];
                 gamma[8 * t + 2] = BitConverter.GetBytes(tmp[0])[2];
                 gamma[8 * t + 3] = BitConverter.GetBytes(tmp[0])[3];
@@ -39,34 +39,9 @@ namespace CryptoSQLite.CryptoProviders
                 gamma[8 * t + 6] = BitConverter.GetBytes(tmp[1])[2];
                 gamma[8 * t + 7] = BitConverter.GetBytes(tmp[1])[3];
 
-                tmp.ZeroMemory();
+                tmp.ZeroMemory();   // clean up
             }
             return gamma;
-        }
-
-        public byte[] Encrypt(byte[] openData)
-        {
-            if(_key == null)
-                throw new NullReferenceException("Encryption key has not been installed");
-            if(_solt == null)
-                throw new NullReferenceException("Solt has not been installed");
-
-            var closedData = new byte[openData.Length];
-            var gamma = GetGamma(openData.Length);
-            for (var i = 0; i < openData.Length; i++)
-            {
-                closedData[i] = (byte)(openData[i] ^ gamma[i]);
-            }
-
-            for (var i = 0; i < gamma.Length; i++)      // cleaning is important
-                gamma[i] = 0;
-
-            return closedData;
-        }
-
-        public byte[] Decrypt(byte[] closedData)
-        {
-            return Encrypt(closedData); // gamma-cyphers works that way
         }
 
         public void SetKey(byte[] key)
@@ -76,7 +51,7 @@ namespace CryptoSQLite.CryptoProviders
 
             _key = key;
 
-            _gost.InitKey(key);
+            _gost.SetKey(key);
         }
 
         public void SetSolt(byte[] solt)
@@ -91,20 +66,31 @@ namespace CryptoSQLite.CryptoProviders
             _solt[1] = BitConverter.ToUInt32(solt, 4);
         }
 
+        public void XorGamma(byte[] data)
+        {
+            if (_key == null)
+                throw new NullReferenceException("Encryption key has not been installed");
+            if (_solt == null)
+                throw new NullReferenceException("Solt has not been installed");
+
+            var gamma = GetGamma(data.Length);
+            
+            data.Xor(gamma, data.Length);
+
+            gamma.ZeroMemory();     // clean up
+        }
+
         public void Dispose()
         {
             _key?.ZeroMemory(); // TODO think about it.
+            _key = null;
             _gost.Dispose();
         }
     }
 
 
     #region Implementation GOST
-    internal enum CryptoMode
-    {
-        Encrypt = 3,    
-        Decrypt         
-    }
+
     internal class Gost28147 : IDisposable
     {
         private readonly uint[,] _table =
@@ -176,7 +162,7 @@ namespace CryptoSQLite.CryptoProviders
                 GostTakt(_roundKeysForEncrypt[i]);
         }
 
-        public void InitKey(byte[] key)
+        public void SetKey(byte[] key)
         {
             if (key.Length < 32) throw new ArgumentException("Gost key len incorrect");
 

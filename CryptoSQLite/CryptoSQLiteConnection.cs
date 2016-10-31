@@ -273,11 +273,6 @@ namespace CryptoSQLite
             _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
         }
 
-        public CryptoSQLiteAsyncConnection(string dbFileName, IEncryptor encryptor)
-        {
-            _connection = new CryptoSQLiteConnection(dbFileName, encryptor);
-        }
-
         public void SetEncryptionKey(byte[] key)
         {
             _connection.SetEncryptionKey(key);
@@ -354,8 +349,6 @@ namespace CryptoSQLite
 
         private readonly SQLiteDatabaseConnection _connection;
 
-        private readonly IEncryptor _externalEncryptor;
-
         private readonly ICryptoProvider _internalEncryptor;
 
         private readonly ISoltGenerator _solter;
@@ -398,14 +391,6 @@ namespace CryptoSQLite
             _tables = new Dictionary<string, TableMap>();
         }
 
-        public CryptoSQLiteConnection(string dbFilename, IEncryptor encryptor)
-        {
-            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-            _externalEncryptor = encryptor;
-            _internalEncryptor = null;
-            _tables = new Dictionary<string, TableMap>();
-        }
-
         #endregion
 
 
@@ -424,10 +409,6 @@ namespace CryptoSQLite
 
         public void SetEncryptionKey(byte[] key)
         {
-            if (_internalEncryptor == null && _externalEncryptor != null)
-                throw new CryptoSQLiteException(
-                    "You are using External Crypto Provider. You can use this function only if you use internal crypto provider.");
-
             if (key.Length != 32)
                 throw new ArgumentException("Key length must be 32 bytes");
 
@@ -452,8 +433,6 @@ namespace CryptoSQLite
             {
                 throw new CryptoSQLiteException(ex.Message, "Apparently table name or names of columns contain forbidden symbols.");
             }
-
-
             _tables.Add(tableName, map);
         }
 
@@ -653,7 +632,7 @@ namespace CryptoSQLite
             var columns = new List<string>();
             var values = new List<string>();
             byte[] solt = null;
-            IEncryptor encryptor = null;
+            ICryptoProvider encryptor = null;
 
             var columnsToAdd = OrmUtils.GetCompatibleProperties<TTable>().ToList();
             if (columnsToAdd.Find(p => p.IsEncrypted()) != null)
@@ -832,7 +811,7 @@ namespace CryptoSQLite
             return items;
         }
 
-        private string GetEncryptedValue(Type type, object value, IEncryptor encryptor)
+        private static string GetEncryptedValue(Type type, object value, ICryptoProvider encryptor)
         {
             if(encryptor == null)
                 throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
@@ -843,24 +822,24 @@ namespace CryptoSQLite
                 if (str == null)
                     throw new CryptoSQLiteException("GetEncryptedValue function. Argument is not compatible with it type");
 
-                var open = Encoding.UTF8.GetBytes(str);
-                var encrypted = encryptor.Encrypt(open);
-                var encryptedStr = encrypted.ToSqlString();
+                var data = Encoding.UTF8.GetBytes(str);
+                encryptor.XorGamma(data);
+                var encryptedStr = data.ToSqlString();
                 return $"\'{encryptedStr}\'";
             }
             if (type == typeof(DateTime))
             {
-                var openBytes = BitConverter.GetBytes(((DateTime)value).Ticks);
-                var encryptedBytes = encryptor.Encrypt(openBytes);
-                var encryptedTicks = BitConverter.ToInt64(encryptedBytes, 0);
+                var data = BitConverter.GetBytes(((DateTime)value).Ticks);
+                encryptor.XorGamma(data);
+                var encryptedTicks = BitConverter.ToInt64(data, 0);
                 return $"{encryptedTicks}";
             }
             if (type == typeof(short) || type == typeof(int) || type == typeof(long) ||
                 type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
             {
-                var openBytes = BitConverter.GetBytes((ulong)value);
-                var encryptedBytes = encryptor.Encrypt(openBytes);
-                var encryptedVal = BitConverter.ToUInt64(encryptedBytes, 0);
+                var data = BitConverter.GetBytes((ulong)value);
+                encryptor.XorGamma(data);
+                var encryptedVal = BitConverter.ToUInt64(data, 0);
                 return $"{encryptedVal}";
             }
             // one byte and bool we will not Encrypt
@@ -877,7 +856,7 @@ namespace CryptoSQLite
             var properties = propertieInfos.ToList();
             var columns = columnInfos.ToList();
 
-            IEncryptor encryptor = null;
+            ICryptoProvider encryptor = null;
             var soltColumn = columns.Find(c => c.Name == SoltColumnName);
             if (soltColumn != null)
             {
@@ -897,7 +876,7 @@ namespace CryptoSQLite
             }
         }
 
-        private void GetDecryptedValue(PropertyInfo property, object item, string sqlValue, IEncryptor encryptor)
+        private static void GetDecryptedValue(PropertyInfo property, object item, string sqlValue, ICryptoProvider encryptor)
         {
             if (encryptor == null)
                 throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
@@ -906,16 +885,16 @@ namespace CryptoSQLite
 
             if (type == typeof(string))
             {
-                var encrypted = sqlValue.ToByteArrayFromSqlString();
-                var open = encryptor.Decrypt(encrypted);
-                var openString = Encoding.UTF8.GetString(open, 0, open.Length);
+                var data = sqlValue.ToByteArrayFromSqlString();
+                encryptor.XorGamma(data);
+                var openString = Encoding.UTF8.GetString(data, 0, data.Length);
                 property.SetValue(item, openString);
             }
             else if (type == typeof(DateTime))
             {
-                var ticksBytes = BitConverter.GetBytes(Convert.ToInt64(sqlValue));
-                var openTicksBytes = encryptor.Decrypt(ticksBytes);
-                var ticks = BitConverter.ToInt64(openTicksBytes, 0);
+                var data = BitConverter.GetBytes(Convert.ToInt64(sqlValue));
+                encryptor.XorGamma(data);
+                var ticks = BitConverter.ToInt64(data, 0);
                 var dateTime = new DateTime(ticks);
                 property.SetValue(item, dateTime);
             }
@@ -923,9 +902,9 @@ namespace CryptoSQLite
             type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
             {
                 var value = Convert.ToUInt64(sqlValue);
-                var bytes = BitConverter.GetBytes(value);
-                var openBytes = encryptor.Decrypt(bytes);
-                value = BitConverter.ToUInt64(openBytes, 0);
+                var data = BitConverter.GetBytes(value);
+                encryptor.XorGamma(data);
+                value = BitConverter.ToUInt64(data, 0);
                 property.SetValue(item, value);
             }
             else if (type == typeof(byte))
@@ -935,7 +914,7 @@ namespace CryptoSQLite
                 property.SetValue(item, Convert.ToBoolean(byte.Parse(sqlValue)));
         }
 
-        private void GetNotEncryptedValue(PropertyInfo property, object item, string sqlValue)
+        private static void GetNotEncryptedValue(PropertyInfo property, object item, string sqlValue)
         {
             var type = property.PropertyType;
 
@@ -961,7 +940,7 @@ namespace CryptoSQLite
                 property.SetValue(item, Convert.ToBoolean(byte.Parse(sqlValue)));
         }
 
-        private string GetTableName<TTable>()
+        private static string GetTableName<TTable>()
         {
             var type = typeof(TTable);
 
@@ -978,10 +957,8 @@ namespace CryptoSQLite
             return tableAttribute.TableName;
         }
 
-        private IEncryptor GetEncryptor(byte[] solt = null)
+        private ICryptoProvider GetEncryptor(byte[] solt = null)
         {
-            if (_externalEncryptor != null) return _externalEncryptor;
-            
             if(solt != null)
                 _internalEncryptor.SetSolt(solt);
 
