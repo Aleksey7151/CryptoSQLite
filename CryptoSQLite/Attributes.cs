@@ -3,7 +3,7 @@
 namespace CryptoSQLite
 {
     /// <summary>
-    /// This attribute used to specify table, that can contain encrypted colunms
+    /// This attribute used to specify table and its name, that can contain encrypted colunms
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class CryptoTableAttribute : Attribute
@@ -16,10 +16,10 @@ namespace CryptoSQLite
         public CryptoTableAttribute(string tableName)
         {
             if(tableName == null)
-                throw new ArgumentException("Table name can't be null");
+                throw new ArgumentException("Table name can't be null.");
 
             if(string.IsNullOrEmpty(tableName))
-                throw new ArgumentException("Table name can't be empty");
+                throw new ArgumentException("Table name can't be empty.");
 
             TableName = tableName;
         }
@@ -35,16 +35,22 @@ namespace CryptoSQLite
     }
 
     /// <summary>
-    /// This attribute used to specify column, that won't be encrypted before writting into SQL file.
+    /// This attribute used to specify column name in table.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
     {
-        public string Name { get; }
+        public string ColumnName { get; }
 
-        public ColumnAttribute(string name)
+        public ColumnAttribute(string columnName)
         {
-            Name = name;
+            if (columnName == null)
+                throw new ArgumentException("Column name can't be null.");
+
+            if (string.IsNullOrEmpty(columnName))
+                throw new ArgumentException("Column name can't be empty.");
+
+            ColumnName = columnName;
         }
     }
 
@@ -66,6 +72,7 @@ namespace CryptoSQLite
         
     }
 
+    /*
     /// <summary>
     /// This attribute used to specify length of column that contains chars.
     /// </summary>
@@ -79,12 +86,13 @@ namespace CryptoSQLite
             Length = maxLength;
         }
     }
+    */
 
     /// <summary>
-    /// This attribute used to indicate property that should be ignored by the table mapping
+    /// This attribute used to indicate property that won't be added in table in database file
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class IgnoreAttribute : Attribute
+    public class IgnoredAttribute : Attribute
     {
         
     }

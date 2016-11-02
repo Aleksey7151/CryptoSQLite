@@ -47,7 +47,7 @@ namespace CryptoSQLite
         void SetEncryptionKey(byte[] key);
 
         /// <summary>
-        /// Creates a new table in database, that can contain encrypted columns.
+        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
         /// 
         /// Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing one more column: "SoltColumn". This column 
@@ -162,7 +162,15 @@ namespace CryptoSQLite
         void SetEncryptionKey(byte[] key);
 
         /// <summary>
-        /// Creates a new table in database, that can contain encrypted columns.
+        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// 
+        /// Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing one more column: "SoltColumn". This column 
+        /// is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// 
+        /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
+        /// to decrypt data too. Properties order in table type is importent thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -601,20 +609,27 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Table can't contain column with name: {SoltColumnName}. This name is reserved for CryptoSQLite needs.");
 
+            if(properties.Count(p => p.IsPrimaryKey()) < 1)
+                throw new CryptoSQLiteException("Crypto table must contain at least one PrimaryKey column.");
+
             if (properties.Count(p => p.IsPrimaryKey()) > 1)
-                // we can't have two or more columns specified as PrimaryKey
                 throw new CryptoSQLiteException("Crypto Table can't contain more that one PrimaryKey column.");
 
             if (properties.Any(p => p.IsPrimaryKey() && p.IsEncrypted()))
-                throw new CryptoSQLiteException("Column with PrimaryKey Attribute can't have Encrypted Attribute");
+                throw new CryptoSQLiteException("Column with PrimaryKey Attribute can't be Encrypted.");
 
             if (properties.Any(p => p.IsAutoIncremental() && p.IsEncrypted()))
-                throw new CryptoSQLiteException("Column with AutoIncremental Attribute can't have Encrypted Attribute");
+                throw new CryptoSQLiteException("Column with AutoIncremental Attribute can't be Encrypted.");
 
             if (
                 properties.Any(
                     p => p.IsEncrypted() && (p.PropertyType == typeof(bool) || p.PropertyType == typeof(byte))))
-                throw new CryptoSQLiteException("Columns that have Boolean or Byte type can't be Encrypted");
+                throw new CryptoSQLiteException("Columns that have Boolean or Byte type can't be Encrypted.");
+
+            for(var i = 0; i < properties.Count; i++)
+                for(var j = i+1; j < properties.Count; j++)
+                    if (properties[i].GetColumnName() == properties[j].GetColumnName())
+                        throw new CryptoSQLiteException($"Table {tableName} contains columns with same names {properties[i].GetColumnName()}.", "Table can't contain two columns with same names.");
 
             var tableMap = new TableMap(tableName, type, properties, properties.Any(p => p.IsEncrypted()));
 
@@ -643,7 +658,7 @@ namespace CryptoSQLite
 
             foreach (var col in columnsToAdd)
             {
-                if (col.IsAutoIncremental()) // if column is AutoIncremental
+                if (col.IsAutoIncremental() && !replaceRowIfExisits) // if column is AutoIncremental and we don't want to replace this row
                     continue;
 
                 columns.Add(col.GetColumnName());
@@ -704,9 +719,7 @@ namespace CryptoSQLite
                 var queryable = _connection.Query(cmd);
                 foreach (var row in queryable)
                 {
-                    columnsFromFile.AddRange(
-                        row.Select(
-                            column => new SqlColumnInfo {Name = column.ColumnInfo.Name, SqlValue = column.ToString()}));
+                    columnsFromFile.AddRange(row.Select(column => new SqlColumnInfo {Name = column.ColumnInfo.Name, SqlValue = column.ToString()}));
                     break;
                 }
             }
@@ -947,12 +960,9 @@ namespace CryptoSQLite
             var cryptoTableAttributes = type.GetTypeInfo().GetCustomAttributes<CryptoTableAttribute>().ToArray();
 
             if (!cryptoTableAttributes.Any())
-                throw new CryptoSQLiteException($"Table {typeof(TTable)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}");
+                throw new CryptoSQLiteException($"Table {typeof(TTable)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}.");
 
             var tableAttribute = cryptoTableAttributes.First();
-
-            if (string.IsNullOrEmpty(tableAttribute.TableName))
-                throw new CryptoSQLiteException("The name of Table can't be empty");
 
             return tableAttribute.TableName;
         }

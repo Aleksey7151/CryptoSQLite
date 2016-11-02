@@ -42,7 +42,7 @@ namespace CryptoSQLite
 
         public static bool IsIgnorable(this PropertyInfo property)
         {
-            var attributes = property.GetCustomAttributes<IgnoreAttribute>();
+            var attributes = property.GetCustomAttributes<IgnoredAttribute>();
             return attributes.Any();
         }
 
@@ -67,7 +67,7 @@ namespace CryptoSQLite
         public static string GetColumnName(this PropertyInfo property)
         {
             var attrs = property.GetCustomAttributes<ColumnAttribute>().ToArray();
-            return attrs.Length == 0 ? property.Name : attrs[0].Name;
+            return attrs.Length == 0 ? property.Name : attrs[0].ColumnName;
         }
 
         public static string GetSqlType(this PropertyInfo property)

@@ -1,0 +1,154 @@
+﻿using CryptoSQLite;
+
+namespace Tests
+{
+    [CryptoTable("AccountsData")]
+    internal class AccountsData
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Column("Name")]
+        public string AccountName { get; set; }
+
+        [Encrypted, Column("Password")]
+        public string AccountPassword { get; set; }
+        
+        [Encrypted]
+        public uint SocialSecureId { get; set; }
+
+        public int Age { get; set; }
+
+        public bool IsAdministrator { get; set; }
+
+        [Ignored]
+        public string IgnoredString { get; set; }
+        
+    }
+
+    internal class TableWithoutCryptoTableAttribute
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+    }
+
+    [CryptoTable("")]
+    internal class TableWithEmptyName
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+    }
+
+    [CryptoTable(null)]
+    internal class TableWithNullName
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+    }
+
+    [CryptoTable("TableWithoutPrimaryKeyColumn")]
+    internal class TableWithoutPrimaryKeyColumn
+    {
+        [Column("ID")]
+        public int Id { get; set; }
+        
+    }
+
+    [CryptoTable("TableWithTwoPrimaryKeyColumns")]
+    internal class TableWithTwoPrimaryKeyColumns
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [PrimaryKey]
+        public int Age { get; set; }
+    }
+
+    [CryptoTable("TableWithSoltColumnNameFirst")]
+    internal class TableWithSoltColumnNameFirst
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        public string SoltColumn { get; set; }
+    }
+
+    [CryptoTable("TableWithSoltColumnNameSecond")]
+    internal class TableWithSoltColumnNameSecond
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Column("SoltColumn")]
+        public string Solt { get; set; }
+    }
+
+    [CryptoTable("TableWithEncryptedPrimaryKey")]
+    internal class TableWithEncryptedPrimaryKey
+    {
+        [PrimaryKey, Encrypted]
+        public int Id { get; set; }
+    }
+
+    [CryptoTable("TableWithEncryptedAutoIncrementalKey")]
+    internal class TableWithEncryptedAutoIncrementalKey
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [AutoIncremental, Encrypted]
+        public int AnotherId { get; set; }
+    }
+
+    [CryptoTable("TableWithEncryptedByteColumn")]
+    internal class TableWithEncryptedByteColumn
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public byte ByteVal { get; set; }
+    }
+
+    [CryptoTable("TableWithEncryptedBoolColumn")]
+    internal class TableWithEncryptedBoolColumn
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public bool BoolVal { get; set; }
+    }
+
+    [CryptoTable("TableWithTwoEqualColumnNames")]
+    internal class TableWithTwoEqualColumnNames
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        public string Column { get; set; }
+
+        [Column("Column")]
+        public string Col { get; set; }
+    }
+
+    [CryptoTable("TableWithNullColumnName")]
+    internal class TableWithNullColumnName
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Column(null)]
+        public int Column { get; set; }
+    }
+
+    [CryptoTable("TableWithEmptyColumnName")]
+    internal class TableWithEmptyColumnName
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Column("")]
+        public int Column { get; set; }
+    }
+}
