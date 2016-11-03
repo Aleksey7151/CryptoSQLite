@@ -2,12 +2,12 @@
 
 namespace CryptoSQLite.CryptoProviders
 {
-    internal class GostExternalCryptoProvider : ICryptoProvider, IDisposable
+    internal class GostCryptoProvider : ICryptoProvider, IDisposable
     {
         private byte[] _key;
         private uint[] _solt;
         private readonly Gost28147 _gost;
-        public GostExternalCryptoProvider()
+        public GostCryptoProvider()
         {
             _solt = new uint[2];
             _gost = new Gost28147();
@@ -66,16 +66,18 @@ namespace CryptoSQLite.CryptoProviders
             _solt[1] = BitConverter.ToUInt32(solt, 4);
         }
 
-        public void XorGamma(byte[] data)
+        public void XorGamma(byte[] data, int dataLen = 0)
         {
             if (_key == null)
                 throw new NullReferenceException("Encryption key has not been installed");
             if (_solt == null)
                 throw new NullReferenceException("Solt has not been installed");
 
-            var gamma = GetGamma(data.Length);
+            var len = dataLen == 0 ? data.Length : dataLen;
+
+            var gamma = GetGamma(len);
             
-            data.Xor(gamma, data.Length);
+            data.Xor(gamma, len);
 
             gamma.ZeroMemory();     // clean up
         }

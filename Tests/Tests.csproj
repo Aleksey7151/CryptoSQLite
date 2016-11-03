@@ -62,8 +62,9 @@
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
     <Compile Include="CheckTableStructureTests.cs" />
-    <Compile Include="CRUDTests.cs" />
-    <Compile Include="Tables.cs" />
+    <Compile Include="Tables\CorrectTables.cs" />
+    <Compile Include="CrudTests.cs" />
+    <Compile Include="Tables\IncorrectTables.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

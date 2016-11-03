@@ -1,6 +1,7 @@
 ﻿using System;
 using CryptoSQLite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Tests.Tables;
 
 namespace Tests
 {
@@ -30,7 +31,29 @@ namespace Tests
         }
 
         [TestMethod]
-        public void TableCanNotHaveEmptyName()
+        public void TableNameCanNotBeNull()
+        {
+            using (var db = GetGostConnection())
+            {
+                try
+                {
+                    db.CreateTable<TableWithNullName>();
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
+                        0);
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TableNameCanNotBeEmpty()
         {
             using (var db = GetGostConnection())
             {
@@ -38,15 +61,15 @@ namespace Tests
                 {
                     db.CreateTable<TableWithEmptyName>();
                 }
-                catch (ArgumentException cex)
+                catch (CryptoSQLiteException cex)
                 {
                     Assert.IsTrue(
-                        cex.Message.IndexOf("Table name can't be empty.", StringComparison.Ordinal) >=
+                        cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
                         0);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Assert.Fail();
+                    Assert.Fail(ex.Message);
                 }
             }
         }
@@ -86,28 +109,6 @@ namespace Tests
                 {
                     Assert.IsTrue(
                         cex.Message.IndexOf("Column name can't be empty.", StringComparison.Ordinal) >=
-                        0);
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-            }
-        }
-
-        [TestMethod]
-        public void TableCanNotBeNull()
-        {
-            using (var db = GetGostConnection())
-            {
-                try
-                {
-                    db.CreateTable<TableWithNullName>();
-                }
-                catch (ArgumentException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Table name can't be null.", StringComparison.Ordinal) >=
                         0);
                 }
                 catch (Exception)

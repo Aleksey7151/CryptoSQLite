@@ -15,12 +15,13 @@ namespace CryptoSQLite
         /// <param name="tableName">Table name</param>
         public CryptoTableAttribute(string tableName)
         {
+            /*
             if(tableName == null)
                 throw new ArgumentException("Table name can't be null.");
 
             if(string.IsNullOrEmpty(tableName))
                 throw new ArgumentException("Table name can't be empty.");
-
+            */
             TableName = tableName;
         }
     }
@@ -44,12 +45,13 @@ namespace CryptoSQLite
 
         public ColumnAttribute(string columnName)
         {
+            
             if (columnName == null)
                 throw new ArgumentException("Column name can't be null.");
 
             if (string.IsNullOrEmpty(columnName))
                 throw new ArgumentException("Column name can't be empty.");
-
+                
             ColumnName = columnName;
         }
     }

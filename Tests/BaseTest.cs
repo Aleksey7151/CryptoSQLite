@@ -1,4 +1,5 @@
-﻿using CryptoSQLite;
+﻿using System.Collections.Generic;
+using CryptoSQLite;
 
 namespace Tests
 {
@@ -22,6 +23,11 @@ namespace Tests
             var conn = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
+        }
+
+        public CryptoSQLiteConnection[] GetConnections()
+        {
+            return new[] {GetGostConnection(), GetAesConnection()};
         }
     }
 }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace CryptoSQLite.CryptoProviders
 {
-    internal class AesExternalCryptoProvider : ICryptoProvider, IDisposable
+    internal class AesCryptoProvider : ICryptoProvider, IDisposable
     {
         private byte[] _key;
         private readonly byte[] _solt;
         private readonly Aes _aes;
 
-        public AesExternalCryptoProvider()
+        public AesCryptoProvider()
         {
             _aes = new Aes(Aes.AesKeyType.Aes256);
             _solt = new byte[16];
@@ -40,16 +40,18 @@ namespace CryptoSQLite.CryptoProviders
             return gamma;
         }
 
-        public void XorGamma(byte[] data)
+        public void XorGamma(byte[] data, int dataLen = 0)
         {
             if (_key == null)
                 throw new NullReferenceException("Encryption key has not been installed");
             if (_solt == null)
                 throw new NullReferenceException("Solt has not been installed");
 
-            var gamma = GetGamma(data.Length);
+            var len = dataLen == 0 ? data.Length : dataLen;
 
-            data.Xor(gamma, data.Length);
+            var gamma = GetGamma(len);
+
+            data.Xor(gamma, len);
 
             gamma.ZeroMemory();     // clean gamma
         }

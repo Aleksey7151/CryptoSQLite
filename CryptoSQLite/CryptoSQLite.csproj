@@ -37,8 +37,8 @@
     <Compile Include="Attributes.cs" />
     <Compile Include="CryptoProviders\ICryptoProvider.cs" />
     <Compile Include="CryptoProviders\SoltGenerator.cs" />
-    <Compile Include="CryptoProviders\AesExternalCryptoProvider.cs" />
-    <Compile Include="CryptoProviders\GostExternalCryptoProvider.cs" />
+    <Compile Include="CryptoProviders\AesCryptoProvider.cs" />
+    <Compile Include="CryptoProviders\GostCryptoProvider.cs" />
     <Compile Include="CryptoSQLiteConnection.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="OrmUtils.cs" />

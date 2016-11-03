@@ -73,14 +73,16 @@ namespace CryptoSQLite
         public static string GetSqlType(this PropertyInfo property)
         {
             var type = property.PropertyType;
-            if (type == typeof(int) || type == typeof(short) || type == typeof(long) ||
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(ulong) ||
-                type == typeof(byte) || type == typeof(bool) || type == typeof(DateTime))
-                return "integer";
-            if (type == typeof(string))
-                return "text";
+
+            if (type == typeof(int)    || type == typeof(short) || type == typeof(uint) || 
+                type == typeof(ushort) || type == typeof(byte)  || type == typeof(bool) )
+                return "INTEGER";
+
+            if (type == typeof(string) || type == typeof(ulong) || type == typeof(long) || type == typeof(DateTime))
+                return "TEXT";
+
             if (type == typeof(double) || type == typeof(float))
-                return "real";
+                return "REAL";
 
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
@@ -167,23 +169,30 @@ namespace CryptoSQLite
 
         public static string GetSqlView(Type type, object value)
         {
-            if (type == typeof(int) || type == typeof(short) || type == typeof(long) ||
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(ulong) ||
-                type == typeof(byte) || type == typeof(DateTime) ||
-                type == typeof(double) || type == typeof(float))
+            if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort) || 
+                type == typeof(byte) || type == typeof(double) || type == typeof(float))
                 return $"{value}";
-            if (type == typeof(string))
-            {
-                var str = value as string;
-                if (str == null)
-                    throw new ArgumentException("Value of object is not corresponds to it type");
 
+            if (type == typeof(string) || type == typeof(ulong) || type == typeof(long))
+            {
+                var str = value.ToString();
+                
                 var forbidden = new[] { '\'', '\"' };
                 if (str.IndexOfAny(forbidden, 0) >= 0)
                     throw new CryptoSQLiteException("Strings that will not be encrypted can't contain symbols like: \' and \". Strings, that will be encrypted can contain any symbols.");
 
                 return $"\'{value}\'";
             }
+
+            if (type == typeof(DateTime))
+            {
+                var date = (DateTime) value;
+                var ticks = date.ToBinary();
+                var data = BitConverter.GetBytes(ticks);
+                var str = data.ToSqlString();
+                return $"\'{str}\'";
+            }
+
             if(type == typeof(bool))
                 return $"{Convert.ToByte(value)}";
 

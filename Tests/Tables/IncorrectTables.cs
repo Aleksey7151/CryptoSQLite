@@ -1,31 +1,7 @@
 ﻿using CryptoSQLite;
 
-namespace Tests
+namespace Tests.Tables
 {
-    [CryptoTable("AccountsData")]
-    internal class AccountsData
-    {
-        [PrimaryKey, AutoIncremental]
-        public int Id { get; set; }
-
-        [Column("Name")]
-        public string AccountName { get; set; }
-
-        [Encrypted, Column("Password")]
-        public string AccountPassword { get; set; }
-        
-        [Encrypted]
-        public uint SocialSecureId { get; set; }
-
-        public int Age { get; set; }
-
-        public bool IsAdministrator { get; set; }
-
-        [Ignored]
-        public string IgnoredString { get; set; }
-        
-    }
-
     internal class TableWithoutCryptoTableAttribute
     {
         [PrimaryKey]

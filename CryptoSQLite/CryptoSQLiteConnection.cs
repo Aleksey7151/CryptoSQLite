@@ -373,7 +373,7 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-            _internalEncryptor = new AesExternalCryptoProvider();
+            _internalEncryptor = new AesCryptoProvider();
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -384,15 +384,15 @@ namespace CryptoSQLite
             switch (cryptoAlgoritm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
-                    _internalEncryptor = new AesExternalCryptoProvider();
+                    _internalEncryptor = new AesCryptoProvider();
                     break;
 
                 case CryptoAlgoritms.Gost28147With256BitsKey:
-                    _internalEncryptor = new GostExternalCryptoProvider();
+                    _internalEncryptor = new GostCryptoProvider();
                     break;
 
                 default:
-                    _internalEncryptor = new AesExternalCryptoProvider();
+                    _internalEncryptor = new AesCryptoProvider();
                     break;
             }
             _solter = new SoltGenerator();
@@ -439,7 +439,8 @@ namespace CryptoSQLite
             }
             catch (Exception ex)
             {
-                throw new CryptoSQLiteException(ex.Message, "Apparently table name or names of columns contain forbidden symbols.");
+                throw new CryptoSQLiteException(ex.Message,
+                    "Apparently table name or names of columns contain forbidden symbols.");
             }
             _tables.Add(tableName, map);
         }
@@ -456,7 +457,7 @@ namespace CryptoSQLite
             {
                 throw new CryptoSQLiteException(ex.Message, "Apparently name of table contains forbidden symbols.");
             }
-            
+
 
             if (_tables.ContainsKey(tableName))
                 _tables.Remove(tableName);
@@ -609,7 +610,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Table can't contain column with name: {SoltColumnName}. This name is reserved for CryptoSQLite needs.");
 
-            if(properties.Count(p => p.IsPrimaryKey()) < 1)
+            if (properties.Count(p => p.IsPrimaryKey()) < 1)
                 throw new CryptoSQLiteException("Crypto table must contain at least one PrimaryKey column.");
 
             if (properties.Count(p => p.IsPrimaryKey()) > 1)
@@ -626,10 +627,12 @@ namespace CryptoSQLite
                     p => p.IsEncrypted() && (p.PropertyType == typeof(bool) || p.PropertyType == typeof(byte))))
                 throw new CryptoSQLiteException("Columns that have Boolean or Byte type can't be Encrypted.");
 
-            for(var i = 0; i < properties.Count; i++)
-                for(var j = i+1; j < properties.Count; j++)
+            for (var i = 0; i < properties.Count; i++)
+                for (var j = i + 1; j < properties.Count; j++)
                     if (properties[i].GetColumnName() == properties[j].GetColumnName())
-                        throw new CryptoSQLiteException($"Table {tableName} contains columns with same names {properties[i].GetColumnName()}.", "Table can't contain two columns with same names.");
+                        throw new CryptoSQLiteException(
+                            $"Table {tableName} contains columns with same names {properties[i].GetColumnName()}.",
+                            "Table can't contain two columns with same names.");
 
             var tableMap = new TableMap(tableName, type, properties, properties.Any(p => p.IsEncrypted()));
 
@@ -658,15 +661,20 @@ namespace CryptoSQLite
 
             foreach (var col in columnsToAdd)
             {
-                if (col.IsAutoIncremental() && !replaceRowIfExisits) // if column is AutoIncremental and we don't want to replace this row
-                    continue;
+                if (col.IsAutoIncremental() && !replaceRowIfExisits)
+                    continue;       // if column is AutoIncremental and we don't want to replace this row
 
                 columns.Add(col.GetColumnName());
                 var value = col.GetValue(row);
                 var type = col.PropertyType;
-                var sqlValue = col.IsEncrypted()
-                    ? GetEncryptedValue(type, value, encryptor)
-                    : OrmUtils.GetSqlView(type, value);
+                string sqlValue;
+
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (col.IsEncrypted())
+                    sqlValue = GetEncryptedValue(type, value, encryptor);
+                else
+                    sqlValue = OrmUtils.GetSqlView(type, value);
+
                 values.Add(sqlValue);
             }
 
@@ -710,67 +718,30 @@ namespace CryptoSQLite
 
             var item = new TTable();
 
-            var columnsFromFile = new List<SqlColumnInfo>();
+            var tableName = GetTableName<TTable>();
 
-            var cmd = SqlCmds.CmdSelect(GetTableName<TTable>(), columnName, columnValue, columnType);
+            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue, columnType);
 
-            try
-            {
-                var queryable = _connection.Query(cmd);
-                foreach (var row in queryable)
-                {
-                    columnsFromFile.AddRange(row.Select(column => new SqlColumnInfo {Name = column.ColumnInfo.Name, SqlValue = column.ToString()}));
-                    break;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new CryptoSQLiteException(ex.Message, "Apparantly column name is invalid or contains forbidden symbols");
-            }
+            var table = ReadRowsFromTable(cmd, tableName);
 
+            if (table.Count == 0)
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain row with column: {columnName} that contain value {columnValue}.");
 
-            DecryptRow(properties, columnsFromFile, item);
+            DecryptRow(properties, table[0], item);
 
             return item;
         }
 
         private TTable GetRowFromTableUsingId<TTable>(int id) where TTable : new()
         {
-            var properties = OrmUtils.GetCompatibleProperties<TTable>();
+            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
 
-            var propertieInfos = properties as PropertyInfo[] ?? properties.ToArray();
-            var idProperty = propertieInfos.First(p => p.GetColumnName().ToLower() == "id");
+            var idProperty = properties.First(p => p.GetColumnName().ToLower() == "id");
             if (idProperty == null)
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            var item = new TTable();
-
-            var columnsFromFile = new List<SqlColumnInfo>();
-
-            var tableName = GetTableName<TTable>();
-            var cmd = SqlCmds.CmdSelect(tableName, idProperty.GetColumnName(), id, typeof(int));
-            try
-            {
-                var queryable = _connection.Query(cmd);
-                foreach (var row in queryable)
-                {
-                    columnsFromFile.AddRange(
-                        row.Select(
-                            column => new SqlColumnInfo {Name = column.ColumnInfo.Name, SqlValue = column.ToString()}));
-                    break;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new CryptoSQLiteException(ex.Message,
-                    $"Apparently column with name \"id\" doesn't exists in table {tableName}.");
-            }
-
-
-            DecryptRow(propertieInfos, columnsFromFile, item);
-
-            return item;
+            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id, typeof(int));
         }
 
         private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue, Type columnType)
@@ -784,17 +755,37 @@ namespace CryptoSQLite
             }
             catch (Exception ex)
             {
-                throw new CryptoSQLiteException(ex.Message, $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
+                throw new CryptoSQLiteException(ex.Message,
+                    $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
             }
 
         }
 
         private IEnumerable<TTable> GetAllTable<TTable>() where TTable : new()
         {
-            var table = new List<List<SqlColumnInfo>>();
             var tableName = GetTableName<TTable>();
+
             var cmd = SqlCmds.CmdSelectAllTable(tableName);
 
+            var table = ReadRowsFromTable(cmd, tableName);
+
+            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+                DecryptRow(properties, row, item);
+                items.Add(item);
+            }
+
+            return items;
+        }
+
+        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, string tableName)
+        {
+            var table = new List<List<SqlColumnInfo>>();
             try
             {
                 var queryable = _connection.Query(cmd);
@@ -803,7 +794,12 @@ namespace CryptoSQLite
                     var columnsFromFile = new List<SqlColumnInfo>();
                     foreach (var column in row)
                     {
-                        columnsFromFile.Add(new SqlColumnInfo { Name = column.ColumnInfo.Name, SqlValue = column.ToString() });
+                        var item = new SqlColumnInfo
+                        {
+                            Name = column.ColumnInfo.Name,
+                            SqlValue = column.ToString()
+                        };
+                        columnsFromFile.Add(item);
                     }
                     table.Add(columnsFromFile);
                 }
@@ -812,59 +808,11 @@ namespace CryptoSQLite
             {
                 throw new CryptoSQLiteException(ex.Message, $"Apparantly table with name {tableName} doesn't exist in database file.");
             }
-            
-            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
-            var items = new List<TTable>(); 
-            foreach (var row in table)
-            {
-                var item = new TTable();
-                DecryptRow(properties, row, item);
-                items.Add(item);
-            }
-            return items;
+            return table;
         }
 
-        private static string GetEncryptedValue(Type type, object value, ICryptoProvider encryptor)
-        {
-            if(encryptor == null)
-                throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
-
-            if (type == typeof(string))
-            {
-                var str = value as string;
-                if (str == null)
-                    throw new CryptoSQLiteException("GetEncryptedValue function. Argument is not compatible with it type");
-
-                var data = Encoding.UTF8.GetBytes(str);
-                encryptor.XorGamma(data);
-                var encryptedStr = data.ToSqlString();
-                return $"\'{encryptedStr}\'";
-            }
-            if (type == typeof(DateTime))
-            {
-                var data = BitConverter.GetBytes(((DateTime)value).Ticks);
-                encryptor.XorGamma(data);
-                var encryptedTicks = BitConverter.ToInt64(data, 0);
-                return $"{encryptedTicks}";
-            }
-            if (type == typeof(short) || type == typeof(int) || type == typeof(long) ||
-                type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
-            {
-                var data = BitConverter.GetBytes((ulong)value);
-                encryptor.XorGamma(data);
-                var encryptedVal = BitConverter.ToUInt64(data, 0);
-                return $"{encryptedVal}";
-            }
-            // one byte and bool we will not Encrypt
-            if (type == typeof(byte))
-                return $"{value}";
-            if (type == typeof(bool))
-                return $"{Convert.ToByte(value)}";
-            
-            throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
-        }
-
-        private void DecryptRow<TTable>(IEnumerable<PropertyInfo> propertieInfos, IEnumerable<SqlColumnInfo> columnInfos, TTable item)
+        private void DecryptRow<TTable>(IEnumerable<PropertyInfo> propertieInfos, IEnumerable<SqlColumnInfo> columnInfos,
+            TTable item)
         {
             var properties = propertieInfos.ToList();
             var columns = columnInfos.ToList();
@@ -874,14 +822,15 @@ namespace CryptoSQLite
             if (soltColumn != null)
             {
                 var solt = soltColumn.SqlValue.ToByteArrayFromSqlString();
-                encryptor = GetEncryptor(solt);     // this solt we were using in encryption of columns
+                encryptor = GetEncryptor(solt); // this solt we were using in encryption of columns
             }
-            
+
             foreach (var property in properties)
             {
                 var column = columns.Find(c => c.Name == property.GetColumnName());
-                if(column == null)
-                    throw new CryptoSQLiteException($"Can't find appropriate column in database for property: {property.GetColumnName()}");
+                if (column == null)
+                    throw new CryptoSQLiteException(
+                        $"Can't find appropriate column in database for property: {property.GetColumnName()}");
 
                 if (property.IsEncrypted())
                     GetDecryptedValue(property, item, column.SqlValue, encryptor);
@@ -889,6 +838,91 @@ namespace CryptoSQLite
             }
         }
 
+        private static string GetEncryptedValue(Type type, object value, ICryptoProvider encryptor)
+        {
+            if (encryptor == null)
+                throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
+
+            if (type == typeof(string))
+            {
+                var str = value as string;
+                if (str == null)
+                    throw new CryptoSQLiteException(
+                        "GetEncryptedValue function. Argument is not compatible with it type");
+
+                var data = Encoding.UTF8.GetBytes(str);
+                encryptor.XorGamma(data);
+                var encryptedStr = data.ToSqlString();
+                return $"\'{encryptedStr}\'";
+            }
+            if (type == typeof(DateTime))
+            {
+                var dateTime = (DateTime) value;
+                var data = BitConverter.GetBytes(dateTime.ToBinary());
+                encryptor.XorGamma(data);
+                var str = data.ToSqlString();
+                return $"\'{str}\'";
+            }
+            if (type == typeof(ushort))
+            {
+                ushort tmpValue = ushort.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var encryptedVal = BitConverter.ToUInt16(data, 0);
+                return $"{encryptedVal}";
+            }
+            if (type == typeof(short))
+            {
+                short tmpValue = short.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var encryptedVal = BitConverter.ToUInt16(data, 0);
+                return $"{encryptedVal}";
+            }
+            if (type == typeof(uint))
+            {
+                uint tmpValue = uint.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var encryptedVal = BitConverter.ToUInt32(data, 0);
+                return $"{encryptedVal}";
+            }
+            if (type == typeof(int))
+            {
+                int tmpValue = int.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var encryptedVal = BitConverter.ToUInt32(data, 0);
+                return $"{encryptedVal}";
+            }
+            if (type == typeof(ulong))
+            {
+                var tmpValue = ulong.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var str = data.ToSqlString();
+                var tmp = $"\'{str}\'";
+                return tmp;
+            }
+            if (type == typeof(long))
+            {
+                var tmpValue = long.Parse(value.ToString());
+                var data = BitConverter.GetBytes(tmpValue);
+                encryptor.XorGamma(data);
+                var str = data.ToSqlString();
+                var tmp = $"\'{str}\'";
+                return tmp;
+            }
+            // one byte and bool we will not Encrypt
+            if (type == typeof(byte))
+                return $"{value}";
+            if (type == typeof(bool))
+                return $"{Convert.ToByte(value)}";
+
+            throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
+        }
+
+     
         private static void GetDecryptedValue(PropertyInfo property, object item, string sqlValue, ICryptoProvider encryptor)
         {
             if (encryptor == null)
@@ -905,21 +939,43 @@ namespace CryptoSQLite
             }
             else if (type == typeof(DateTime))
             {
-                var data = BitConverter.GetBytes(Convert.ToInt64(sqlValue));
+                var data = sqlValue.ToByteArrayFromSqlString();
                 encryptor.XorGamma(data);
                 var ticks = BitConverter.ToInt64(data, 0);
-                var dateTime = new DateTime(ticks);
+                var dateTime = DateTime.FromBinary(ticks);
                 property.SetValue(item, dateTime);
             }
-            else if (type == typeof(short) || type == typeof(int) || type == typeof(long) ||
-            type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
+            else if (type == typeof(ushort) || type == typeof(short))
             {
-                var value = Convert.ToUInt64(sqlValue);
+                var value = ushort.Parse(sqlValue);
                 var data = BitConverter.GetBytes(value);
                 encryptor.XorGamma(data);
-                value = BitConverter.ToUInt64(data, 0);
-                property.SetValue(item, value);
+                if (type == typeof(short))
+                    property.SetValue(item, BitConverter.ToInt16(data, 0));
+                else if (type == typeof(ushort))
+                    property.SetValue(item, BitConverter.ToUInt16(data, 0));
             }
+            else if (type == typeof(int) || type == typeof(uint))
+            {
+                var value = uint.Parse(sqlValue);
+                var data = BitConverter.GetBytes(value);
+                encryptor.XorGamma(data);
+                if (type == typeof(int))
+                    property.SetValue(item, BitConverter.ToInt32(data, 0));
+                else if (type == typeof(uint))
+                    property.SetValue(item, BitConverter.ToUInt32(data, 0));
+
+            }
+            else if (type == typeof(long) || type == typeof(ulong))
+            {
+                var data = sqlValue.ToByteArrayFromSqlString();
+                encryptor.XorGamma(data);
+                if (type == typeof(long))
+                    property.SetValue(item, BitConverter.ToInt64(data, 0));
+                else if (type == typeof(ulong))
+                    property.SetValue(item, BitConverter.ToUInt64(data, 0));
+            }
+
             else if (type == typeof(byte))
                 property.SetValue(item, Convert.ToByte(sqlValue));
 
@@ -934,23 +990,32 @@ namespace CryptoSQLite
             if (type == typeof(string))
                 property.SetValue(item, sqlValue);
             else if (type == typeof(DateTime))
-                property.SetValue(item, new DateTime(Convert.ToInt64(sqlValue)));
+            {
+                var data = sqlValue.ToByteArrayFromSqlString();
+                var ticks = BitConverter.ToInt64(data,0);
+                var date = DateTime.FromBinary(ticks);
+                property.SetValue(item, date);
+            }
             else if (type == typeof(short))
                 property.SetValue(item, Convert.ToInt16(sqlValue));
-            else if(type == typeof(ushort))
+            else if (type == typeof(ushort))
                 property.SetValue(item, Convert.ToUInt16(sqlValue));
-            else if(type == typeof(int))
+            else if (type == typeof(int))
                 property.SetValue(item, Convert.ToInt32(sqlValue));
-            else if(type == typeof(uint))
+            else if (type == typeof(uint))
                 property.SetValue(item, Convert.ToUInt32(sqlValue));
-            else if(type == typeof(long))
+            else if (type == typeof(long))
                 property.SetValue(item, Convert.ToInt64(sqlValue));
-            else if(type == typeof(ulong))
+            else if (type == typeof(ulong))
                 property.SetValue(item, Convert.ToUInt64(sqlValue));
             else if (type == typeof(byte))
-                property.SetValue(item, Convert.ToByte(sqlValue));
+                property.SetValue(item, byte.Parse(sqlValue));
             else if (type == typeof(bool))
                 property.SetValue(item, Convert.ToBoolean(byte.Parse(sqlValue)));
+            else if (type == typeof(double))
+                property.SetValue(item, double.Parse(sqlValue));
+            else if (type == typeof(float))
+                property.SetValue(item, float.Parse(sqlValue));
         }
 
         private static string GetTableName<TTable>()
@@ -961,6 +1026,9 @@ namespace CryptoSQLite
 
             if (!cryptoTableAttributes.Any())
                 throw new CryptoSQLiteException($"Table {typeof(TTable)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}.");
+
+            if(string.IsNullOrEmpty(cryptoTableAttributes[0].TableName))
+                throw new CryptoSQLiteException("Table name can't be null or empty.");
 
             var tableAttribute = cryptoTableAttributes.First();
 
