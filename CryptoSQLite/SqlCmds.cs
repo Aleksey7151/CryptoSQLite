@@ -8,14 +8,14 @@ namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(this TableMap table, string soltColumn = null)
+        public static string CmdCreateTable(TableMap table, string soltColumn = null)
         {
             var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
 
             var cols = table.Columns.Select(col => col.CmdMapColumn()).ToList();
 
             if (soltColumn != null)
-                cols.Add($"{soltColumn} text");
+                cols.Add($"{soltColumn} BLOB");
 
             var columns = string.Join(",\n", cols);
 
@@ -35,6 +35,19 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdInsertOrReplaceNew(string tableName, IEnumerable<string> columns)
+        {
+            var enumerable = columns as string[] ?? columns.ToArray();
+
+            var cols = string.Join(",", enumerable.Select(x => x));
+
+            var vals = string.Join(",", enumerable.Select(x => "?"));
+
+            var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({vals})";
+
+            return cmd;
+        }
+
         public static string CmdInsert(string tableName, IEnumerable<string> columns, IEnumerable<string> values)
         {
             var cols = string.Join(",", columns.Select(x => x));
@@ -46,9 +59,22 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdInsertNew(string tableName, IEnumerable<string> columns)
+        {
+            var enumerable = columns as string[] ?? columns.ToArray();
+
+            var cols = string.Join(",", enumerable.Select(x => x));
+
+            var vals = string.Join(",", enumerable.Select(x => "?"));
+
+            var cmd = $"INSERT INTO {tableName} ({cols}) VALUES ({vals})";
+
+            return cmd;
+        }
+
         public static string CmdSelect(string tableName, string columnName, object value, Type valueType)
         {
-            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlView(valueType, value)}";
+            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlViewFromClr(valueType, value)}";
 
             return cmd;
         }
@@ -60,7 +86,7 @@ namespace CryptoSQLite
 
         public static string CmdDeleteRow(string tableName, string columnName, object value, Type valueType)
         {
-            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlView(valueType, value)}";
+            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlViewFromClr(valueType, value)}";
 
             return cmd;
         }

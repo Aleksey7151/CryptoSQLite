@@ -11,11 +11,15 @@ namespace CryptoSQLite
     {
         public string Name { get; set; }
         public string SqlType { get; set; }
-        public string SqlValue { get; set; }
+        public object SqlValue { get; set; }
     }
 
     internal static class OrmUtils
     {
+        public static Type[] CompatibleTypes = { typeof(DateTime), typeof(bool), typeof(string), typeof(byte[]), typeof(byte),
+                                                 typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong),
+                                                 typeof(float), typeof(double)};
+
         public static bool IsEncrypted(this PropertyInfo property)
         {
             var attributes = property.GetCustomAttributes<EncryptedAttribute>();
@@ -72,17 +76,23 @@ namespace CryptoSQLite
 
         public static string GetSqlType(this PropertyInfo property)
         {
+            if (property.IsEncrypted())
+                return "BLOB";          // ll encrypted types has BLOB QSL type
+
             var type = property.PropertyType;
 
-            if (type == typeof(int)    || type == typeof(short) || type == typeof(uint) || 
-                type == typeof(ushort) || type == typeof(byte)  || type == typeof(bool) )
+            if (type == typeof(int)  || type == typeof(short)  || type == typeof(byte) || 
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(bool) )
                 return "INTEGER";
 
-            if (type == typeof(string) || type == typeof(ulong) || type == typeof(long) || type == typeof(DateTime))
+            if (type == typeof(string))
                 return "TEXT";
 
             if (type == typeof(double) || type == typeof(float))
                 return "REAL";
+
+            if (type == typeof(long) || type == typeof(ulong) || type == typeof(DateTime) || type == typeof(byte[]))
+                return "BLOB";
 
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
@@ -106,35 +116,6 @@ namespace CryptoSQLite
 
             return compatibleProperties;
         }
-
-        public static string ToSqlString(this byte[] data)
-        {
-            var builder = new StringBuilder("");
-            foreach (var t in data)
-            {
-                builder.Append($"{t:X02}");
-            }
-            return builder.ToString();
-        }
-
-        public static byte[] ToByteArrayFromSqlString(this string data)
-        {
-            if (data.Length % 2 != 0)
-                throw new ArgumentException("Data length must be an even number");
-
-            var toRet = new byte[data.Length / 2];
-
-            var builder = new StringBuilder(data);
-            var j = 0;
-            for (var i = 0; i < data.Length; i += 2)
-            {
-                toRet[j] = byte.Parse($"{builder[i]}{builder[i + 1]}", NumberStyles.HexNumber);
-                j++;
-            }
-            return toRet;
-        }
-
-
 
         public static SqlColumnInfo[] GetColumnsMappingWithSqlTypes(IList<PropertyInfo> properties)
         {
@@ -167,38 +148,83 @@ namespace CryptoSQLite
             return true;
         }
 
-        public static string GetSqlView(Type type, object value)
+        public static object GetSqlViewFromClr(Type type, object value)
         {
-            if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort) || 
-                type == typeof(byte) || type == typeof(double) || type == typeof(float))
-                return $"{value}";
+            if (type == typeof(int)  || type == typeof(short)  || type == typeof(double)|| type == typeof(byte) || 
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(float) || type == typeof(byte[]))
+                return value;
 
-            if (type == typeof(string) || type == typeof(ulong) || type == typeof(long))
+            if (type == typeof(string))
             {
-                var str = value.ToString();
-                
+                var str = (string)value;
+
                 var forbidden = new[] { '\'', '\"' };
                 if (str.IndexOfAny(forbidden, 0) >= 0)
                     throw new CryptoSQLiteException("Strings that will not be encrypted can't contain symbols like: \' and \". Strings, that will be encrypted can contain any symbols.");
 
-                return $"\'{value}\'";
+                return value;
             }
+
+            if (type == typeof(long))
+                return BitConverter.GetBytes((long) value);
+            
+            if (type == typeof(ulong))
+                return BitConverter.GetBytes((ulong) value);
 
             if (type == typeof(DateTime))
             {
                 var date = (DateTime) value;
                 var ticks = date.ToBinary();
-                var data = BitConverter.GetBytes(ticks);
-                var str = data.ToSqlString();
-                return $"\'{str}\'";
+                return BitConverter.GetBytes(ticks);
             }
 
             if(type == typeof(bool))
-                return $"{Convert.ToByte(value)}";
+                return Convert.ToInt32(value);
 
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite.");
         }
 
-        
+        public static void GetClrViewFromSql(PropertyInfo property, object item, object sqlValue)
+        {
+            var type = property.PropertyType;
+
+            if (type == typeof(string))
+                property.SetValue(item, sqlValue);
+            else if (type == typeof(DateTime))
+            {
+                var bytes = (byte[])sqlValue;
+                var ticks = BitConverter.ToInt64(bytes, 0);
+                var date = DateTime.FromBinary(ticks);
+                property.SetValue(item, date);
+            }
+            else if (type == typeof(short))
+                property.SetValue(item, Convert.ToInt16(sqlValue));
+            else if (type == typeof(ushort))
+                property.SetValue(item, Convert.ToUInt16(sqlValue));
+            else if (type == typeof(int))
+                property.SetValue(item, Convert.ToInt32(sqlValue));
+            else if (type == typeof(uint))
+                property.SetValue(item, Convert.ToUInt32(sqlValue));
+            else if (type == typeof(long))
+            {
+                var value = BitConverter.ToInt64((byte[])sqlValue, 0);
+                property.SetValue(item, value);
+            }
+            else if (type == typeof(ulong))
+            {
+                var value = BitConverter.ToUInt64((byte[]) sqlValue, 0);
+                property.SetValue(item, value);
+            }
+            else if (type == typeof(byte))
+                property.SetValue(item, Convert.ToByte(sqlValue));
+            else if (type == typeof(bool))
+                property.SetValue(item, Convert.ToBoolean(sqlValue));
+            else if (type == typeof(double))
+                property.SetValue(item, Convert.ToDouble(sqlValue));
+            else if (type == typeof(float))
+                property.SetValue(item, Convert.ToSingle(sqlValue));
+            else if (type == typeof(byte[]))
+                property.SetValue(item, (byte[])sqlValue);
+        }
     }
 }

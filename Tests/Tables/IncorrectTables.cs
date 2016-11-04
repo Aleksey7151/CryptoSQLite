@@ -127,4 +127,15 @@ namespace Tests.Tables
         [Column("")]
         public int Column { get; set; }
     }
+
+    [CryptoTable("TableWithInCompatibleColumnType")]
+    internal class TableWithInCompatibleColumnType
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        public byte[] Data { get; set; }
+
+        public int[] IncompatibleColumn { get; set; }
+    }
 }

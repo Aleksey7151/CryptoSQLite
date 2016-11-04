@@ -265,8 +265,27 @@ namespace Tests.Tables
 
         public FloatNumbers()
         {
-            FloatMaxVal = 711.411f;
-            FloatMinVal = -2372.232f;
+            FloatMaxVal = float.MaxValue;
+            FloatMinVal = float.MinValue;
+        }
+    }
+
+    [CryptoTable("FloatEncryptedNumbers")]
+    internal class FloatEncryptedNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public float FloatMaxVal { get; set; }
+
+        [Encrypted]
+        public float FloatMinVal { get; set; }
+
+        public FloatEncryptedNumbers()
+        {
+            FloatMaxVal = float.MaxValue;
+            FloatMinVal = float.MinValue;
         }
     }
 
@@ -282,9 +301,43 @@ namespace Tests.Tables
 
         public DoubleNumbers()
         {
-            DoubleMaxVal = 16123.1281;
-            DoubleMinVal = -1223.14134;
+            DoubleMaxVal = double.MaxValue;
+            DoubleMinVal = double.MinValue;
         }
+    }
+
+    [CryptoTable("DoubleEncryptedNumbers")]
+    internal class DoubleEncryptedNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public double DoubleMaxVal { get; set; }
+
+        [Encrypted]
+        public double DoubleMinVal { get; set; }
+
+        public DoubleEncryptedNumbers()
+        {
+            DoubleMaxVal = double.MaxValue;
+            DoubleMinVal = double.MinValue;
+        }
+    }
+
+    [CryptoTable("SecretTasks")]
+    internal class SecretTask
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SecretToDo { get; set; }
+
+        [Encrypted]
+        public string Description { get; set; }
+
+        public bool IsDone { get; set; }
     }
 
     [CryptoTable("AccountsData")]
@@ -308,5 +361,17 @@ namespace Tests.Tables
 
         [Ignored]
         public string IgnoredString { get; set; }
+    }
+
+    internal static class TestExtensions
+    {
+        public static bool AreTableEqualsTo(this AccountsData ac1, AccountsData ac2)
+        {
+            return ac1.IsAdministrator == ac2.IsAdministrator &&
+                   ac1.AccountName == ac2.AccountName &&
+                   ac1.AccountPassword == ac2.AccountPassword &&
+                   ac1.Age == ac2.Age &&
+                   ac1.SocialSecureId == ac2.SocialSecureId;
+        }
     }
 }

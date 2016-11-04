@@ -515,7 +515,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InsertFloatValue()
+        public void InsertFloatNumbers()
         {
             var item = new FloatNumbers();
             foreach (var db in GetConnections())
@@ -548,7 +548,40 @@ namespace Tests
         }
 
         [TestMethod]
-        public void InsertDoubleValue()
+        public void InsertFloatEncryptedNumbers()
+        {
+            var item = new FloatEncryptedNumbers();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<FloatEncryptedNumbers>();
+                    db.CreateTable<FloatEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<FloatEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(Math.Abs(element.FloatMaxVal - item.FloatMaxVal) < 0.00001 && Math.Abs(element.FloatMinVal - item.FloatMinVal) < 0.00001);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void InsertDoubleNumbers()
         {
             var item = new DoubleNumbers();
             foreach (var db in GetConnections())
@@ -579,7 +612,39 @@ namespace Tests
                 }
             }
         }
-        
+
+        [TestMethod]
+        public void InsertDoubleEncryptedNumbers()
+        {
+            var item = new DoubleEncryptedNumbers();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DoubleEncryptedNumbers>();
+                    db.CreateTable<DoubleEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<DoubleEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(Math.Abs(element.DoubleMaxVal - item.DoubleMaxVal) < 0.000001 && Math.Abs(element.DoubleMinVal - item.DoubleMinVal) < 0.000001);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
 
         [TestMethod]
         public void InsertNormalElementInCryptoTable()
@@ -637,15 +702,5 @@ namespace Tests
         }
     }
 
-    internal static class TestExtensions
-    {
-        public static bool AreTableEqualsTo(this AccountsData ac1, AccountsData ac2)
-        {
-            return ac1.IsAdministrator == ac2.IsAdministrator &&
-                   ac1.AccountName == ac2.AccountName &&
-                   ac1.AccountPassword == ac2.AccountPassword &&
-                   ac1.Age == ac2.Age &&
-                   ac1.SocialSecureId == ac2.SocialSecureId;
-        }
-    }
+    
 }

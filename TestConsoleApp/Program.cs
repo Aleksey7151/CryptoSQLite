@@ -93,19 +93,20 @@ namespace TestConsoleApp
                 try
                 {
                     db.SetEncryptionKey(key);
-
+/*
                     db.DeleteTable<ULongNumbers>();
                     db.DeleteTable<ULongEncryptedNumbers>();
                     db.DeleteTable<LongNumbers>();
                     db.DeleteTable<LongEncryptedNumbers>();
                     db.DeleteTable<DoubleNumbers>();
-
+                    */
                     db.CreateTable<ULongNumbers>();
                     db.CreateTable<ULongEncryptedNumbers>();
                     db.CreateTable<LongNumbers>();
                     db.CreateTable<LongEncryptedNumbers>();
                     db.CreateTable<DoubleNumbers>();
                     bool i;
+                    
                     {
                         var uln = new ULongNumbers
                         {
@@ -113,18 +114,19 @@ namespace TestConsoleApp
                             ULongMinVal = ulong.MinValue
                         };
 
-                        db.InsertItem(uln);
+                        //db.InsertItem(uln);
                         var tuln = db.Table<ULongNumbers>().ToArray();
                         i = tuln[0].ULongMaxVal == uln.ULongMaxVal && tuln[0].ULongMinVal == uln.ULongMinVal;
                         Console.WriteLine(i.ToString());
                     }
+                    
                     {
                         var ulen = new ULongEncryptedNumbers
                         {
                             ULongMaxVal = ulong.MaxValue,
                             ULongMinVal = ulong.MinValue
                         };
-                        db.InsertItem(ulen);
+                        //db.InsertItem(ulen);
                         var tulen = db.Table<ULongEncryptedNumbers>().ToArray();
                         i = tulen[0].ULongMaxVal == ulen.ULongMaxVal && tulen[0].ULongMinVal == ulen.ULongMinVal;
                         Console.WriteLine(i.ToString());
@@ -135,7 +137,7 @@ namespace TestConsoleApp
                             LongMaxVal = long.MaxValue,
                             LongMinVal = long.MinValue
                         };
-                        db.InsertItem(ln);
+                        //db.InsertItem(ln);
                         var tln = db.Table<LongNumbers>().ToArray();
                         i = tln[0].LongMaxVal == ln.LongMaxVal && tln[0].LongMinVal == ln.LongMinVal;
                         Console.WriteLine(i.ToString());
@@ -146,8 +148,9 @@ namespace TestConsoleApp
                             LongMaxVal = long.MaxValue,
                             LongMinVal = long.MinValue
                         };
-                        db.InsertItem(len);
+                        //db.InsertItem(len);
                         var tlen = db.Table<LongNumbers>().ToArray();
+
                         i = tlen[0].LongMaxVal == len.LongMaxVal && tlen[0].LongMinVal == len.LongMinVal;
                         Console.WriteLine(i.ToString());
                     }
