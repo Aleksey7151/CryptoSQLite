@@ -15,13 +15,6 @@ namespace CryptoSQLite
         /// <param name="tableName">Table name</param>
         public CryptoTableAttribute(string tableName)
         {
-            /*
-            if(tableName == null)
-                throw new ArgumentException("Table name can't be null.");
-
-            if(string.IsNullOrEmpty(tableName))
-                throw new ArgumentException("Table name can't be empty.");
-            */
             TableName = tableName;
         }
     }
@@ -73,22 +66,6 @@ namespace CryptoSQLite
     {
         
     }
-
-    /*
-    /// <summary>
-    /// This attribute used to specify length of column that contains chars.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    public class MaxLengthAttribute : Attribute
-    {
-        public int Length { get; }
-
-        public MaxLengthAttribute(int maxLength)
-        {
-            Length = maxLength;
-        }
-    }
-    */
 
     /// <summary>
     /// This attribute used to indicate property that won't be added in table in database file

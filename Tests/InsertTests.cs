@@ -8,7 +8,7 @@ using Tests.Tables;
 namespace Tests
 {
     [TestClass]
-    public class CrudTests : BaseTest
+    public class InsertTests : BaseTest
     {
         [TestMethod]
         public void CreateDataBaseFiles()
@@ -647,6 +647,49 @@ namespace Tests
         }
 
         [TestMethod]
+        public void InserdBlobData()
+        {
+            var item = new BlobData
+            {
+                OpenBlob = new byte[16],
+                ClosedBlob = new byte[32]
+            };
+            item.OpenBlob.MemSet(0x17);
+            item.ClosedBlob.MemSet(0xCB);
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<BlobData>();
+                    db.CreateTable<BlobData>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<BlobData>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+
+                    Assert.IsTrue(item.OpenBlob.MemCmp(element.OpenBlob) == 0 && item.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
+
+                    Assert.IsTrue(element.SingleByte == item.SingleByte);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
         public void InsertNormalElementInCryptoTable()
         {
             var account1 = new AccountsData
@@ -657,7 +700,7 @@ namespace Tests
                 AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
                 Age = 27,
                 IsAdministrator = false,
-                IgnoredString = "Some string that will be ignored in table mapping"
+                IgnoredString = "Some string that i can't will be ignored in table mapping"
             };
 
             var account2 = new AccountsData
@@ -668,7 +711,7 @@ namespace Tests
                 AccountPassword = "I am master of Anor flame.",
                 Age = 27,
                 IsAdministrator = true,
-                IgnoredString = "Some string that will be ignored in table mapping"
+                IgnoredString = "Some string that'll be ignored in table mapping"
             };
 
             foreach (var db in GetConnections())
@@ -701,6 +744,4 @@ namespace Tests
             }
         }
     }
-
-    
 }

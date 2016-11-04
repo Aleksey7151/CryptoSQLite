@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace CryptoSQLite
 {
@@ -155,15 +153,7 @@ namespace CryptoSQLite
                 return value;
 
             if (type == typeof(string))
-            {
-                var str = (string)value;
-
-                var forbidden = new[] { '\'', '\"' };
-                if (str.IndexOfAny(forbidden, 0) >= 0)
-                    throw new CryptoSQLiteException("Strings that will not be encrypted can't contain symbols like: \' and \". Strings, that will be encrypted can contain any symbols.");
-
                 return value;
-            }
 
             if (type == typeof(long))
                 return BitConverter.GetBytes((long) value);

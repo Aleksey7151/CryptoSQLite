@@ -325,6 +325,20 @@ namespace Tests.Tables
         }
     }
 
+    [CryptoTable("BlobData")]
+    internal class BlobData
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        public byte[] OpenBlob { get; set; }
+
+        [Encrypted]
+        public byte[] ClosedBlob { get; set; }
+
+        public byte SingleByte { get; set; }
+    }
+
     [CryptoTable("SecretTasks")]
     internal class SecretTask
     {
@@ -334,8 +348,9 @@ namespace Tests.Tables
         [Encrypted]
         public string SecretToDo { get; set; }
 
-        [Encrypted]
         public string Description { get; set; }
+
+        public double Price { get; set; }
 
         public bool IsDone { get; set; }
     }

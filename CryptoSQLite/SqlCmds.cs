@@ -24,18 +24,8 @@ namespace CryptoSQLite
             return cmd;
         }
 
-        public static string CmdInsertOrReplace(string tableName, IEnumerable<string> columns, IEnumerable<string> values)
-        {
-            var cols = string.Join(",", columns.Select(x => x));
 
-            var vals = string.Join(",", values.Select(x => x));
-
-            var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({vals})";
-
-            return cmd;
-        }
-
-        public static string CmdInsertOrReplaceNew(string tableName, IEnumerable<string> columns)
+        public static string CmdInsertOrReplace(string tableName, IEnumerable<string> columns)
         {
             var enumerable = columns as string[] ?? columns.ToArray();
 
@@ -48,18 +38,8 @@ namespace CryptoSQLite
             return cmd;
         }
 
-        public static string CmdInsert(string tableName, IEnumerable<string> columns, IEnumerable<string> values)
-        {
-            var cols = string.Join(",", columns.Select(x => x));
 
-            var vals = string.Join(",", values.Select(x => x));
-
-            var cmd = $"INSERT INTO {tableName} ({cols}) VALUES ({vals})";
-
-            return cmd;
-        }
-
-        public static string CmdInsertNew(string tableName, IEnumerable<string> columns)
+        public static string CmdInsert(string tableName, IEnumerable<string> columns)
         {
             var enumerable = columns as string[] ?? columns.ToArray();
 

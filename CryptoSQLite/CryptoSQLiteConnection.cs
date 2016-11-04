@@ -690,7 +690,7 @@ namespace CryptoSQLite
             var name = GetTableName<TTable>();
             if (replaceRowIfExisits)
             {
-                var cmd = SqlCmds.CmdInsertOrReplaceNew(name, columns);
+                var cmd = SqlCmds.CmdInsertOrReplace(name, columns);
                 try
                 {
                     _connection.Execute(cmd, values.ToArray());
@@ -702,7 +702,7 @@ namespace CryptoSQLite
             }
             else
             {
-                var cmd = SqlCmds.CmdInsertNew(name, columns);
+                var cmd = SqlCmds.CmdInsert(name, columns);
                 try
                 {
                     _connection.Execute(cmd, values.ToArray());
@@ -866,11 +866,7 @@ namespace CryptoSQLite
 
             if (type == typeof(string))
             {
-                var str = value as string;
-                if (str == null)
-                    throw new CryptoSQLiteException("GetEncryptedValue function. Argument is not compatible with it type");
-
-                var bytes = Encoding.Unicode.GetBytes(str);
+                var bytes = Encoding.Unicode.GetBytes((string)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
@@ -928,6 +924,14 @@ namespace CryptoSQLite
                 var bytes = BitConverter.GetBytes((double)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
+            }
+            if (type == typeof(byte[]))
+            {
+                var bytes = (byte[])value;
+                var bytesForEncrypt = new byte[bytes.Length];
+                bytesForEncrypt.MemCpy(bytes, bytes.Length);
+                encryptor.XorGamma(bytesForEncrypt);
+                return bytesForEncrypt;
             }
             
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
@@ -1004,9 +1008,13 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToDouble(bytes, 0));
             }
+            else if (type == typeof(byte[]))
+            {
+                var bytes = (byte[]) sqlValue;
+                encryptor.XorGamma(bytes);
+                property.SetValue(item, bytes);
+            }
         }
-
-        
 
         private static string GetTableName<TTable>()
         {
