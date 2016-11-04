@@ -913,6 +913,14 @@ namespace CryptoSQLite
                 var tmp = $"\'{str}\'";
                 return tmp;
             }
+            if (type == typeof(float))
+            {
+                
+            }
+            if (type == typeof(double))
+            {
+                
+            }
             // one byte and bool we will not Encrypt
             if (type == typeof(byte))
                 return $"{value}";
@@ -964,7 +972,6 @@ namespace CryptoSQLite
                     property.SetValue(item, BitConverter.ToInt32(data, 0));
                 else if (type == typeof(uint))
                     property.SetValue(item, BitConverter.ToUInt32(data, 0));
-
             }
             else if (type == typeof(long) || type == typeof(ulong))
             {

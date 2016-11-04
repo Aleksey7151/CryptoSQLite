@@ -133,6 +133,7 @@ namespace Tests.Tables
         }
     }
 
+    [CryptoTable("UIntNumbers")]
     internal class UIntNumbers
     {
         [PrimaryKey, AutoIncremental]
@@ -258,14 +259,14 @@ namespace Tests.Tables
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
 
-        public float DoubleMaxVal { get; set; }
+        public float FloatMaxVal { get; set; }
 
-        public float DoubleMinVal { get; set; }
+        public float FloatMinVal { get; set; }
 
         public FloatNumbers()
         {
-            DoubleMaxVal = float.MaxValue;
-            DoubleMinVal = float.MinValue;
+            FloatMaxVal = 711.411f;
+            FloatMinVal = -2372.232f;
         }
     }
 
@@ -281,8 +282,8 @@ namespace Tests.Tables
 
         public DoubleNumbers()
         {
-            DoubleMaxVal = double.MaxValue;
-            DoubleMinVal = double.MinValue;
+            DoubleMaxVal = 16123.1281;
+            DoubleMinVal = -1223.14134;
         }
     }
 
