@@ -8,7 +8,7 @@ using Tests.Tables;
 namespace Tests
 {
     [TestClass]
-    public class InsertTests : BaseTest
+    public class InsertItemTests : BaseTest
     {
         [TestMethod]
         public void CreateDataBaseFiles()

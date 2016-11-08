@@ -119,11 +119,10 @@ namespace CryptoSQLite
         /// Removes element from table <typeparamref name="TTable"/> in database.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <typeparam name="TVal">Type of column value.</typeparam>
         /// <param name="columnName">Column name.</param>
         /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        void DeleteItem<TTable, TVal>(string columnName, TVal columnValue) where TTable : class;
+        void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database using
@@ -242,11 +241,10 @@ namespace CryptoSQLite
         /// Removes element from table <typeparamref name="TTable"/> in database.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <typeparam name="TVal">Type of column value.</typeparam>
         /// <param name="columnName">Column name.</param>
         /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        Task DeleteItemAsync<TTable, TVal>(string columnName, TVal columnValue) where TTable : class;
+        Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database using
@@ -327,9 +325,9 @@ namespace CryptoSQLite
             await Task.Run(() => _connection.DeleteItem(item));
         }
 
-        public async Task DeleteItemAsync<TTable, TVal>(string columnName, TVal columnValue) where TTable : class
+        public async Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class
         {
-            await Task.Run(() => _connection.DeleteItem<TTable, TVal>(columnName, columnValue));
+            await Task.Run(() => _connection.DeleteItem<TTable>(columnName, columnValue));
         }
 
         public async Task DeleteItemAsync<TTable>(int id) where TTable : class
@@ -506,11 +504,11 @@ namespace CryptoSQLite
             return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
         }
 
-        public void DeleteItem<TTable, TVal>(string columnName, TVal columnValue) where TTable : class
+        public void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class
         {
             CheckTable<TTable>();
 
-            DeleteRowUsingColumnName<TTable>(columnName, columnValue, typeof(TVal));
+            DeleteRowUsingColumnName<TTable>(columnName, columnValue);
         }
 
         public void DeleteItem<TTable>(int id) where TTable : class
@@ -524,7 +522,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            DeleteRowUsingColumnName<TTable>(idProperty.GetColumnName(), id, typeof(int));
+            DeleteRowUsingColumnName<TTable>(idProperty.GetColumnName(), id);
         }
 
         public void DeleteItem<TTable>(TTable item) where TTable : class
@@ -533,9 +531,9 @@ namespace CryptoSQLite
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>();
 
-            var notNull = properties.First(p => p.GetValue(item) != null);
+            var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));
 
-            DeleteRowUsingColumnName<TTable>(notNull.GetColumnName(), notNull.GetValue(item), notNull.PropertyType);
+            DeleteRowUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
         }
 
         public IEnumerable<TTable> Table<TTable>() where TTable : class, new()
@@ -749,23 +747,36 @@ namespace CryptoSQLite
 
             return item;
         }
-
-
-        private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue, Type columnType)
+        
+        private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue)
         {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if (columnValue == null)
+                throw new CryptoSQLiteException("Column value can't be null.");
+
             var tableName = GetTableName<TTable>();
-            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName, columnValue, columnType);
+
+            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
+
+            if (properties.All(p => p.GetColumnName() != columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            if (properties.Any(p => p.GetColumnName() == columnName && p.IsEncrypted()))
+                throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
+
+            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName);
 
             try
             {
-                _connection.Execute(cmd);
+                _connection.Execute(cmd, columnValue);
             }
             catch (Exception ex)
             {
                 throw new CryptoSQLiteException(ex.Message,
                     $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
             }
-
         }
 
         private IEnumerable<TTable> GetAllTable<TTable>() where TTable : new()

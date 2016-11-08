@@ -7,7 +7,7 @@ using Tests.Tables;
 namespace Tests
 {
     [TestClass]
-    public class UpdateTests : BaseTest
+    public class UpdateItemTests : BaseTest
     {
         [TestMethod]
         public void UpdateShortNumbers()

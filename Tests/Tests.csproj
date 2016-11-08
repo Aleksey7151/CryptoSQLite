@@ -62,12 +62,13 @@
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
     <Compile Include="CheckTableStructureTests.cs" />
+    <Compile Include="DeleteItemTests.cs" />
     <Compile Include="GetItemTests.cs" />
     <Compile Include="Tables\CorrectTables.cs" />
-    <Compile Include="InsertTests.cs" />
+    <Compile Include="InsertItemTests.cs" />
     <Compile Include="Tables\IncorrectTables.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UpdateTests.cs" />
+    <Compile Include="UpdateItemTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CryptoSQLite\CryptoSQLite.csproj">

@@ -64,9 +64,9 @@ namespace CryptoSQLite
             return $"SELECT * FROM {tableName}";
         }
 
-        public static string CmdDeleteRow(string tableName, string columnName, object value, Type valueType)
+        public static string CmdDeleteRow(string tableName, string columnName)
         {
-            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlViewFromClr(valueType, value)}";
+            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = (?)";
 
             return cmd;
         }
