@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CryptoSQLite;
+using Tests.Tables;
 
 namespace Tests
 {
@@ -29,6 +30,41 @@ namespace Tests
         public CryptoSQLiteConnection[] GetConnections()
         {
             return new[] {GetGostConnection(), GetAesConnection()};
+        }
+
+        public SecretTask[] GetTasks()
+        {
+            return new[]
+            {
+                new SecretTask
+                {
+                    Description = "It's the first task",
+                    SecretToDo = "I must kill Mefisto",
+                    Price = 8772.123,
+                    IsDone = true
+                },
+                new SecretTask
+                {
+                    Description = "It's the second task",
+                    SecretToDo = "I must kill Diablo",
+                    Price = 24523.123,
+                    IsDone = true
+                },
+                new SecretTask
+                {
+                    Description = "It's the third task",
+                    SecretToDo = "I must kill Baal",
+                    Price = 791233.7383,
+                    IsDone = false
+                },
+                new SecretTask
+                {
+                    Description = "It's the fourth task",
+                    SecretToDo = "I must stop playing games",
+                    Price = -97593.2342,
+                    IsDone = false
+                }
+            };
         }
     }
 

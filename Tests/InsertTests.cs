@@ -726,8 +726,8 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.AreTableEqualsTo(account1)));
-                    Assert.IsTrue(table.Any(e => e.AreTableEqualsTo(account2)));
+                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
+                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account2)));
                 }
                 catch (CryptoSQLiteException cex)
                 {

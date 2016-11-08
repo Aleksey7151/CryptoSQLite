@@ -340,7 +340,9 @@ namespace Tests.Tables
     }
 
     [CryptoTable("SecretTasks")]
-    internal class SecretTask
+#pragma warning disable 660,661
+    public class SecretTask
+#pragma warning restore 660,661
     {
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
@@ -353,7 +355,10 @@ namespace Tests.Tables
         public double Price { get; set; }
 
         public bool IsDone { get; set; }
+
     }
+
+    
 
     [CryptoTable("AccountsData")]
     internal class AccountsData
@@ -380,13 +385,24 @@ namespace Tests.Tables
 
     internal static class TestExtensions
     {
-        public static bool AreTableEqualsTo(this AccountsData ac1, AccountsData ac2)
+        public static bool IsTableEqualsTo(this AccountsData ac1, AccountsData ac2)
         {
             return ac1.IsAdministrator == ac2.IsAdministrator &&
                    ac1.AccountName == ac2.AccountName &&
                    ac1.AccountPassword == ac2.AccountPassword &&
                    ac1.Age == ac2.Age &&
                    ac1.SocialSecureId == ac2.SocialSecureId;
+        }
+
+        public static bool IsTaskEqualTo(this SecretTask left, SecretTask right)
+        {
+            if (left == null || right == null)
+                return false;
+
+            return left.IsDone == right.IsDone &&
+                   left.Description == right.Description &&
+                   left.SecretToDo == right.SecretToDo &&
+                   Math.Abs(left.Price - right.Price) < 0.000005;
         }
     }
 }
