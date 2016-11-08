@@ -89,12 +89,11 @@ namespace CryptoSQLite
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <typeparam name="TVal">Type of column value.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        TTable GetItem<TTable, TVal>(string columnName, TVal columnValue) where TTable : class, new();
+        TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
         /// Gets element from database using element <paramref name="id"/>.
@@ -204,12 +203,11 @@ namespace CryptoSQLite
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <typeparam name="TVal">Type of column value.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        Task<TTable> GetItemAsync<TTable, TVal>(string columnName, TVal columnValue) where TTable : class, new();
+        Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
         /// Gets element from database using element <paramref name="id"/>.
@@ -306,9 +304,9 @@ namespace CryptoSQLite
             await Task.Run(() => _connection.InsertOrReplaceItem(item));
         }
 
-        public async Task<TTable> GetItemAsync<TTable, TVal>(string columnName, TVal columnValue) where TTable : class, new()
+        public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
-            var table = Task.Run(() => _connection.GetItem<TTable, TVal>(columnName, columnValue));
+            var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
             return await table;
         }
 
@@ -476,11 +474,11 @@ namespace CryptoSQLite
             InsertRowInTable(item, true);
         }
 
-        public TTable GetItem<TTable, TVal>(string columnName, TVal columnValue) where TTable : class, new()
+        public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable<TTable>();
 
-            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue, typeof(TVal));
+            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue);
         }
 
         public TTable GetItem<TTable>(int id) where TTable : class, new()
@@ -494,7 +492,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id, typeof(int));
+            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id);
         }
 
         public TTable GetItem<TTable>(TTable item) where TTable : class, new()
@@ -503,15 +501,9 @@ namespace CryptoSQLite
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>();
 
-            var notNull = properties.First(p => p.GetValue(item) != null);              //TODO it's not working!!!
+            var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
 
-            if (notNull.PropertyType.IsPointer)
-            {
-                var weAreHere = 0;
-            }
-
-            return GetRowFromTableUsingColumnName<TTable>(notNull.GetColumnName(), notNull.GetValue(item),
-                notNull.PropertyType);
+            return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
         }
 
         public void DeleteItem<TTable, TVal>(string columnName, TVal columnValue) where TTable : class
@@ -726,8 +718,14 @@ namespace CryptoSQLite
             }
         }
 
-        private TTable GetRowFromTableUsingColumnName<TTable>(string columnName, object columnValue, Type columnType) where TTable : class, new()
+        private TTable GetRowFromTableUsingColumnName<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
+            if(string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if(columnValue == null)
+                throw new CryptoSQLiteException("Column value can't be null.");
+
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
 
             var tableName = GetTableName<TTable>();
@@ -738,9 +736,9 @@ namespace CryptoSQLite
             if(properties.Any(p=>p.GetColumnName()==columnName && p.IsEncrypted()))
                 throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue, columnType);
+            var cmd = SqlCmds.CmdSelect(tableName, columnName);
 
-            var table = ReadRowsFromTable(cmd, tableName);
+            var table = ReadRowsFromTable(cmd, tableName, columnValue);
 
             if (table.Count == 0)
                 return null;
@@ -792,12 +790,12 @@ namespace CryptoSQLite
             return items;
         }
 
-        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, string tableName)
+        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, string tableName, object value = null)
         {
             var table = new List<List<SqlColumnInfo>>();
             try
             {
-                var queryable = _connection.Query(cmd);
+                var queryable = value == null ? _connection.Query(cmd) : _connection.Query(cmd, value);
                 foreach (var row in queryable)
                 {
                     var columnsFromFile = new List<SqlColumnInfo>();
@@ -837,8 +835,7 @@ namespace CryptoSQLite
             return table;
         }
 
-        private void ProcessRow<TTable>(IEnumerable<PropertyInfo> propertieInfos, IEnumerable<SqlColumnInfo> columnInfos,
-            TTable item)
+        private void ProcessRow<TTable>(IEnumerable<PropertyInfo> propertieInfos, IEnumerable<SqlColumnInfo> columnInfos, TTable item)
         {
             var properties = propertieInfos.ToList();
             var columns = columnInfos.ToList();
@@ -942,7 +939,6 @@ namespace CryptoSQLite
             
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
         }
-
      
         private static void GetDecryptedValue(PropertyInfo property, object item, object sqlValue, ICryptoProvider encryptor)
         {

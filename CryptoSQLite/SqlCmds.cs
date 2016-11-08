@@ -52,9 +52,9 @@ namespace CryptoSQLite
             return cmd;
         }
 
-        public static string CmdSelect(string tableName, string columnName, object value, Type valueType)
+        public static string CmdSelect(string tableName, string columnName)
         {
-            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = {OrmUtils.GetSqlViewFromClr(valueType, value)}";
+            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = (?)";
 
             return cmd;
         }

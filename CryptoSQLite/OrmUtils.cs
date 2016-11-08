@@ -14,9 +14,12 @@ namespace CryptoSQLite
 
     internal static class OrmUtils
     {
-        public static Type[] CompatibleTypes = { typeof(DateTime), typeof(bool), typeof(string), typeof(byte[]), typeof(byte),
-                                                 typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong),
-                                                 typeof(float), typeof(double)};
+        public static Type[] CompatibleTypes =
+        {
+            typeof(DateTime), typeof(bool), typeof(string), typeof(byte[]), typeof(byte),
+            typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong),
+            typeof(float), typeof(double)
+        };
 
         public static bool IsEncrypted(this PropertyInfo property)
         {
@@ -75,12 +78,12 @@ namespace CryptoSQLite
         public static string GetSqlType(this PropertyInfo property)
         {
             if (property.IsEncrypted())
-                return "BLOB";          // ll encrypted types has BLOB QSL type
+                return "BLOB"; // ll encrypted types has BLOB QSL type
 
             var type = property.PropertyType;
 
-            if (type == typeof(int)  || type == typeof(short)  || type == typeof(byte) || 
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(bool) )
+            if (type == typeof(int) || type == typeof(short) || type == typeof(byte) ||
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(bool))
                 return "INTEGER";
 
             if (type == typeof(string))
@@ -95,7 +98,7 @@ namespace CryptoSQLite
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
 
-        
+
 
         public static IEnumerable<PropertyInfo> GetCompatibleProperties<TTable>()
         {
@@ -106,14 +109,35 @@ namespace CryptoSQLite
 
             var compatibleProperties = type.GetRuntimeProperties().Where(pr => pr.CanRead &&
                                                                                pr.CanWrite &&
-                                                                               pr.GetMethod!=null &&
-                                                                               pr.SetMethod!=null &&
+                                                                               pr.GetMethod != null &&
+                                                                               pr.SetMethod != null &&
                                                                                !pr.GetMethod.IsStatic &&
                                                                                !pr.SetMethod.IsStatic &&
                                                                                !pr.IsIgnorable());
 
             return compatibleProperties;
         }
+
+
+        public static bool IsDefaultValue(this PropertyInfo property, object value)
+        {
+            if (property.PropertyType.IsPointer && value == null)
+                return true;
+
+            try
+            {
+                var intVal = Convert.ToInt32(value);
+                if (intVal == 0)
+                    return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
 
         public static SqlColumnInfo[] GetColumnsMappingWithSqlTypes(IList<PropertyInfo> properties)
         {

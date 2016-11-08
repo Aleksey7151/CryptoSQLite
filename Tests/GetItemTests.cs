@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CryptoSQLite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Tables;
@@ -12,6 +9,105 @@ namespace Tests
     [TestClass]
     public class GetItemTests : BaseTest
     {
+        [TestMethod]
+        public void GetItemColumnNameCanNotBeNull()
+        {
+            var tasks = GetTasks();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    foreach (var task in tasks)
+                        db.InsertItem(task);
+
+                    db.GetItem<SecretTask>(null, 123);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >=
+                        0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GetItemColumnNameCanNotBeEmpty()
+        {
+            var tasks = GetTasks();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    foreach (var task in tasks)
+                        db.InsertItem(task);
+
+                    db.GetItem<SecretTask>("", 123);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >=
+                        0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GetItemColumnValueCanNotBeNull()
+        {
+            var tasks = GetTasks();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    foreach (var task in tasks)
+                        db.InsertItem(task);
+
+                    db.GetItem<SecretTask>("Id", null);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Column value can't be null.", StringComparison.Ordinal) >=
+                        0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
         [TestMethod]
         public void GetItemUsingIncorrectColumnName()
         {
@@ -26,7 +122,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    var element = db.GetItem<SecretTask, int>("IT", 2);
+                    db.GetItem<SecretTask>("IT", 2);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -59,7 +155,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    var element = db.GetItem<SecretTask, string>("SecretToDo", "Hello, world!");
+                    db.GetItem<SecretTask>("SecretToDo", "Hello, world!");
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -93,12 +189,12 @@ namespace Tests
                         db.InsertItem(task);
 
 
-                    var element = db.GetItem<SecretTask, int>("Id", 2);
+                    var element = db.GetItem<SecretTask>("Id", 2);
                     
                     Assert.IsNotNull(element);
                     Assert.IsTrue(tasks[1].IsTaskEqualTo(element));
 
-                    element = db.GetItem<SecretTask, bool>("IsDone", true);
+                    element = db.GetItem<SecretTask>("IsDone", true);
                     Assert.IsNotNull(element);
                     Assert.IsTrue(element.IsTaskEqualTo(tasks[0]));
                 }
@@ -186,6 +282,11 @@ namespace Tests
                     db.Dispose();
                 }
             }
+        }
+
+        public void GetItemReturns_Null_IfItemDoesNotExistsInDataBase()
+        {
+            
         }
        
         [TestMethod]
