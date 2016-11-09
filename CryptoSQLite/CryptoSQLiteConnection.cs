@@ -368,6 +368,7 @@ namespace CryptoSQLite
 
         public CryptoSQLiteConnection(string dbFilename)
         {
+            
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             _cryptor = new AesCryptoProvider();
             _solter = new SoltGenerator();
