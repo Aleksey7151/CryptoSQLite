@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CryptoSQLite;
 using Tests.Tables;
 
@@ -30,6 +29,15 @@ namespace Tests
         public CryptoSQLiteConnection[] GetConnections()
         {
             return new[] {GetGostConnection(), GetAesConnection()};
+        }
+
+        public CryptoSQLiteConnection[] GetOnlyConnections()
+        {
+            return new[]
+            {
+                new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey),
+                new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey)
+            };
         }
 
         public SecretTask[] GetTasks()

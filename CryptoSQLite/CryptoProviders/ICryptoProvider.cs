@@ -1,6 +1,8 @@
-﻿namespace CryptoSQLite.CryptoProviders
+﻿using System;
+
+namespace CryptoSQLite.CryptoProviders
 {
-    internal interface ICryptoProvider
+    internal interface ICryptoProvider : IDisposable
     {
         /// <summary>
         /// Sets the encryption key. Key is secret parameter of encryption algoritm. 

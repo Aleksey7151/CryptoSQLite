@@ -2,7 +2,7 @@
 
 namespace CryptoSQLite.CryptoProviders
 {
-    internal class GostCryptoProvider : ICryptoProvider, IDisposable
+    internal class GostCryptoProvider : ICryptoProvider
     {
         private byte[] _key;
         private uint[] _solt;
@@ -59,7 +59,7 @@ namespace CryptoSQLite.CryptoProviders
             if(solt == null)
                 throw new ArgumentNullException(nameof(solt));
             if(solt.Length < 8)
-                throw new ArgumentException("Solt must contain at least 8 baytes");
+                throw new ArgumentException("Solt must contain at least 8 baytes.");
 
             _solt = new uint[2];
             _solt[0] = BitConverter.ToUInt32(solt, 0);
@@ -69,9 +69,9 @@ namespace CryptoSQLite.CryptoProviders
         public void XorGamma(byte[] data, int dataLen = 0)
         {
             if (_key == null)
-                throw new NullReferenceException("Encryption key has not been installed");
+                throw new NullReferenceException("Encryption key has not been installed.");
             if (_solt == null)
-                throw new NullReferenceException("Solt has not been installed");
+                throw new NullReferenceException("Solt has not been installed.");
 
             var len = dataLen == 0 ? data.Length : dataLen;
 
@@ -84,7 +84,6 @@ namespace CryptoSQLite.CryptoProviders
 
         public void Dispose()
         {
-            _key?.ZeroMemory(); // TODO think about it.
             _key = null;
             _gost.Dispose();
         }

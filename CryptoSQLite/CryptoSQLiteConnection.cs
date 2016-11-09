@@ -353,7 +353,7 @@ namespace CryptoSQLite
 
         private readonly SQLiteDatabaseConnection _connection;
 
-        private readonly ICryptoProvider _internalEncryptor;
+        private readonly ICryptoProvider _cryptor;
 
         private readonly ISoltGenerator _solter;
 
@@ -369,7 +369,7 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-            _internalEncryptor = new AesCryptoProvider();
+            _cryptor = new AesCryptoProvider();
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -380,15 +380,15 @@ namespace CryptoSQLite
             switch (cryptoAlgoritm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
-                    _internalEncryptor = new AesCryptoProvider();
+                    _cryptor = new AesCryptoProvider();
                     break;
 
                 case CryptoAlgoritms.Gost28147With256BitsKey:
-                    _internalEncryptor = new GostCryptoProvider();
+                    _cryptor = new GostCryptoProvider();
                     break;
 
                 default:
-                    _internalEncryptor = new AesCryptoProvider();
+                    _cryptor = new AesCryptoProvider();
                     break;
             }
             _solter = new SoltGenerator();
@@ -402,8 +402,9 @@ namespace CryptoSQLite
 
         public void Dispose()
         {
+            _cryptor.Dispose();     // clear encryption key!
             _tables.Clear();
-            _connection?.Dispose();
+            _connection.Dispose();
         }
 
         #endregion
@@ -413,10 +414,13 @@ namespace CryptoSQLite
 
         public void SetEncryptionKey(byte[] key)
         {
-            if (key.Length != 32)
-                throw new ArgumentException("Key length must be 32 bytes");
+            if(key == null)
+                throw new ArgumentNullException();
 
-            _internalEncryptor?.SetKey(key);
+            if (key.Length != 32)
+                throw new ArgumentException("Key length must be 32 bytes.");
+
+            _cryptor?.SetKey(key);
         }
 
         public void CreateTable<TTable>() where TTable : class
@@ -1049,9 +1053,9 @@ namespace CryptoSQLite
         private ICryptoProvider GetEncryptor(byte[] solt = null)
         {
             if(solt != null)
-                _internalEncryptor.SetSolt(solt);
+                _cryptor.SetSolt(solt);
 
-            return _internalEncryptor;
+            return _cryptor;
         }
 
         private byte[] GetSolt()
@@ -1062,8 +1066,4 @@ namespace CryptoSQLite
 
         #endregion
     }
-
-
-
-
 }
