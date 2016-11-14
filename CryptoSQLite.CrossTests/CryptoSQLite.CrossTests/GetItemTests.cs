@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
-    public class DeleteItemTests : BaseTest
+    public class GetItemTests : BaseTest
     {
         [Test]
-        public void DeleteItemColumnNameCanNotBeNull()
+        public void GetItemColumnNameCanNotBeNull()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -23,7 +22,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    db.DeleteItem<SecretTask>(null, 123);
+                    db.GetItem<SecretTask>(null, 123);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -43,7 +42,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemColumnNameCanNotBeEmpty()
+        public void GetItemColumnNameCanNotBeEmpty()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -56,7 +55,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    db.DeleteItem<SecretTask>("", 123);
+                    db.GetItem<SecretTask>("", 123);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -76,7 +75,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemColumnValueCanNotBeNull()
+        public void GetItemColumnValueCanNotBeNull()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -89,7 +88,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    db.DeleteItem<SecretTask>("Id", null);
+                    db.GetItem<SecretTask>("Id", null);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -109,7 +108,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemUsingIncorrectColumnName()
+        public void GetItemUsingIncorrectColumnName()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -122,7 +121,7 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    db.DeleteItem<SecretTask>("IT", 2);
+                    db.GetItem<SecretTask>("IT", 2);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -142,7 +141,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemUsingEncryptedColumn()
+        public void GetItemUsingEncryptedColumn()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -155,12 +154,12 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    db.DeleteItem<SecretTask>("SecretToDo", "Hello, world!");
+                    db.GetItem<SecretTask>("SecretToDo", "Hello, world!");
                 }
                 catch (CryptoSQLiteException cex)
                 {
                     Assert.IsTrue(
-                        cex.Message.IndexOf("You can't use [Encrypted] column as a column in which the columnValue should be deleted.", StringComparison.Ordinal) >=
+                        cex.Message.IndexOf("You can't use [Encrypted] column as a column in which the columnValue should be found.", StringComparison.Ordinal) >=
                         0);
                 }
                 catch (Exception ex)
@@ -175,7 +174,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemUsingColumnName()
+        public void GetItemUsingColumnName()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -189,16 +188,14 @@ namespace Tests
                         db.InsertItem(task);
 
 
-                    db.DeleteItem<SecretTask>("Price", 24523.123);
+                    var element = db.GetItem<SecretTask>("Id", 2);
+                    
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(tasks[1].IsTaskEqualTo(element));
 
-                    var elements = db.Table<SecretTask>().ToArray();
-
-                    Assert.IsTrue(elements.Length == tasks.Length - 1);
-
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[0]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
-
+                    element = db.GetItem<SecretTask>("IsDone", true);
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.IsTaskEqualTo(tasks[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -216,7 +213,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemUsingId()
+        public void GetItemUsingId()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -229,17 +226,12 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-
-                    db.DeleteItem<SecretTask>(1);
-
-                    var elements = db.Table<SecretTask>().ToArray();
-
-                    Assert.IsTrue(elements.Length == tasks.Length - 1);
-
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[1]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
-
+                    for (var i = 1; i <= tasks.Length; i++)
+                    {
+                        var element = db.GetItem<SecretTask>(i);
+                        Assert.IsNotNull(element);
+                        Assert.IsTrue(tasks[i-1].IsTaskEqualTo(element));
+                    }
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -257,7 +249,7 @@ namespace Tests
         }
 
         [Test]
-        public void DeleteItemUsingItemInstance()
+        public void GetItemUsingItemInstance()
         {
             var tasks = GetTasks();
             foreach (var db in GetConnections())
@@ -270,18 +262,95 @@ namespace Tests
                     foreach (var task in tasks)
                         db.InsertItem(task);
 
-                    var item = new SecretTask {Description = "It's the first task" };
+                    var item = new SecretTask {Price = 24523.123};
+                    item = db.GetItem(item);
 
-                    db.DeleteItem(item);
+                    Assert.IsNotNull(item);
+                    Assert.IsTrue(item.IsTaskEqualTo(tasks[1]));
+
+                    var item2 = new SecretTask {Description = "It's the fourth task" };
+                    item2 = db.GetItem(item2);
+
+                    Assert.IsNotNull(item2);
+                    Assert.IsTrue(item2.IsTaskEqualTo(tasks[3]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void GetItemReturns_Null_IfItemDoesNotExistsInDataBase()
+        {
+            var tasks = GetTasks();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    foreach (var task in tasks)
+                        db.InsertItem(task);
+
+                    var item = new SecretTask { Price = 621536 };
+                    item = db.GetItem(item);
+                    Assert.IsNull(item);
+
+                    item = new SecretTask();
+                    item = db.GetItem<SecretTask>("Price", 54);
+                    Assert.IsNull(item);
+
+                    item = new SecretTask();
+                    item = db.GetItem<SecretTask>(67);
+                    Assert.IsNull(item);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+       
+        [Test]
+        public void GetAllItems()
+        {
+            var tasks = GetTasks();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    foreach (var task in tasks)
+                        db.InsertItem(task);
+
 
                     var elements = db.Table<SecretTask>().ToArray();
 
-                    Assert.IsTrue(elements.Length == tasks.Length - 1);
-
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[1]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
-
+                    Assert.IsNotNull(elements);
+                    Assert.IsTrue(tasks.Length == elements.Length);
+                    for (var i = 0; i < elements.Length; i++)
+                        Assert.IsTrue(tasks[i].IsTaskEqualTo(elements[i]));
                 }
                 catch (CryptoSQLiteException cex)
                 {

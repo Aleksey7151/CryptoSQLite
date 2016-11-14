@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Tests.Tables;
 
 namespace Tests
 {
-    [TestClass]
+    [TestFixture]
     public class GetItemTests : BaseTest
     {
-        [TestMethod]
+        [Test]
         public void GetItemColumnNameCanNotBeNull()
         {
             var tasks = GetTasks();
@@ -42,7 +42,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemColumnNameCanNotBeEmpty()
         {
             var tasks = GetTasks();
@@ -75,7 +75,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemColumnValueCanNotBeNull()
         {
             var tasks = GetTasks();
@@ -108,7 +108,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemUsingIncorrectColumnName()
         {
             var tasks = GetTasks();
@@ -141,7 +141,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemUsingEncryptedColumn()
         {
             var tasks = GetTasks();
@@ -174,7 +174,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemUsingColumnName()
         {
             var tasks = GetTasks();
@@ -213,7 +213,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemUsingId()
         {
             var tasks = GetTasks();
@@ -249,7 +249,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemUsingItemInstance()
         {
             var tasks = GetTasks();
@@ -290,7 +290,7 @@ namespace Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetItemReturns_Null_IfItemDoesNotExistsInDataBase()
         {
             var tasks = GetTasks();
@@ -331,7 +331,7 @@ namespace Tests
             }
         }
        
-        [TestMethod]
+        [Test]
         public void GetAllItems()
         {
             var tasks = GetTasks();

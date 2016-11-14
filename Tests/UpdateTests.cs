@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Tables;
 
 namespace Tests
 {
-    [TestFixture]
-    public class UpdateItemTests : BaseTest
+    [TestClass]
+    public class UpdateTests : BaseTest
     {
-        [Test]
+        [TestMethod]
         public void UpdateShortNumbers()
         {
             var item = new ShortNumbers();
@@ -51,7 +51,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateIntNumbers()
         {
             var item = new IntNumbers();
@@ -93,7 +93,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateLongNumbers()
         {
             var item = new LongNumbers();
@@ -135,7 +135,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateDoubleNumbers()
         {
             var item = new DoubleNumbers();
@@ -177,7 +177,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateFloatNumbers()
         {
             var item = new FloatNumbers();
@@ -219,7 +219,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateEncryptedStrings()
         {
             var item = new EncryptedStrings {Str1 = "Hello, world!", Str2 = "Good buy, world!"};
@@ -262,7 +262,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateBlobs()
         {
             var item = new BlobData
@@ -318,7 +318,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateShortEncryptedNumbers()
         {
             var item = new ShortEncryptedNumbers();
@@ -360,7 +360,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateIntEncryptedNumbers()
         {
             var item = new IntEncryptedNumbers();
@@ -402,7 +402,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateLongEncryptedNumbers()
         {
             var item = new LongEncryptedNumbers();
@@ -444,7 +444,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateDoubleEncryptedNumbers()
         {
             var item = new DoubleEncryptedNumbers();
@@ -486,7 +486,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void UpdateFloatEncryptedNumbers()
         {
             var item = new FloatEncryptedNumbers();

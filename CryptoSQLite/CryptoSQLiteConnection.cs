@@ -6,7 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using CryptoSQLite.CryptoProviders;
 using CryptoSQLite.Mapping;
+using SQLitePCL;
 using SQLitePCL.pretty;
+
+
 
 
 namespace CryptoSQLite
@@ -368,7 +371,6 @@ namespace CryptoSQLite
 
         public CryptoSQLiteConnection(string dbFilename)
         {
-            
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             _cryptor = new AesCryptoProvider();
             _solter = new SoltGenerator();
@@ -378,6 +380,7 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgoritm)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
+            
             switch (cryptoAlgoritm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:

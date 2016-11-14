@@ -1,9 +1,8 @@
 ﻿using System;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
     public class CheckTableStructureTests : BaseTest

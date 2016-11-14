@@ -1,45 +1,13 @@
 ﻿using System;
 using System.Linq;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
     public class InsertItemTests : BaseTest
     {
-        /*
-        [Test]
-        public void CreateDataBaseFiles()
-        {
-            try
-            {
-                if (File.Exists(GostDbFile))
-                    File.Delete(GostDbFile);
-
-                if (File.Exists(AesDbFile))
-                    File.Delete(AesDbFile);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
-
-            using (GetGostConnection())
-            {
-
-            }
-            Assert.IsTrue(File.Exists(GostDbFile));
-
-            using (GetAesConnection())
-            {
-
-            }
-            Assert.IsTrue(File.Exists(AesDbFile));
-        }
-        */
-
         [Test]
         public void CreateCryptoTableInDatabase()
         {

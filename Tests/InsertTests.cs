@@ -1,16 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using CryptoSQLite;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Tables;
 
 namespace Tests
 {
-    [TestFixture]
-    public class InsertItemTests : BaseTest
+    [TestClass]
+    public class InsertTests : BaseTest
     {
-        /*
-        [Test]
+        [TestMethod]
         public void CreateDataBaseFiles()
         {
             try
@@ -38,9 +38,8 @@ namespace Tests
             }
             Assert.IsTrue(File.Exists(AesDbFile));
         }
-        */
 
-        [Test]
+        [TestMethod]
         public void CreateCryptoTableInDatabase()
         {
             foreach (var db in GetConnections())
@@ -64,7 +63,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertShortsNumbers()
         {
             var item = new ShortNumbers();
@@ -97,7 +96,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertEncryptedShortsNumbers()
         {
             var item = new ShortEncryptedNumbers();
@@ -130,7 +129,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertUnsignedShortsNumbers()
         {
             var item = new UShortNumbers();
@@ -163,7 +162,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertUnsignedEncryptedShortsNumbers()
         {
             var item = new UShortEncryptedNumbers();
@@ -196,7 +195,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertIntNumbers()
         {
             var item = new IntNumbers();
@@ -229,7 +228,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertIntEncryptedNumbers()
         {
             var item = new IntEncryptedNumbers();
@@ -262,7 +261,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertUIntNumbers()
         {
             var item = new UIntNumbers();
@@ -295,7 +294,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertUIntEncryptedNumbers()
         {
             var item = new UIntEncryptedNumbers();
@@ -328,7 +327,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertLongNumbers()
         {
             var item = new LongNumbers();
@@ -361,7 +360,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertLongEncryptedNumbers()
         {
             var item = new LongEncryptedNumbers();
@@ -394,7 +393,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertULongNumbers()
         {
             var item = new ULongNumbers();
@@ -427,7 +426,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertULongEncryptedNumbers()
         {
             var item = new ULongEncryptedNumbers();
@@ -460,7 +459,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertDateTimeValue()
         {
             var item1 = new DateTimeTable
@@ -515,7 +514,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertFloatNumbers()
         {
             var item = new FloatNumbers();
@@ -548,7 +547,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertFloatEncryptedNumbers()
         {
             var item = new FloatEncryptedNumbers();
@@ -581,7 +580,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertDoubleNumbers()
         {
             var item = new DoubleNumbers();
@@ -614,7 +613,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertDoubleEncryptedNumbers()
         {
             var item = new DoubleEncryptedNumbers();
@@ -647,7 +646,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InserdBlobData()
         {
             var item = new BlobData
@@ -690,7 +689,7 @@ namespace Tests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void InsertNormalElementInCryptoTable()
         {
             var account1 = new AccountsData
