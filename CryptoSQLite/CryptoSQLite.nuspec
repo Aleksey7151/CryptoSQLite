@@ -5,12 +5,14 @@
     <version>1.0.0</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
-    <licenseUrl>https://github.com/bordoley/SQLitePCL.pretty/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/bordoley/SQLitePCL.pretty</projectUrl>
+    <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>ORM with data encryption</summary>
     <description>
-
+    Simple ORM for SQLite with data encryption. Just add [CryptoTable("TableName")] attribute to a table and [Encrypted]
+    attribute to a properties that you want to be stored in database file in encrypted view. 
+    CryptoSQLite will encrypt all [Encrypted] properties automatically when you adding elements in Table and decrypt all
+    encrypted properties when you getting elements from Table in database file.
     </description>
     <tags>Portable ORM for SQLite with data encryption</tags>
     <references>
@@ -25,5 +27,6 @@
   <files>
     <file src="bin/Release/CryptoSQLite.dll" target="lib/portable-net45+netcore45+wpa81+wp8" />
     <file src="bin/Release/CryptoSQLite.xml" target="lib/portable-net45+netcore45+wpa81+wp8" />
+    <file src="Sample.txt" target=""/>
   </files>
 </package>

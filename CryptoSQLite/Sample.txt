@@ -1,0 +1,46 @@
+﻿
+	[CryptoTable("SecretTasks")]
+    public class SecretTask
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SecretToDo { get; set; }
+
+        public string Description { get; set; }
+
+        public double Price { get; set; }
+
+        public bool IsDone { get; set; }
+
+    }
+	private readonly byte[] _key =
+        {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+        };
+
+	public void TestExample()
+    {
+        try
+        {
+			//Important! Before creating connection on Xamarin.Android or Xamarin.iOS platforms you must call 
+			// SQLitePCL.Batteries_V2.Init() function!! This function from NuGet Package SQLitePCLRaw.bundle_green by Eric Sink
+            CryptoSQLiteConnection conn = new CryptoSQLiteConnection("DbFilePath.db3", CryptoAlgoritms.Gost28147With256BitsKey);
+            conn.SetEncryptionKey(_key);
+			conn.CreateTable<SecretTask>();
+			conn.InsertItem(new SecretTask
+                {
+                    Description = "It's the third task",
+                    SecretToDo = "I must kill Baal",
+                    Price = 791233.7383,
+                    IsDone = false
+                });
+			var item = conn.GetItem<SecretTask>(1);
+         }
+         catch (Exception ex)
+         {
+             var msg = ex.Message;
+         }
+     }
