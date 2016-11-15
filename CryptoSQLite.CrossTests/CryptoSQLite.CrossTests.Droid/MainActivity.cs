@@ -25,7 +25,6 @@ using System;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using SQLitePCL;
 
 namespace CryptoSQLite.CrossTests.Droid
 {
@@ -39,7 +38,7 @@ namespace CryptoSQLite.CrossTests.Droid
             base.OnCreate(savedInstanceState);
             try
             {
-                SQLitePCL.Batteries_V2.Init();
+                SQLitePCL.Batteries_V2.Init();      // From NuGet Package SQLitePCLRaw.bundle_green by Eric Sink
             }
             catch (Exception ex)
             {

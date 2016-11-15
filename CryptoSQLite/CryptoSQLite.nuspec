@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>CryptoSQLite.ORM</id>
+    <version>1.0.0</version>
+    <title>CryptoSQLite.ORM</title>
+    <authors>Alexei Safonov</authors>
+    <licenseUrl>https://github.com/bordoley/SQLitePCL.pretty/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/bordoley/SQLitePCL.pretty</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>ORM with data encryption</summary>
+    <description>
+
+    </description>
+    <tags>Portable ORM for SQLite with data encryption</tags>
+    <references>
+      <reference file="CryptoSQLite.dll" />
+    </references>
+    <dependencies>
+      <dependency id="SQLitePCL.pretty" version="1.1.0" />
+      <dependency id="SQLitePCL.raw" version="0.9.3" />
+      <dependency id="SQLitePCLRaw.core" version="1.1.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin/Release/CryptoSQLite.dll" target="lib/portable-net45+netcore45+wpa81+wp8" />
+    <file src="bin/Release/CryptoSQLite.xml" target="lib/portable-net45+netcore45+wpa81+wp8" />
+  </files>
+</package>
