@@ -2,20 +2,27 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
     <iconUrl>https://github.com/Aleksey7151/CryptoSQLite/blob/master/CryptoSQLite/PackageIcon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>ORM with data encryption</summary>
+    <summary>Simple SQLite ORM with data encryption</summary>
     <description>
-    Simple ORM for SQLite with data encryption. Just add [CryptoTable("TableName")] attribute to a table and [Encrypted]
-    attribute to a properties that you want to be stored in database file in encrypted view. 
-    CryptoSQLite will encrypt all [Encrypted] properties automatically when you adding elements in Table and decrypt all
-    encrypted properties when you getting elements from Table in database file.
+    Simple ORM for SQLite with data encryption.
+	Supported Xamarin platforms:
+	- Android
+	- iOS
+	- Windows Phone 8.1
+	Just add [CryptoTable("TableName")] attribute to your class definition (Table)
+	and [Encrypted] attribute to a properties in your class that you want
+	to be stored in database file in encrypted view.
+	    CryptoSQLite will encrypt all [Encrypted] properties automatically
+	when you adding elements in your Table and decrypt all
+    encrypted properties when you getting elements from the Table in database file.
     </description>
-    <tags>Portable ORM for SQLite with data encryption</tags>
+    <tags>crypt sqlite ios xamarin android encryption monoandroid winphone monotouch key</tags>
     <dependencies>
       <dependency id="SQLitePCL.pretty" version="1.1.0" />
       <dependency id="SQLitePCL.raw" version="0.9.3" />
@@ -24,6 +31,7 @@
   <files>
     <file src="bin/Release/CryptoSQLite.dll" target="lib/portable-net45+netcore45+wpa81+wp8" />
     <file src="bin/Release/CryptoSQLite.xml" target="lib/portable-net45+netcore45+wpa81+wp8" />
-    <file src="Sample.txt" target=""/>
+    <file src="Sample.MainActivity.cs.txt" target="content"/>
+	<file src="Sample.ViewController.cs.txt" target="content"/>
   </files>
 </package>
