@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CryptoSQLite.CryptoProviders;
 using CryptoSQLite.Mapping;
-using SQLitePCL;
 using SQLitePCL.pretty;
 
 
@@ -14,6 +13,9 @@ using SQLitePCL.pretty;
 
 namespace CryptoSQLite
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CryptoSQLiteException : Exception
     {
         public string ProbableCause { get; }
@@ -44,6 +46,9 @@ namespace CryptoSQLite
     {
         /// <summary>
         /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
+        /// 
+        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// of <paramref name="key"/> immediately after you finish work with it.
         /// </summary>
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
         /// <exception cref="NullReferenceException"></exception>
@@ -153,11 +158,16 @@ namespace CryptoSQLite
         IEnumerable<TTable> Table<TTable>() where TTable : class, new();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ICryptoSQLiteAsyncConnection
     {
         /// <summary>
         /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
         /// </summary>
+        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// of <paramref name="key"/> immediately after you finish work with it.
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
         /// <exception cref="NullReferenceException"></exception>
         void SetEncryptionKey(byte[] key);
@@ -266,6 +276,9 @@ namespace CryptoSQLite
         Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new();
     }
 
+    /// <summary>
+    /// Represents SQLite async connection to database file
+    /// </summary>
     public class CryptoSQLiteAsyncConnection : ICryptoSQLiteAsyncConnection, IDisposable
     {
         private readonly ICryptoSQLiteConnection _connection;
@@ -350,6 +363,10 @@ namespace CryptoSQLite
         }
     }
 
+
+    /// <summary>
+    /// Represents a connection to the SQLite database file.
+    /// </summary>
     public class CryptoSQLiteConnection : ICryptoSQLiteConnection, IDisposable
     {
         #region Private fields

@@ -40,6 +40,29 @@ namespace Tests
             };
         }
 
+        public CryptoSQLiteAsyncConnection GetGostAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetAesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection[] GetAsyncConnections()
+        {
+            return new[]
+            {
+                GetAesAsyncConnection(),
+                GetGostAsyncConnection()
+            };
+        }
+
         public SecretTask[] GetTasks()
         {
             return new[]

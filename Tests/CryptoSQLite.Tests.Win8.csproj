@@ -60,6 +60,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="AsyncTests.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="CheckTableStructureTests.cs" />
     <Compile Include="DeleteItemTests.cs" />
