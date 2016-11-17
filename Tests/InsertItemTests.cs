@@ -9,37 +9,6 @@ namespace Tests
     [TestFixture]
     public class InsertItemTests : BaseTest
     {
-        /*
-        [Test]
-        public void CreateDataBaseFiles()
-        {
-            try
-            {
-                if (File.Exists(GostDbFile))
-                    File.Delete(GostDbFile);
-
-                if (File.Exists(AesDbFile))
-                    File.Delete(AesDbFile);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
-
-            using (GetGostConnection())
-            {
-
-            }
-            Assert.IsTrue(File.Exists(GostDbFile));
-
-            using (GetAesConnection())
-            {
-
-            }
-            Assert.IsTrue(File.Exists(AesDbFile));
-        }
-        */
-
         [Test]
         public void CreateCryptoTableInDatabase()
         {
@@ -64,6 +33,34 @@ namespace Tests
             }
         }
 
+        [Test]
+        public void InsertElementInTableThatDoNotExistInDatabaseFile()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<AccountsData>();
+
+                    db.InsertItem(new AccountsData());
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Database doesn't contain table with name", StringComparison.Ordinal) >=
+                        0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+        
         [Test]
         public void InsertShortsNumbers()
         {

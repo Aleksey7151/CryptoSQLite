@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -10,17 +10,14 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Simple SQLite ORM with data encryption</summary>
     <description>
-    Simple ORM for SQLite with data encryption.
-	Supported Xamarin platforms:
-	- Android
-	- iOS
-	- Windows Phone 8.1
-	Just add [CryptoTable("TableName")] attribute to your class definition (Table)
-	and [Encrypted] attribute to a properties in your class that you want
-	to be stored in database file in encrypted view.
-	    CryptoSQLite will encrypt all [Encrypted] properties automatically
-	when you adding elements in your Table and decrypt all
-    encrypted properties when you getting elements from the Table in database file.
+Simple ORM for SQLite with data encryption.
+Supported Xamarin platforms:
+- Android
+- iOS
+- Windows Phone 8.1
+Just add [CryptoTable("TableName")] attribute to your class definition (Table) and [Encrypted] attribute to a properties in your class that you want to be stored in database file in encrypted view.
+CryptoSQLite will encrypt all [Encrypted] properties automatically when you adding elements in your Table and decrypt all encrypted properties when you getting elements from the Table in database file.
+PCL provides only CRUD (create, read, update, delete) functions.
     </description>
     <tags>crypt sqlite ios xamarin android encryption monoandroid winphone monotouch key</tags>
     <dependencies>
