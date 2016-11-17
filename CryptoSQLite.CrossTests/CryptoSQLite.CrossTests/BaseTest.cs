@@ -70,6 +70,29 @@ namespace CryptoSQLite.CrossTests
             };
         }
 
+        public CryptoSQLiteAsyncConnection GetGostAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgoritms.Gost28147With256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetAesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(AesDbFile), CryptoAlgoritms.AesWith256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection[] GetAsyncConnections()
+        {
+            return new[]
+            {
+                GetAesAsyncConnection(),
+                GetGostAsyncConnection()
+            };
+        }
+
         public SecretTask[] GetTasks()
         {
             return new[]

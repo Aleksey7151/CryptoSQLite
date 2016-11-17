@@ -32,6 +32,8 @@ namespace CryptoSQLite.CrossTests
             }
         }
 
+        
+
         [Test]
         public void InsertShortsNumbers()
         {

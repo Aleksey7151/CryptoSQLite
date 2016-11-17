@@ -14,12 +14,20 @@ using SQLitePCL.pretty;
 namespace CryptoSQLite
 {
     /// <summary>
-    /// 
+    /// Class represents CryptoSQLite Exception.
     /// </summary>
     public class CryptoSQLiteException : Exception
     {
+        /// <summary>
+        /// Propable cause of exception.
+        /// </summary>
         public string ProbableCause { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message">Message with the reason.</param>
+        /// <param name="cause">Probable cause of exception.</param>
         public CryptoSQLiteException(string message, string cause = null) : base(message)
         {
             ProbableCause = cause;
@@ -42,6 +50,9 @@ namespace CryptoSQLite
         AesWith256BitsKey
     }
 
+    /// <summary>
+    /// Interface of SQLite connection to database file with data encryption
+    /// </summary>
     public interface ICryptoSQLiteConnection
     {
         /// <summary>
@@ -283,80 +294,181 @@ namespace CryptoSQLite
     {
         private readonly ICryptoSQLiteConnection _connection;
 
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFileName">Path to SQLite database file</param>
         public CryptoSQLiteAsyncConnection(string dbFileName)
         {
             _connection = new CryptoSQLiteConnection(dbFileName);
         }
 
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFileName">Path to database file</param>
+        /// <param name="cryptoAlgoritms">Type of crypto algoritm that will be used for data encryption</param>
         public CryptoSQLiteAsyncConnection(string dbFileName, CryptoAlgoritms cryptoAlgoritms)
         {
             _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
         }
-
+        /// <summary>
+        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
+        /// </summary>
+        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <exception cref="NullReferenceException"></exception>
         public void SetEncryptionKey(byte[] key)
         {
             _connection.SetEncryptionKey(key);
         }
 
+        /// <summary>
+        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// 
+        /// Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing one more column: "SoltColumn". This column 
+        /// is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// 
+        /// Warning! If you insert element in the table, and then change Properties order in table type (in your class),
+        /// you won't be able to decrypt data too. Properties order in table type is importent thing.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task CreateTableAsync<TTable>() where TTable : class
         {
             await Task.Run(() => _connection.CreateTable<TTable>());
         }
 
+        /// <summary>
+        /// Deletes the table from database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task DeleteTableAsync<TTable>() where TTable : class 
         {
             await Task.Run(() => _connection.DeleteTable<TTable>());
         }
 
+        /// <summary>
+        /// Inserts new element (row) in table.
+        /// The table must be already created.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
+        /// <param name="item">Instance of element to insert.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task InsertItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.InsertItem(item));
         }
 
+        /// <summary>
+        /// Inserts or replaces the element if it exists in database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
+        /// <param name="item">Instance of element to insert.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task InsertOrReplaceItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.InsertOrReplaceItem(item));
         }
 
+        /// <summary>
+        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
+        /// <param name="columnName">column name.</param>
+        /// <param name="columnValue">column value.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
             return await table;
         }
 
+        /// <summary>
+        /// Gets element from database using element <paramref name="id"/>.
+        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
+        /// <param name="id">Identifacation number of element in table.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(id));
             return await table;
         }
 
+        /// <summary>
+        /// Gets element from table <typeparamref name="TTable"/> in database.
+        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
+        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem(item));
             return await table;
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database.
+        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task DeleteItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem(item));
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem<TTable>(columnName, columnValue));
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database using
+        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="id">Identifacation number of element in table.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task DeleteItemAsync<TTable>(int id) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem<TTable>(id));
         }
 
+        /// <summary>
+        /// Gets all elements from table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table with information about table</typeparam>
+        /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         public async Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new()
         {
             var table = Task.Run(() => _connection.Table<TTable>());
             return await table;
         }
 
+        /// <summary>
+        /// Closes connection to SQLite database file. And cleans internal copies of encryption keys.
+        /// !! WARNING !! You must clean encryption key, that you have set using 'SetEncryptionKey()'
+        /// function, on your own. 
+        /// </summary>
         public void Dispose()
         {
             (_connection as IDisposable)?.Dispose();
@@ -386,6 +498,10 @@ namespace CryptoSQLite
 
         #region Constructors
 
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFilename">Path to SQLite database file.</param>
         public CryptoSQLiteConnection(string dbFilename)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
@@ -394,6 +510,11 @@ namespace CryptoSQLite
             _tables = new Dictionary<string, TableMap>();
         }
 
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFilename">Path to database file</param>
+        /// <param name="cryptoAlgoritm">Type of crypto algoritm that will be used for data encryption</param>
         public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgoritm)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
@@ -421,6 +542,11 @@ namespace CryptoSQLite
 
         #region Implementation of IDispose
 
+        /// <summary>
+        /// Closes connection to SQLite database file. And cleans internal copies of encryption keys.
+        /// !! WARNING !! You must clean encryption key, that you have set using 'SetEncryptionKey()'
+        /// function, on your own. 
+        /// </summary>
         public void Dispose()
         {
             _cryptor.Dispose();     // clear encryption key!
@@ -433,6 +559,14 @@ namespace CryptoSQLite
 
         #region Implementation of ICryptoSQLite
 
+        /// <summary>
+        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
+        /// 
+        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// </summary>
+        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <exception cref="NullReferenceException"></exception>
         public void SetEncryptionKey(byte[] key)
         {
             if(key == null)
@@ -444,6 +578,19 @@ namespace CryptoSQLite
             _cryptor?.SetKey(key);
         }
 
+        /// <summary>
+        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// 
+        /// Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing one more column: "SoltColumn". This column 
+        /// is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// 
+        /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
+        /// to decrypt data too. Properties order in table type is importent thing.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void CreateTable<TTable>() where TTable : class
         {
             var tableName = GetTableName<TTable>();
@@ -466,6 +613,11 @@ namespace CryptoSQLite
             _tables.Add(tableName, map);
         }
 
+        /// <summary>
+        /// Deletes the table from database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void DeleteTable<TTable>() where TTable : class 
         {
             var tableName = GetTableName<TTable>();
@@ -484,12 +636,25 @@ namespace CryptoSQLite
                 _tables.Remove(tableName);
         }
 
+        /// <summary>
+        /// Inserts new element (row) in table.
+        /// The table must be already created.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
+        /// <param name="item">Instance of element to insert.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void InsertItem<TTable>(TTable item) where TTable : class
         {
             CheckTable<TTable>();
             InsertRowInTable(item, false);
         }
 
+        /// <summary>
+        /// Inserts or replaces the element if it exists in database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
+        /// <param name="item">Instance of element to insert.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void InsertOrReplaceItem<TTable>(TTable item) where TTable : class
         {
             CheckTable<TTable>();
@@ -497,6 +662,14 @@ namespace CryptoSQLite
             InsertRowInTable(item, true);
         }
 
+        /// <summary>
+        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
+        /// <param name="columnName">column name.</param>
+        /// <param name="columnValue">column value.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -504,6 +677,14 @@ namespace CryptoSQLite
             return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue);
         }
 
+        /// <summary>
+        /// Gets element from database using element <paramref name="id"/>.
+        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
+        /// <param name="id">Identifacation number of element in table.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public TTable GetItem<TTable>(int id) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -518,6 +699,14 @@ namespace CryptoSQLite
             return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id);
         }
 
+        /// <summary>
+        /// Gets element from table <typeparamref name="TTable"/> in database.
+        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
+        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public TTable GetItem<TTable>(TTable item) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -529,6 +718,13 @@ namespace CryptoSQLite
             return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class
         {
             CheckTable<TTable>();
@@ -536,6 +732,13 @@ namespace CryptoSQLite
             DeleteRowUsingColumnName<TTable>(columnName, columnValue);
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database using
+        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="id">Identifacation number of element in table.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void DeleteItem<TTable>(int id) where TTable : class
         {
             CheckTable<TTable>();
@@ -550,6 +753,13 @@ namespace CryptoSQLite
             DeleteRowUsingColumnName<TTable>(idProperty.GetColumnName(), id);
         }
 
+        /// <summary>
+        /// Removes element from table <typeparamref name="TTable"/> in database.
+        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
+        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public void DeleteItem<TTable>(TTable item) where TTable : class
         {
             CheckTable<TTable>();
@@ -561,6 +771,11 @@ namespace CryptoSQLite
             DeleteRowUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
         }
 
+        /// <summary>
+        /// Gets all elements from table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table with information about table</typeparam>
+        /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         public IEnumerable<TTable> Table<TTable>() where TTable : class, new()
         {
             CheckTable<TTable>();
