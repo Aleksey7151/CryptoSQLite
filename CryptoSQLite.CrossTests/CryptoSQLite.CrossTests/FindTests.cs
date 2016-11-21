@@ -160,5 +160,83 @@ namespace CryptoSQLite.CrossTests
                 }
             }
         }
+
+        [Test]
+        public async Task FindFunctionUsingInvalidColumnName()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    foreach (var account in accounts)
+                        await db.InsertItemAsync(account);
+
+                    var result = await db.FindAsync<AccountsData>("Agee");
+
+                    var table = result.ToArray();
+
+                    Assert.IsTrue(table.Length == accounts.Length);
+
+                    for (var i = 0; i < accounts.Length; i++)
+                        Assert.IsTrue(table[i].IsTableEqualsTo(accounts[i]));
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("doesn't contain column", StringComparison.Ordinal) > 0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public async Task FindFunctionUsingEncryptedColumnIsForbidden()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    foreach (var account in accounts)
+                        await db.InsertItemAsync(account);
+
+                    var result = await db.FindAsync<AccountsData>("Password");
+
+                    var table = result.ToArray();
+
+                    Assert.IsTrue(table.Length == accounts.Length);
+
+                    for (var i = 0; i < accounts.Length; i++)
+                        Assert.IsTrue(table[i].IsTableEqualsTo(accounts[i]));
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("has [Encrypted] attribute, so this column is encrypted. Find function can't work with encrypted columns", StringComparison.Ordinal) > 0);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
     }
 }

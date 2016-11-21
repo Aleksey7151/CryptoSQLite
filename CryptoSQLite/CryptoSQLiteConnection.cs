@@ -1080,11 +1080,24 @@ namespace CryptoSQLite
         {
             var tableName = GetTableName<TTable>();
 
+            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
+
+            if (!string.IsNullOrEmpty(columnName))  
+            {
+                // we come here only if we in Find function
+                if (properties.All(p => p.GetColumnName() != columnName))
+                    throw new CryptoSQLiteException($"Table {tableName} doesn't contain column {columnName}");
+
+                var col = properties.First(p => p.GetColumnName() == columnName);
+
+                if (col.IsEncrypted())
+                    throw new CryptoSQLiteException($"Column {columnName} has [Encrypted] attribute, so this column is encrypted. Find function can't work with encrypted columns.");
+
+            }
+
             var cmd = SqlCmds.CmdFindInTable(tableName, columnName, lowerValue, upperValue);
 
             var table = ReadRowsFromTable(cmd, tableName, lowerValue, upperValue);
-
-            var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
 
             var items = new List<TTable>();
 
