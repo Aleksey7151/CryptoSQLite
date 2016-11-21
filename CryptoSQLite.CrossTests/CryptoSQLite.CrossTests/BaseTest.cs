@@ -127,6 +127,75 @@ namespace CryptoSQLite.CrossTests
                 }
             };
         }
+
+        public AccountsData[] GetAccounts()
+        {
+            var account0 = new AccountsData
+            {
+                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 174376512,
+                AccountName = "Barbarian",
+                AccountPassword = "Bct ghjcnj 1",
+                Age = 21,
+                IsAdministrator = false,
+            };
+
+            var account1 = new AccountsData
+            {
+                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 174376512,
+                AccountName = "Frodo Beggins",
+                AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
+                Age = 22,
+                IsAdministrator = false,
+                IgnoredString = "Some string that i can't will be ignored in table mapping"
+            };
+
+            var account2 = new AccountsData
+            {
+                Id = 66,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = uint.MaxValue,
+                AccountName = "Gendalf Gray",
+                AccountPassword = "I am master of Anor flame.",
+                Age = 23,
+                IsAdministrator = true,
+                IgnoredString = "Some string that'll be ignored in table mapping"
+            };
+
+            var account3 = new AccountsData
+            {
+                Id = 166,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 123462,
+                AccountName = "Andariel",
+                AccountPassword = "Big monster with big teeth.",
+                Age = 23,
+                IsAdministrator = true,
+                IgnoredString = "Some string that'll be ignored in table mapping"
+            };
+
+            var account4 = new AccountsData
+            {
+                Id = 666,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 7292362,
+                AccountName = "Little Bug",
+                AccountPassword = "I'm little bug. And you won't find me.",
+                Age = 24,
+                IsAdministrator = true,
+                IgnoredString = "Some string that'll be ignored in table mapping"
+            };
+
+            var account5 = new AccountsData
+            {
+                Id = 666,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 7292362,
+                AccountName = "Big Bug",
+                AccountPassword = "I'm big bug.",
+                Age = 25,
+                IsAdministrator = false
+            };
+
+            return new[] { account0, account1, account2, account3, account4, account5 };
+        }
     }
 
     internal static class Extensions

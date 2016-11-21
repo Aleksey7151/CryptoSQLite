@@ -360,7 +360,7 @@ namespace CryptoSQLite.CrossTests.Tables
     
 
     [CryptoTable("AccountsData")]
-    internal class AccountsData
+    public class AccountsData
     {
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }

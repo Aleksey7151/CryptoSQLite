@@ -167,6 +167,17 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
         /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         IEnumerable<TTable> Table<TTable>() where TTable : class, new();
+
+        /// <summary>
+        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="lowerValue">Lower value (inclusive).</param>
+        /// <param name="upperValue">Upper value (inclusive).</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
     }
 
     /// <summary>
@@ -285,6 +296,17 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
         /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new();
+
+        /// <summary>
+        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="lowerValue">Lower value (inclusive).</param>
+        /// <param name="upperValue">Upper value (inclusive).</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
     }
 
     /// <summary>
@@ -460,8 +482,25 @@ namespace CryptoSQLite
         /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         public async Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new()
         {
-            var table = Task.Run(() => _connection.Table<TTable>());
-            return await table;
+            var table = await Task.Run(() => _connection.Table<TTable>());
+            return table;
+        }
+
+
+        /// <summary>
+        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="lowerValue">Lower value (inclusive).</param>
+        /// <param name="upperValue">Upper value (inclusive).</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
+            where TTable : class, new()
+        {
+            var elements = await Task.Run(() => _connection.Find<TTable>(columnName, lowerValue, upperValue));
+            return elements;
         }
 
         /// <summary>
@@ -780,7 +819,24 @@ namespace CryptoSQLite
         {
             CheckTable<TTable>();
 
-            return GetAllTable<TTable>();
+            return FindInTable<TTable>("");     // all table
+        }
+
+        /// <summary>
+        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="lowerValue">Lower value (inclusive).</param>
+        /// <param name="upperValue">Upper value (inclusive).</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        public IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null)
+            where TTable : class, new()
+        {
+            CheckTable<TTable>();
+
+            return FindInTable<TTable>(columnName, lowerValue, upperValue);
         }
 
         #endregion
@@ -1019,13 +1075,14 @@ namespace CryptoSQLite
             }
         }
 
-        private IEnumerable<TTable> GetAllTable<TTable>() where TTable : new()
+
+        private IEnumerable<TTable> FindInTable<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : new()
         {
             var tableName = GetTableName<TTable>();
 
-            var cmd = SqlCmds.CmdSelectAllTable(tableName);
+            var cmd = SqlCmds.CmdFindInTable(tableName, columnName, lowerValue, upperValue);
 
-            var table = ReadRowsFromTable(cmd, tableName);
+            var table = ReadRowsFromTable(cmd, tableName, lowerValue, upperValue);
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
 
@@ -1041,12 +1098,15 @@ namespace CryptoSQLite
             return items;
         }
 
-        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, string tableName, object value = null)
+        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, string tableName, params object[] values)
         {
             var table = new List<List<SqlColumnInfo>>();
             try
             {
-                var queryable = value == null ? _connection.Query(cmd) : _connection.Query(cmd, value);
+                var notNullValues = values.Where(v => v != null).ToArray();
+
+
+                var queryable = notNullValues.Length == 0 ? _connection.Query(cmd) : _connection.Query(cmd, notNullValues);
                 foreach (var row in queryable)
                 {
                     var columnsFromFile = new List<SqlColumnInfo>();

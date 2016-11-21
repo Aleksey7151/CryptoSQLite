@@ -53,7 +53,7 @@ namespace CryptoSQLite.CrossTests.Droid
             //nunit.AutoRun = true;
 
             // If you want to add tests in another assembly
-            nunit.AddTestAssembly(typeof(CryptoSQLite.CrossTests.CheckTableStructureTests).Assembly);
+            nunit.AddTestAssembly(typeof(CryptoSQLite.CrossTests.InsertItemTests).Assembly);
 
             // Do you want to automatically run tests when the app starts?
 

@@ -65,6 +65,7 @@
     <Compile Include="CheckTableStructureTests.cs" />
     <Compile Include="DeleteItemTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />
+    <Compile Include="FindTests.cs" />
     <Compile Include="GetItemTests.cs" />
     <Compile Include="Tables\CorrectTables.cs" />
     <Compile Include="InsertItemTests.cs" />

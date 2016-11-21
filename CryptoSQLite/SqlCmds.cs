@@ -63,6 +63,23 @@ namespace CryptoSQLite
             return $"SELECT * FROM {tableName}";
         }
 
+        public static string CmdFindInTable(string tableName, string columnName, object lower, object upper)
+        {
+            if (lower != null && upper != null)
+            {
+                return $"SELECT * FROM {tableName} WHERE {columnName} BETWEEN (?) AND (?)";
+            }
+            if (lower != null)
+            {
+                return $"SELECT * FROM {tableName} WHERE {columnName} >= (?)";
+            }
+            if (upper != null)
+            {
+                return $"SELECT * FROM {tableName} WHERE {columnName} <= (?)";
+            }
+            return $"SELECT * FROM {tableName}";    // all table
+        }
+
         public static string CmdDeleteRow(string tableName, string columnName)
         {
             var cmd = $"DELETE FROM {tableName} WHERE {columnName} = (?)";
