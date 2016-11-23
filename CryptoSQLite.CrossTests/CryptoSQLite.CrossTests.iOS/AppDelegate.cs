@@ -60,7 +60,7 @@ namespace CryptoSQLite.CrossTests.iOS
             nunit.AddTestAssembly(typeof(CryptoSQLite.CrossTests.CheckTableStructureTests).Assembly);
 
             // Do you want to automatically run tests when the app starts?
-            //nunit.AutoRun = true;
+            nunit.AutoRun = true;
 
             LoadApplication(nunit);
 

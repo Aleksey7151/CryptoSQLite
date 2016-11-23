@@ -50,7 +50,7 @@ namespace CryptoSQLite.CrossTests.Droid
 
             // This will load all tests within the current project
             var nunit = new NUnit.Runner.App();
-            //nunit.AutoRun = true;
+            nunit.AutoRun = true;
 
             // If you want to add tests in another assembly
             nunit.AddTestAssembly(typeof(CryptoSQLite.CrossTests.InsertItemTests).Assembly);

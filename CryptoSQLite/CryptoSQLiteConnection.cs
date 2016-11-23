@@ -923,11 +923,6 @@ namespace CryptoSQLite
             if (properties.Any(p => p.IsAutoIncremental() && p.IsEncrypted()))
                 throw new CryptoSQLiteException("Column with AutoIncremental Attribute can't be Encrypted.");
 
-            if (
-                properties.Any(
-                    p => p.IsEncrypted() && (p.PropertyType == typeof(bool) || p.PropertyType == typeof(byte))))
-                throw new CryptoSQLiteException("Columns that have Boolean or Byte type can't be Encrypted.");
-
             for (var i = 0; i < properties.Count; i++)
                 for (var j = i + 1; j < properties.Count; j++)
                     if (properties[i].GetColumnName() == properties[j].GetColumnName())
@@ -1074,8 +1069,7 @@ namespace CryptoSQLite
                     $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
             }
         }
-
-
+        
         private IEnumerable<TTable> FindInTable<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : new()
         {
             var tableName = GetTableName<TTable>();
@@ -1260,6 +1254,18 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytesForEncrypt);
                 return bytesForEncrypt;
             }
+            if (type == typeof(bool))
+            {
+                var bytes = BitConverter.GetBytes((bool) value);
+                encryptor.XorGamma(bytes);
+                return bytes;
+            }
+            if (type == typeof(byte))
+            {
+                var bytes = BitConverter.GetBytes((byte)value);
+                encryptor.XorGamma(bytes);
+                return bytes;
+            }
             
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
         }
@@ -1339,6 +1345,18 @@ namespace CryptoSQLite
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, bytes);
+            }
+            else if (type == typeof(bool))
+            {
+                var bytes = (byte[]) sqlValue;
+                encryptor.XorGamma(bytes);
+                property.SetValue(item, BitConverter.ToBoolean(bytes, 0));
+            }
+            else if(type == typeof(byte))
+            {
+                var bytes = (byte[])sqlValue;
+                encryptor.XorGamma(bytes);
+                property.SetValue(item, bytes[0]);
             }
         }
 

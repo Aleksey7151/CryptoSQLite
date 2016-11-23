@@ -22,12 +22,14 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf($"Table {typeof(TableWithoutCryptoTableAttribute)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
             }
+            Assert.Fail();
         }
 
         [Test]
@@ -44,11 +46,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -66,11 +70,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception ex)
                 {
                     Assert.Fail(ex.Message);
                 }
+                Assert.Fail();
             }
         }
 
@@ -88,11 +94,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Column name can't be null.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -110,16 +118,18 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Column name can't be empty.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
         [Test]
-        public void TableCanNotContainSoltColumn()
+        public void TableCanNotContainSoltColumn_v1()
         {
             using (var db = GetGostConnection())
             {
@@ -132,12 +142,21 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("This name is reserved for CryptoSQLite needs.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
+            }
+        }
 
+        [Test]
+        public void TableCanNotContainSoltColumn_v2()
+        {
+            using (var db = GetGostConnection())
+            {
                 try
                 {
                     db.CreateTable<TableWithSoltColumnNameSecond>();
@@ -147,11 +166,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("This name is reserved for CryptoSQLite needs.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -169,11 +190,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Crypto table must contain at least one PrimaryKey column.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -191,11 +214,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("Crypto Table can't contain more that one PrimaryKey column.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -212,11 +237,13 @@ namespace Tests
                 {
                     Assert.IsTrue(
                         cex.Message.IndexOf("Column with PrimaryKey Attribute can't be Encrypted.", StringComparison.Ordinal) >= 0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -233,11 +260,13 @@ namespace Tests
                 {
                     Assert.IsTrue(
                         cex.Message.IndexOf("Column with AutoIncremental Attribute can't be Encrypted.", StringComparison.Ordinal) >= 0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
 
@@ -255,55 +284,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.ProbableCause.IndexOf("Table can't contain two columns with same names.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
-            }
-        }
-
-        [Test]
-        public void TableCanNotContainEncryptedByteColumn()
-        {
-            using (var db = GetGostConnection())
-            {
-                try
-                {
-                    db.CreateTable<TableWithEncryptedByteColumn>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Columns that have Boolean or Byte type can't be Encrypted.", StringComparison.Ordinal) >=
-                        0);
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-            }
-        }
-
-        [Test]
-        public void TableCanNotContainEncryptedBoolColumn()
-        {
-            using (var db = GetGostConnection())
-            {
-                try
-                {
-                    db.CreateTable<TableWithEncryptedBoolColumn>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Columns that have Boolean or Byte type can't be Encrypted.", StringComparison.Ordinal) >=
-                        0);
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
+                Assert.Fail();
             }
         }
 
@@ -321,11 +308,13 @@ namespace Tests
                     Assert.IsTrue(
                         cex.Message.IndexOf("contains incompatible type of property.", StringComparison.Ordinal) >=
                         0);
+                    return;
                 }
                 catch (Exception)
                 {
                     Assert.Fail();
                 }
+                Assert.Fail();
             }
         }
     }

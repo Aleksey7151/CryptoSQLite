@@ -35,10 +35,9 @@ namespace CryptoSQLite.CrossTests.Tables
         public short ShortMaxVal { get; set; }
         public short ShortMinVal { get; set; }
 
-        public ShortNumbers()
+        public static ShortNumbers GetDefault()
         {
-            ShortMaxVal = short.MaxValue;
-            ShortMinVal = short.MinValue;
+            return new ShortNumbers { ShortMaxVal = short.MaxValue, ShortMinVal = short.MinValue };
         }
     }
 
@@ -54,10 +53,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public short ShortMinVal { get; set; }
 
-        public ShortEncryptedNumbers()
+        public static ShortEncryptedNumbers GetDefault()
         {
-            ShortMaxVal = short.MaxValue;
-            ShortMinVal = short.MinValue;
+            return new ShortEncryptedNumbers { ShortMaxVal = short.MaxValue, ShortMinVal = short.MinValue };
         }
     }
 
@@ -70,10 +68,9 @@ namespace CryptoSQLite.CrossTests.Tables
         public ushort UShortMaxVal { get; set; }
         public ushort UShortMinVal { get; set; }
 
-        public UShortNumbers()
+        public static UShortNumbers GetDefault()
         {
-            UShortMaxVal = ushort.MaxValue;
-            UShortMinVal = ushort.MinValue;
+            return new UShortNumbers { UShortMaxVal = ushort.MaxValue, UShortMinVal = ushort.MinValue };
         }
     }
 
@@ -89,10 +86,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public ushort UShortMinVal { get; set; }
 
-        public UShortEncryptedNumbers()
+        public static UShortEncryptedNumbers GetDefault()
         {
-            UShortMaxVal = ushort.MaxValue;
-            UShortMinVal = ushort.MinValue;
+            return new UShortEncryptedNumbers { UShortMaxVal = ushort.MaxValue, UShortMinVal = ushort.MinValue };
         }
     }
 
@@ -106,10 +102,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public int IntMinVal { get; set; }
 
-        public IntNumbers()
+        public static IntNumbers GetDefault()
         {
-            IntMinVal = int.MinValue;
-            IntMaxVal = int.MaxValue;
+            return new IntNumbers { IntMinVal = int.MinValue, IntMaxVal = int.MaxValue };
         }
     }
 
@@ -125,10 +120,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public int IntMinVal { get; set; }
 
-        public IntEncryptedNumbers()
+        public static IntEncryptedNumbers GetDefault()
         {
-            IntMinVal = int.MinValue;
-            IntMaxVal = int.MaxValue;
+            return new IntEncryptedNumbers { IntMinVal = int.MinValue, IntMaxVal = int.MaxValue };
         }
     }
 
@@ -142,10 +136,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public uint UIntMinVal { get; set; }
 
-        public UIntNumbers()
+        public static UIntNumbers GetDefault()
         {
-            UIntMaxVal = uint.MaxValue;
-            UIntMinVal = uint.MinValue;
+            return new UIntNumbers { UIntMaxVal = uint.MaxValue, UIntMinVal = uint.MinValue };
         }
     }
 
@@ -161,10 +154,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public uint UIntMinVal { get; set; }
 
-        public UIntEncryptedNumbers()
+        public static UIntEncryptedNumbers GetDefault()
         {
-            UIntMaxVal = uint.MaxValue;
-            UIntMinVal = uint.MinValue;
+            return new UIntEncryptedNumbers { UIntMinVal = uint.MinValue, UIntMaxVal = uint.MaxValue };
         }
     }
 
@@ -178,10 +170,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public ulong ULongMinVal { get; set; }
 
-        public ULongNumbers()
+        public static ULongNumbers GetDefault()
         {
-            ULongMinVal = ulong.MinValue;
-            ULongMaxVal = ulong.MaxValue;
+            return new ULongNumbers { ULongMinVal = ulong.MinValue, ULongMaxVal = ulong.MaxValue };
         }
     }
 
@@ -197,10 +188,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public ulong ULongMinVal { get; set; }
 
-        public ULongEncryptedNumbers()
+        public static ULongEncryptedNumbers GetDefault()
         {
-            ULongMinVal = ulong.MinValue;
-            ULongMaxVal = ulong.MaxValue;
+            return new ULongEncryptedNumbers { ULongMinVal = ulong.MinValue, ULongMaxVal = ulong.MaxValue };
         }
     }
 
@@ -214,10 +204,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public long LongMinVal { get; set; }
 
-        public LongNumbers()
+        public static LongNumbers GetDefault()
         {
-            LongMaxVal = long.MaxValue;
-            LongMinVal = long.MinValue;
+            return new LongNumbers { LongMaxVal = long.MaxValue, LongMinVal = long.MinValue };
         }
     }
 
@@ -233,10 +222,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public long LongMinVal { get; set; }
 
-        public LongEncryptedNumbers()
+        public static LongEncryptedNumbers GetDefault()
         {
-            LongMaxVal = long.MaxValue;
-            LongMinVal = long.MinValue;
+            return new LongEncryptedNumbers { LongMaxVal = long.MaxValue, LongMinVal = long.MinValue };
         }
     }
 
@@ -262,10 +250,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public float FloatMinVal { get; set; }
 
-        public FloatNumbers()
+        public static FloatNumbers GetDefault()
         {
-            FloatMaxVal = float.MaxValue;
-            FloatMinVal = float.MinValue;
+            return new FloatNumbers { FloatMinVal = float.MinValue, FloatMaxVal = float.MaxValue };
         }
     }
 
@@ -281,10 +268,9 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public float FloatMinVal { get; set; }
 
-        public FloatEncryptedNumbers()
+        public static FloatEncryptedNumbers GetDefault()
         {
-            FloatMaxVal = float.MaxValue;
-            FloatMinVal = float.MinValue;
+            return new FloatEncryptedNumbers { FloatMinVal = float.MinValue, FloatMaxVal = float.MaxValue };
         }
     }
 
@@ -298,10 +284,9 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public double DoubleMinVal { get; set; }
 
-        public DoubleNumbers()
+        public static DoubleNumbers GetDefault()
         {
-            DoubleMaxVal = double.MaxValue;
-            DoubleMinVal = double.MinValue;
+            return new DoubleNumbers { DoubleMaxVal = double.MaxValue, DoubleMinVal = double.MinValue };
         }
     }
 
@@ -317,10 +302,65 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public double DoubleMinVal { get; set; }
 
-        public DoubleEncryptedNumbers()
+        public static DoubleEncryptedNumbers GetDefault()
         {
-            DoubleMaxVal = double.MaxValue;
-            DoubleMinVal = double.MinValue;
+            return new DoubleEncryptedNumbers { DoubleMaxVal = double.MaxValue, DoubleMinVal = double.MinValue };
+        }
+    }
+
+    [CryptoTable("BoolEncryptedNumbers")]
+    internal class BoolEncryptedNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public bool B1 { get; set; }
+
+        [Encrypted]
+        public bool B2 { get; set; }
+
+        public bool B3 { get; set; }
+
+        public bool B4 { get; set; }
+
+        public static BoolEncryptedNumbers GetDefault()
+        {
+            return new BoolEncryptedNumbers { B1 = false, B2 = true, B3 = false, B4 = true };
+        }
+    }
+
+    [CryptoTable("ByteEncryptedNumbers")]
+    internal class ByteEncryptedNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public byte ByteMaxVal { get; set; }
+
+        [Encrypted]
+        public byte ByteMinVal { get; set; }
+
+        public static ByteEncryptedNumbers GetDefault()
+        {
+            return new ByteEncryptedNumbers { ByteMaxVal = byte.MaxValue, ByteMinVal = Byte.MinValue };
+        }
+    }
+
+    [CryptoTable("ByteNumbers")]
+    internal class ByteNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        public byte ByteMaxVal { get; set; }
+
+        public byte ByteMinVal { get; set; }
+
+        public static ByteNumbers GetDefault()
+        {
+            return new ByteNumbers { ByteMaxVal = byte.MaxValue, ByteMinVal = byte.MinValue };
         }
     }
 
@@ -357,7 +397,7 @@ namespace CryptoSQLite.CrossTests.Tables
 
     }
 
-    
+
 
     [CryptoTable("AccountsData")]
     public class AccountsData

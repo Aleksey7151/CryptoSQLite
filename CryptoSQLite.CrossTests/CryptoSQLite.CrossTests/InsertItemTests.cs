@@ -63,7 +63,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertShortsNumbers()
         {
-            var item = new ShortNumbers();
+            var item = ShortNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -96,7 +96,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertEncryptedShortsNumbers()
         {
-            var item = new ShortEncryptedNumbers();
+            var item = ShortEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -129,7 +129,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertUnsignedShortsNumbers()
         {
-            var item = new UShortNumbers();
+            var item = UShortNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -162,7 +162,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertUnsignedEncryptedShortsNumbers()
         {
-            var item = new UShortEncryptedNumbers();
+            var item = UShortEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -195,7 +195,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertIntNumbers()
         {
-            var item = new IntNumbers();
+            var item = IntNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -228,7 +228,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertIntEncryptedNumbers()
         {
-            var item = new IntEncryptedNumbers();
+            var item = IntEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -261,7 +261,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertUIntNumbers()
         {
-            var item = new UIntNumbers();
+            var item = UIntNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -294,7 +294,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertUIntEncryptedNumbers()
         {
-            var item = new UIntEncryptedNumbers();
+            var item = UIntEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -327,7 +327,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertLongNumbers()
         {
-            var item = new LongNumbers();
+            var item = LongNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -360,7 +360,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertLongEncryptedNumbers()
         {
-            var item = new LongEncryptedNumbers();
+            var item = LongEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -393,7 +393,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertULongNumbers()
         {
-            var item = new ULongNumbers();
+            var item = ULongNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -426,7 +426,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertULongEncryptedNumbers()
         {
-            var item = new ULongEncryptedNumbers();
+            var item = ULongEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -514,7 +514,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertFloatNumbers()
         {
-            var item = new FloatNumbers();
+            var item = FloatNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -527,7 +527,7 @@ namespace CryptoSQLite.CrossTests
                     var element = db.Table<FloatNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(Math.Abs(element.FloatMaxVal - item.FloatMaxVal) < 0.00001  && Math.Abs(element.FloatMinVal - item.FloatMinVal) < 0.00001);
+                    Assert.IsTrue(Math.Abs(element.FloatMaxVal - item.FloatMaxVal) < 0.00001 && Math.Abs(element.FloatMinVal - item.FloatMinVal) < 0.00001);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -536,7 +536,7 @@ namespace CryptoSQLite.CrossTests
                 catch (Exception ex)
                 {
                     Assert.Fail(ex.Message);
-                } 
+                }
                 finally
                 {
                     db.Dispose();
@@ -547,7 +547,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertFloatEncryptedNumbers()
         {
-            var item = new FloatEncryptedNumbers();
+            var item = FloatEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -578,9 +578,108 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
+        public void InsertBoolEncryptedValues()
+        {
+            var item = BoolEncryptedNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<BoolEncryptedNumbers>();
+                    db.CreateTable<BoolEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<BoolEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.B1 == item.B1 && element.B2 == item.B2 && element.B3 == item.B3 && element.B4 == item.B4);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void InsertByteEncryptedValues()
+        {
+            var item = ByteEncryptedNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<ByteEncryptedNumbers>();
+                    db.CreateTable<ByteEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<ByteEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.ByteMaxVal == item.ByteMaxVal && element.ByteMinVal == item.ByteMinVal);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void InsertByteValues()
+        {
+            var item = ByteNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<ByteNumbers>();
+                    db.CreateTable<ByteNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<ByteNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.ByteMaxVal == item.ByteMaxVal && element.ByteMinVal == item.ByteMinVal);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public void InsertDoubleNumbers()
         {
-            var item = new DoubleNumbers();
+            var item = DoubleNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
@@ -613,7 +712,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void InsertDoubleEncryptedNumbers()
         {
-            var item = new DoubleEncryptedNumbers();
+            var item = DoubleEncryptedNumbers.GetDefault();
             foreach (var db in GetConnections())
             {
                 try
