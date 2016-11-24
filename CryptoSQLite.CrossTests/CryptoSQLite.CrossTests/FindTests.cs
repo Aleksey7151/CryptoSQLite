@@ -10,7 +10,7 @@ namespace CryptoSQLite.CrossTests
     public class FindTests : BaseTest
     {
         [Test]
-        public async Task FindUsingUpperValue()
+        public async Task FindFunctionUsingUpperValue()
         {
             var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
@@ -49,7 +49,7 @@ namespace CryptoSQLite.CrossTests
 
 
         [Test]
-        public async Task FindUsingLowerValue()
+        public async Task FindFunctionUsingLowerValue()
         {
             var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
@@ -85,7 +85,7 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task FindUsingLowerAndUpperValues()
+        public async Task FindFunctionUsingLowerAndUpperValues()
         {
             var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
@@ -123,7 +123,43 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task FindWithoutUsingValues()
+        public async Task FindByValueFunction()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    foreach (var account in accounts)
+                        await db.InsertItemAsync(account);
+
+                    var result = await db.FindByValueAsync<AccountsData>("Age", 23);
+
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 2);
+                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[2]));
+                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[3]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public async Task FindFunctionWithoutUsingValues()
         {
             var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
@@ -162,9 +198,8 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task FindFunctionUsingInvalidColumnName()
+        public async Task FindByValueFunctionWithoutUsingValues()
         {
-            var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
             {
                 try
@@ -172,22 +207,15 @@ namespace CryptoSQLite.CrossTests
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
-                    foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
 
-                    var result = await db.FindAsync<AccountsData>("Agee");
+                    var result = await db.FindByValueAsync<AccountsData>("Age", null);
 
                     var table = result.ToArray();
-
-                    Assert.IsTrue(table.Length == accounts.Length);
-
-                    for (var i = 0; i < accounts.Length; i++)
-                        Assert.IsTrue(table[i].IsTableEqualsTo(accounts[i]));
-
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("doesn't contain column", StringComparison.Ordinal) > 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Column value can't be null.", StringComparison.Ordinal) >= 0);
+                    return;
                 }
                 catch (Exception ex)
                 {
@@ -201,9 +229,8 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task FindFunctionUsingEncryptedColumnIsForbidden()
+        public async Task FindFunctionUsingInvalidColumnName()
         {
-            var accounts = GetAccounts();
             foreach (var db in GetAsyncConnections())
             {
                 try
@@ -211,22 +238,12 @@ namespace CryptoSQLite.CrossTests
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
-                    foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
-
-                    var result = await db.FindAsync<AccountsData>("Password");
-
-                    var table = result.ToArray();
-
-                    Assert.IsTrue(table.Length == accounts.Length);
-
-                    for (var i = 0; i < accounts.Length; i++)
-                        Assert.IsTrue(table[i].IsTableEqualsTo(accounts[i]));
-
+                    await db.FindAsync<AccountsData>("Agee");
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("has [Encrypted] attribute, so this column is encrypted. Find function can't work with encrypted columns", StringComparison.Ordinal) > 0);
+                    Assert.IsTrue(cex.Message.IndexOf("doesn't contain column", StringComparison.Ordinal) > 0);
+                    return;
                 }
                 catch (Exception ex)
                 {
@@ -236,6 +253,150 @@ namespace CryptoSQLite.CrossTests
                 {
                     db.Dispose();
                 }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public async Task FindByValueFunctionUsingInvalidColumnName()
+        {
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    await db.FindByValueAsync<AccountsData>("Agee", 123);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("doesn't contain column", StringComparison.Ordinal) > 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public async Task FindFunctionUsingNullColumnName()
+        {
+            using (var db = GetGostAsyncConnection())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    await db.FindAsync<AccountsData>(null);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("Column name can't be null.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public async Task FindByValueFunctionUsingNullColumnName()
+        {
+            using (var db = GetGostAsyncConnection())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    await db.FindByValueAsync<AccountsData>(null, 123);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public async Task FindFunctionUsingEncryptedColumnIsForbidden()
+        {
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+                    var result = await db.FindAsync<AccountsData>("Password");
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("has [Encrypted] attribute, so this column is encrypted. Find function can't work with encrypted columns", StringComparison.Ordinal) > 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public async Task FindByValueFunctionUsingEncryptedColumnIsForbidden()
+        {
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+                    var result = await db.FindByValueAsync<AccountsData>("Password", new object());
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("You can't use [Encrypted] column as a column in which the columnValue should be", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
             }
         }
     }
