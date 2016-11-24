@@ -8,7 +8,11 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Class)]
     public class CryptoTableAttribute : Attribute
     {
+        /// <summary>
+        /// Contains crypto table name, that will be used in database file 
+        /// </summary>
         public string TableName { get; }
+        
         /// <summary>
         /// Ctor
         /// </summary>
@@ -34,8 +38,15 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
     {
+        /// <summary>
+        /// Contain column name in table
+        /// </summary>
         public string ColumnName { get; }
 
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="columnName"> column name</param>
         public ColumnAttribute(string columnName)
         {
             
@@ -91,8 +102,15 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class HasDefaultValueAttribute : Attribute
     {
+        /// <summary>
+        /// Default value
+        /// </summary>
         public object DefaultValue { get; }
 
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="defaultValue">Default value</param>
         public HasDefaultValueAttribute(object defaultValue)
         {
             DefaultValue = defaultValue;

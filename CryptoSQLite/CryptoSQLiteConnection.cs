@@ -9,8 +9,6 @@ using CryptoSQLite.Mapping;
 using SQLitePCL.pretty;
 
 
-
-
 namespace CryptoSQLite
 {
     /// <summary>
@@ -178,10 +176,19 @@ namespace CryptoSQLite
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
         IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="columnValue">Value for find</param>
+        /// <returns></returns>
+        IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
     }
 
     /// <summary>
-    /// 
+    /// Interface of SQLite Async connection to database file with data encryption
     /// </summary>
     public interface ICryptoSQLiteAsyncConnection
     {
@@ -307,6 +314,15 @@ namespace CryptoSQLite
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
         Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="columnValue">Value for find</param>
+        /// <returns></returns>
+        Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
     }
 
     /// <summary>
@@ -399,6 +415,8 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
+        /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
+        /// In this case use find function.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="columnName">column name.</param>
@@ -500,6 +518,21 @@ namespace CryptoSQLite
             where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Find<TTable>(columnName, lowerValue, upperValue));
+            return elements;
+        }
+
+
+        /// <summary>
+        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="columnValue">Value for find</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
+            where TTable : class, new()
+        {
+            var elements = await Task.Run(() => _connection.FindByValue<TTable>(columnName, columnValue));
             return elements;
         }
 
@@ -703,7 +736,9 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
-        /// </summary>
+        /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
+        /// In this case use find function.
+        ///  </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
@@ -713,7 +748,7 @@ namespace CryptoSQLite
         {
             CheckTable<TTable>();
 
-            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue);
+            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue).FirstOrDefault();
         }
 
         /// <summary>
@@ -735,7 +770,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id);
+            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id).FirstOrDefault();
         }
 
         /// <summary>
@@ -754,7 +789,7 @@ namespace CryptoSQLite
 
             var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
 
-            return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item));
+            return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
         }
 
         /// <summary>
@@ -837,6 +872,20 @@ namespace CryptoSQLite
             CheckTable<TTable>();
 
             return FindInTable<TTable>(columnName, lowerValue, upperValue);
+        }
+
+        /// <summary>
+        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="columnValue">Value for find</param>
+        /// <returns></returns>
+        public IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        {
+            CheckTable<TTable>();
+
+            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue);
         }
 
         #endregion
@@ -1007,7 +1056,7 @@ namespace CryptoSQLite
             }
         }
 
-        private TTable GetRowFromTableUsingColumnName<TTable>(string columnName, object columnValue) where TTable : class, new()
+        private List<TTable> GetRowFromTableUsingColumnName<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
@@ -1029,14 +1078,16 @@ namespace CryptoSQLite
 
             var table = ReadRowsFromTable(cmd, tableName, columnValue);
 
-            if (table.Count == 0)
-                return null;
+            var items = new List<TTable>();
 
-            var item = new TTable();
+            foreach (var row in table)
+            {
+                var item = new TTable();
+                ProcessRow(properties, row, item);
+                items.Add(item);
+            }
 
-            ProcessRow(properties, table[0], item);
-
-            return item;
+            return items;
         }
         
         private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue)
@@ -1075,6 +1126,9 @@ namespace CryptoSQLite
             var tableName = GetTableName<TTable>();
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
+
+            if(columnName == null)
+                throw new CryptoSQLiteException("Column name can't be null.");
 
             if (!string.IsNullOrEmpty(columnName))  
             {
