@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -18,6 +18,7 @@ Supported Xamarin platforms:
 Just add [CryptoTable("TableName")] attribute to your class definition (Table) and [Encrypted] attribute to a properties in your class that you want to be stored in database file in encrypted view.
 CryptoSQLite will encrypt all [Encrypted] properties automatically when you adding elements in your Table and decrypt all encrypted properties when you getting elements from the Table in database file.
 PCL provides CRUD (Create, Read, Update, Delete) functions and Find functions.
+In 1.0.7 version fixed bugs related with NULL values.
     </description>
     <tags>crypt sqlite ios xamarin android encryption monoandroid winphone monotouch key</tags>
     <dependencies>

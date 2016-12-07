@@ -839,5 +839,91 @@ namespace CryptoSQLite.CrossTests
                 }
             }
         }
+
+        [Test]
+        public void InsertNormalElementInCryptoTableThatHasNullValues()
+        {
+            var account1 = new AccountsData
+            {
+                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 174376512,
+                AccountName = null,
+                AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
+                Age = 27,
+                IsAdministrator = false,
+                IgnoredString = "Some string that i can't will be ignored in table mapping"
+            };
+
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
+
+                    db.InsertItem(account1);
+
+                    var table = db.Table<AccountsData>().ToArray();
+
+                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void InsertNormalElementInCryptoTableThatHasEncryptedColumnsWithNullValues()
+        {
+            var account1 = new AccountsData
+            {
+                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
+                SocialSecureId = 174376512,
+                AccountName = null,
+                AccountPassword = null,
+                Age = 27,
+                IsAdministrator = false,
+                IgnoredString = "Some string that i can't will be ignored in table mapping"
+            };
+
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
+
+                    db.InsertItem(account1);
+
+                    var table = db.Table<AccountsData>().ToArray();
+
+                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
     }
 }
