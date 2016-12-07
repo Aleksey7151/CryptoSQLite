@@ -936,7 +936,7 @@ namespace CryptoSQLite
 
             var tableFromOrmMapping = OrmUtils.GetColumnsMappingWithSqlTypes(properties.ToList());
 
-            if (!OrmUtils.AreTablesEqual(tableFromFile, tableFromOrmMapping)) // if database doesn't contain TTable
+            if (!OrmUtils.IsTablesEqual(tableFromFile, tableFromOrmMapping)) // if database doesn't contain TTable
                 throw new CryptoSQLiteException(
                     $"SQL Database doesn't contain table with column structure that specified in {tableName}.");
         }
@@ -1349,7 +1349,7 @@ namespace CryptoSQLite
                 var openString = Encoding.Unicode.GetString(bytes, 0, bytes.Length);
                 property.SetValue(item, openString);
             }
-            else if (type == typeof(DateTime))
+            else if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
@@ -1357,49 +1357,49 @@ namespace CryptoSQLite
                 var dateTime = DateTime.FromBinary(ticks);
                 property.SetValue(item, dateTime);
             }
-            else if (type == typeof(short))
+            else if (type == typeof(short) || type == typeof(short?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToInt16(bytes, 0));
             }
-            else if (type == typeof(ushort))
+            else if (type == typeof(ushort) || type == typeof(ushort?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToUInt16(bytes, 0));
             }
-            else if (type == typeof(int))
+            else if (type == typeof(int) || type == typeof(int?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToInt32(bytes, 0));
             }
-            else if (type == typeof(uint))
+            else if (type == typeof(uint) || type == typeof(uint?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToUInt32(bytes, 0));
             }
-            else if (type == typeof(long))
+            else if (type == typeof(long) || type == typeof(long?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToInt64(bytes, 0));
             }
-            else if (type == typeof(ulong))
+            else if (type == typeof(ulong) || type == typeof(ulong?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToUInt64(bytes, 0));
             }
-            else if (type == typeof(float))
+            else if (type == typeof(float) || type == typeof(float?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToSingle(bytes, 0));
             }
-            else if (type == typeof(double))
+            else if (type == typeof(double) || type == typeof(double?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
@@ -1411,13 +1411,13 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, bytes);
             }
-            else if (type == typeof(bool))
+            else if (type == typeof(bool) || type == typeof(bool?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, BitConverter.ToBoolean(bytes, 0));
             }
-            else if(type == typeof(byte))
+            else if(type == typeof(byte) || type == typeof(byte?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);

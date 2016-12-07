@@ -77,7 +77,7 @@ namespace Tests
                     var element = db.Table<ShortNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ShortMaxVal == item.ShortMaxVal && element.ShortMinVal == item.ShortMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
