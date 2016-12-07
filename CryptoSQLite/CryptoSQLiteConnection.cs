@@ -1012,15 +1012,19 @@ namespace CryptoSQLite
                 columns.Add(col.GetColumnName());
                 var value = col.GetValue(row);
                 var type = col.PropertyType;
-                object sqlValue;
 
-                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                if (col.IsEncrypted())
-                    sqlValue = GetEncryptedValue(type, value, encryptor);
-                else
-                    sqlValue = OrmUtils.GetSqlViewFromClr(type, value);
+                object sqlValue = null;
 
-                values.Add(sqlValue);
+                if (value != null)
+                {
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (col.IsEncrypted())
+                        sqlValue = GetEncryptedValue(type, value, encryptor);
+                    else
+                        sqlValue = OrmUtils.GetSqlViewFromClr(type, value);
+                }
+
+                values.Add(sqlValue);   // NULL will be NULL
             }
 
             if (solt != null)
@@ -1174,28 +1178,32 @@ namespace CryptoSQLite
                     foreach (var column in row)
                     {
                         var tmp = new SqlColumnInfo {Name = column.ColumnInfo.Name};
-                        switch (column.ColumnInfo.DeclaredType)
+
+                        if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
                         {
-                            case "BLOB":
-                                tmp.SqlValue = column.ToBlob();
-                                break;
-                            case "REAL":
-                                tmp.SqlValue = column.ToDouble();
-                                break;
-                            case "INTEGER":
-                                tmp.SqlValue = column.ToInt64();
-                                break;
-                            case "TEXT":
-                                tmp.SqlValue = column.ToString();
-                                break;
-                            case "NULL":
-                                tmp.SqlValue = null;
-                                break;
-                            default:
-                                throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                            switch (column.ColumnInfo.DeclaredType)
+                            {
+                                case "BLOB":
+                                    tmp.SqlValue = column.ToBlob();
+                                    break;
+                                case "REAL":
+                                    tmp.SqlValue = column.ToDouble();
+                                    break;
+                                case "INTEGER":
+                                    tmp.SqlValue = column.ToInt64();
+                                    break;
+                                case "TEXT":
+                                    tmp.SqlValue = column.ToString();
+                                    break;
+                                case "NULL":
+                                    tmp.SqlValue = null;
+                                    break;
+                                default:
+                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                            }
                         }
 
-                        columnsFromFile.Add(tmp);
+                        columnsFromFile.Add(tmp);   // NULL will be NULL.
                     }
                     table.Add(columnsFromFile);
                 }
@@ -1226,6 +1234,9 @@ namespace CryptoSQLite
                 if (column == null)
                     throw new CryptoSQLiteException(
                         $"Can't find appropriate column in database for property: {property.GetColumnName()}");
+
+                if (column.SqlValue == null)
+                    continue;   // NULL value will stay NULL value
 
                 if (property.IsEncrypted())
                     GetDecryptedValue(property, item, column.SqlValue, encryptor);

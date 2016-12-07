@@ -173,10 +173,10 @@ namespace CryptoSQLite
         public static object GetSqlViewFromClr(Type type, object value)
         {
             if (type == typeof(int)  || type == typeof(short)  || type == typeof(double)|| type == typeof(byte) || 
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(float) || type == typeof(byte[]))
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(float))
                 return value;
 
-            if (type == typeof(string))
+            if (type == typeof(string) || type == typeof(byte[]))       // reference types
                 return value;
 
             if (type == typeof(long))

@@ -427,9 +427,22 @@ namespace Tests.Tables
     {
         public static bool IsTableEqualsTo(this AccountsData ac1, AccountsData ac2)
         {
+            var namesAreEqual = false;
+
+            if (ac1.AccountName == null && ac2.AccountName == null)
+                namesAreEqual = true;
+            else if (ac1.AccountName != null && ac2.AccountName != null)
+                namesAreEqual = ac1.AccountName == ac2.AccountName;
+
+            var passwordsAreEqual = false;
+
+            if (ac1.AccountName == null && ac2.AccountName == null)
+                passwordsAreEqual = true;
+            else if (ac1.AccountPassword != null && ac2.AccountPassword != null)
+                passwordsAreEqual = ac1.AccountPassword == ac2.AccountPassword;
+
             return ac1.IsAdministrator == ac2.IsAdministrator &&
-                   ac1.AccountName == ac2.AccountName &&
-                   ac1.AccountPassword == ac2.AccountPassword &&
+                   namesAreEqual && passwordsAreEqual &&
                    ac1.Age == ac2.Age &&
                    ac1.SocialSecureId == ac2.SocialSecureId;
         }
