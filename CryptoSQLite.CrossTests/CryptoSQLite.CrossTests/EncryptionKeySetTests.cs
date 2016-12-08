@@ -34,7 +34,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetSmallKeyToGost()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey))
+            using (var db = GetGostConnection())
             {
                 var smallKey = new byte[31];
 
@@ -59,7 +59,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetBigKeyToGost()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey))
+            using (var db = GetGostConnection())
             {
                 var bigKey = new byte[33];
 
@@ -83,7 +83,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetSmallKeyToAes()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.AesWith256BitsKey))
+            using (var db = GetAesConnection())
             {
                 var smallKey = new byte[31];
 
@@ -108,7 +108,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetBigKeyToAes()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.AesWith256BitsKey))
+            using (var db = GetAesConnection())
             {
                 var bigKey = new byte[33];
 
@@ -132,7 +132,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetSmallKeyToDes()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.DesWith56BitsKey))
+            using (var db = GetDesConnection())
             {
                 var smallKey = new byte[7];
 
@@ -157,7 +157,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void SetSmallKeyToTripleDes()
         {
-            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.TripleDesWith168BitsKey))
+            using (var db = GetTripleDesConnection())
             {
                 var smallKey = new byte[23];
 
