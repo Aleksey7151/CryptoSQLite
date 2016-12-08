@@ -490,22 +490,35 @@ namespace Tests.Tables
 
         public DateTime Date { get; set; }
 
-        [Encrypted]
-        public DateTime EncryptedDate { get; set; }
-
-        public DateTime? NullAble1 { get; set; }
-
-        [Encrypted]
-        public DateTime? NullAble2 { get; set; }
+        public DateTime? NullAbleDate { get; set; }
 
         public bool Equals(DateTimeTable o)
         {
             if (o == null) return false;
 
             return Date == o.Date &&
-                   EncryptedDate == o.EncryptedDate &&
-                   NullAble1 == o.NullAble1 &&
-                   NullAble2 == o.NullAble2;
+                   NullAbleDate == o.NullAbleDate;
+        }
+    }
+
+    [CryptoTable("DateTimeEncryptedTable")]
+    internal class DateTimeEncryptedTable
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public DateTime Date { get; set; }
+
+        [Encrypted]
+        public DateTime? NullAbleDate { get; set; }
+
+        public bool Equals(DateTimeEncryptedTable o)
+        {
+            if (o == null) return false;
+
+            return Date == o.Date &&
+                   NullAbleDate == o.NullAbleDate;
         }
     }
 

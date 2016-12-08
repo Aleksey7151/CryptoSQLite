@@ -1256,56 +1256,56 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(DateTime))
+            if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
                 var dateTime = (DateTime) value;
                 var bytes = BitConverter.GetBytes(dateTime.ToBinary());
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(ushort))
+            if (type == typeof(ushort) || type == typeof(ushort?))
             {
                 var bytes = BitConverter.GetBytes((ushort)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(short))
+            if (type == typeof(short) || type == typeof(short?))
             {
                 var bytes = BitConverter.GetBytes((short)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(uint))
+            if (type == typeof(uint) || type == typeof(uint?))
             {
                 var bytes = BitConverter.GetBytes((uint)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(int))
+            if (type == typeof(int) || type == typeof(int?))
             {
                 var bytes = BitConverter.GetBytes((int)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(ulong))
+            if (type == typeof(ulong) || type == typeof(ulong?))
             {
                 var bytes = BitConverter.GetBytes((ulong)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(long))
+            if (type == typeof(long) || type == typeof(long?))
             {
                 var bytes = BitConverter.GetBytes((long)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(float))
+            if (type == typeof(float) || type == typeof(float?))
             {
                 var bytes = BitConverter.GetBytes((float)value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(double))
+            if (type == typeof(double) || type == typeof(double?))
             {
                 var bytes = BitConverter.GetBytes((double)value);
                 encryptor.XorGamma(bytes);
@@ -1319,13 +1319,13 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytesForEncrypt);
                 return bytesForEncrypt;
             }
-            if (type == typeof(bool))
+            if (type == typeof(bool) || type == typeof(bool?))
             {
                 var bytes = BitConverter.GetBytes((bool) value);
                 encryptor.XorGamma(bytes);
                 return bytes;
             }
-            if (type == typeof(byte))
+            if (type == typeof(byte) || type == typeof(byte?))
             {
                 var bytes = BitConverter.GetBytes((byte)value);
                 encryptor.XorGamma(bytes);

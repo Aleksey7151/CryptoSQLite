@@ -191,20 +191,20 @@ namespace CryptoSQLite
             if (type == typeof(string) || type == typeof(byte[]))       // reference types
                 return value;
 
-            if (type == typeof(long))
+            if (type == typeof(long) || type == typeof(long?))
                 return BitConverter.GetBytes((long) value);
             
-            if (type == typeof(ulong))
+            if (type == typeof(ulong) || type == typeof(ulong?))
                 return BitConverter.GetBytes((ulong) value);
 
-            if (type == typeof(DateTime))
+            if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
                 var date = (DateTime) value;
                 var ticks = date.ToBinary();
                 return BitConverter.GetBytes(ticks);
             }
 
-            if(type == typeof(bool))
+            if(type == typeof(bool) || type == typeof(bool?))
                 return Convert.ToInt32(value);
 
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite.");
@@ -216,7 +216,7 @@ namespace CryptoSQLite
 
             if (type == typeof(string))
                 property.SetValue(item, sqlValue);
-            else if (type == typeof(DateTime))
+            else if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
                 var bytes = (byte[])sqlValue;
                 var ticks = BitConverter.ToInt64(bytes, 0);

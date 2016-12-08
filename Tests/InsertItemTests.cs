@@ -110,7 +110,7 @@ namespace Tests
                     var element = db.Table<ShortEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ShortMaxVal == item.ShortMaxVal && element.ShortMinVal == item.ShortMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -143,7 +143,7 @@ namespace Tests
                     var element = db.Table<UShortNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.UShortMaxVal == item.UShortMaxVal && element.UShortMinVal == item.UShortMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -176,7 +176,7 @@ namespace Tests
                     var element = db.Table<UShortEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.UShortMaxVal == item.UShortMaxVal && element.UShortMinVal == item.UShortMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -209,7 +209,7 @@ namespace Tests
                     var element = db.Table<IntNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.IntMaxVal == item.IntMaxVal && element.IntMinVal == item.IntMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -242,7 +242,7 @@ namespace Tests
                     var element = db.Table<IntEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.IntMaxVal == item.IntMaxVal && element.IntMinVal == item.IntMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -275,7 +275,7 @@ namespace Tests
                     var element = db.Table<UIntNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.UIntMaxVal == item.UIntMaxVal && element.UIntMinVal == item.UIntMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -308,7 +308,7 @@ namespace Tests
                     var element = db.Table<UIntEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.UIntMaxVal == item.UIntMaxVal && element.UIntMinVal == item.UIntMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -341,7 +341,7 @@ namespace Tests
                     var element = db.Table<LongNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.LongMinVal == item.LongMinVal && element.LongMaxVal == item.LongMaxVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -374,7 +374,7 @@ namespace Tests
                     var element = db.Table<LongEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.LongMinVal == item.LongMinVal && element.LongMaxVal == item.LongMaxVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -407,7 +407,7 @@ namespace Tests
                     var element = db.Table<ULongNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ULongMinVal == item.ULongMinVal && element.ULongMaxVal == item.ULongMaxVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -440,7 +440,7 @@ namespace Tests
                     var element = db.Table<ULongEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ULongMinVal == item.ULongMinVal && element.ULongMaxVal == item.ULongMaxVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -458,26 +458,33 @@ namespace Tests
         }
 
         [Test]
-        public void InsertDateTimeValue()
+        public void InsertDateTimeValues()
         {
-            var item1 = new DateTimeTable
+            var items = new[] 
             {
-                Date = DateTime.Now,
-                EncryptedDate = DateTime.Now
+                new DateTimeTable
+                {
+                    Date = DateTime.Now,
+                    NullAbleDate = null
+                },
+                new DateTimeTable
+                {
+                    Date = DateTime.Now,
+                    NullAbleDate = DateTime.Now
+                },
+                new DateTimeTable
+                {
+                    Date = DateTime.MinValue,
+                    NullAbleDate = DateTime.MinValue
+                },
+                new DateTimeTable
+                {
+                    Date = DateTime.MaxValue,
+                    NullAbleDate = DateTime.MaxValue
+                }
+                
             };
-
-            var item2 = new DateTimeTable
-            {
-                Date = DateTime.MinValue,
-                EncryptedDate = DateTime.MinValue
-            };
-
-            var item3 = new DateTimeTable
-            {
-                Date = DateTime.MaxValue,
-                EncryptedDate = DateTime.MaxValue
-            };
-
+            
             foreach (var db in GetConnections())
             {
                 try
@@ -485,17 +492,74 @@ namespace Tests
                     db.DeleteTable<DateTimeTable>();
                     db.CreateTable<DateTimeTable>();
 
-                    db.InsertItem(item1);
-                    db.InsertItem(item2);
-                    db.InsertItem(item3);
+                    foreach (var item in items)
+                        db.InsertItem(item);
 
                     var elements = db.Table<DateTimeTable>().ToArray();
 
                     Assert.IsNotNull(elements);
 
-                    Assert.IsTrue(DateTime.Equals(elements[0].Date, item1.Date) && DateTime.Equals(elements[0].EncryptedDate, item1.EncryptedDate));
-                    Assert.IsTrue(DateTime.Equals(elements[1].Date, item2.Date) && DateTime.Equals(elements[1].EncryptedDate, item2.EncryptedDate));
-                    Assert.IsTrue(DateTime.Equals(elements[2].Date, item3.Date) && DateTime.Equals(elements[2].EncryptedDate, item3.EncryptedDate));
+                    for(var i = 0; i < elements.Length; i++)
+                        Assert.IsTrue(elements[i].Equals(items[i]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void InsertDateTimeEncryptedValues()
+        {
+            var items = new[]
+            {
+                new DateTimeEncryptedTable
+                {
+                    Date = DateTime.Now,
+                    NullAbleDate = null
+                },
+                new DateTimeEncryptedTable
+                {
+                    Date = DateTime.Now,
+                    NullAbleDate = DateTime.Now
+                },
+                new DateTimeEncryptedTable
+                {
+                    Date = DateTime.MinValue,
+                    NullAbleDate = DateTime.MinValue
+                },
+                new DateTimeEncryptedTable
+                {
+                    Date = DateTime.MaxValue,
+                    NullAbleDate = DateTime.MaxValue
+                }
+            };
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DateTimeEncryptedTable>();
+                    db.CreateTable<DateTimeEncryptedTable>();
+
+                    foreach (var item in items)
+                        db.InsertItem(item);
+
+                    var elements = db.Table<DateTimeEncryptedTable>().ToArray();
+
+                    Assert.IsNotNull(elements);
+
+                    for (var i = 0; i < elements.Length; i++)
+                        Assert.IsTrue(elements[i].Equals(items[i]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -528,7 +592,7 @@ namespace Tests
                     var element = db.Table<FloatNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(Math.Abs(element.FloatMaxVal - item.FloatMaxVal) < 0.00001  && Math.Abs(element.FloatMinVal - item.FloatMinVal) < 0.00001);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -561,7 +625,7 @@ namespace Tests
                     var element = db.Table<FloatEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(Math.Abs(element.FloatMaxVal - item.FloatMaxVal) < 0.00001 && Math.Abs(element.FloatMinVal - item.FloatMinVal) < 0.00001);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -594,7 +658,7 @@ namespace Tests
                     var element = db.Table<BoolEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.B1 == item.B1 && element.B2 == item.B2 && element.B3 == item.B3 && element.B4 == item.B4);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -627,7 +691,7 @@ namespace Tests
                     var element = db.Table<ByteEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ByteMaxVal == item.ByteMaxVal && element.ByteMinVal == item.ByteMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -660,7 +724,7 @@ namespace Tests
                     var element = db.Table<ByteNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.ByteMaxVal == item.ByteMaxVal && element.ByteMinVal == item.ByteMinVal);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -693,7 +757,7 @@ namespace Tests
                     var element = db.Table<DoubleNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(Math.Abs(element.DoubleMaxVal - item.DoubleMaxVal) < 0.000001 && Math.Abs(element.DoubleMinVal - item.DoubleMinVal) < 0.000001);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -726,7 +790,7 @@ namespace Tests
                     var element = db.Table<DoubleEncryptedNumbers>().ToArray()[0];
 
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(Math.Abs(element.DoubleMaxVal - item.DoubleMaxVal) < 0.000001 && Math.Abs(element.DoubleMinVal - item.DoubleMinVal) < 0.000001);
+                    Assert.IsTrue(element.Equals(item));
                 }
                 catch (CryptoSQLiteException cex)
                 {
