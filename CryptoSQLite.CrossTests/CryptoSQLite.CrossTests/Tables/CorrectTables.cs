@@ -33,11 +33,32 @@ namespace CryptoSQLite.CrossTests.Tables
         public int Id { get; set; }
 
         public short ShortMaxVal { get; set; }
+
         public short ShortMinVal { get; set; }
+
+        public short? NullAble1 { get; set; }
+
+        public short? NullAble2 { get; set; }
 
         public static ShortNumbers GetDefault()
         {
-            return new ShortNumbers { ShortMaxVal = short.MaxValue, ShortMinVal = short.MinValue };
+            return new ShortNumbers
+            {
+                ShortMaxVal = short.MaxValue,
+                ShortMinVal = short.MinValue,
+                NullAble2 = short.MinValue,
+                NullAble1 = null
+            };
+        }
+
+        public bool Equals(ShortNumbers o)
+        {
+            if (o == null) return false;
+
+            return ShortMaxVal == o.ShortMaxVal &&
+                   ShortMinVal == o.ShortMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -53,9 +74,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public short ShortMinVal { get; set; }
 
+        [Encrypted]
+        public short? NullAble1 { get; set; }
+
+        [Encrypted]
+        public short? NullAble2 { get; set; }
+
         public static ShortEncryptedNumbers GetDefault()
         {
-            return new ShortEncryptedNumbers { ShortMaxVal = short.MaxValue, ShortMinVal = short.MinValue };
+            return new ShortEncryptedNumbers
+            {
+                ShortMaxVal = short.MaxValue,
+                ShortMinVal = short.MinValue,
+                NullAble1 = null,
+                NullAble2 = short.MaxValue
+            };
+        }
+
+        public bool Equals(ShortEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return ShortMaxVal == o.ShortMaxVal &&
+                   ShortMinVal == o.ShortMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -66,11 +109,32 @@ namespace CryptoSQLite.CrossTests.Tables
         public int Id { get; set; }
 
         public ushort UShortMaxVal { get; set; }
+
         public ushort UShortMinVal { get; set; }
+
+        public ushort? NullAble1 { get; set; }
+
+        public ushort? NullAble2 { get; set; }
 
         public static UShortNumbers GetDefault()
         {
-            return new UShortNumbers { UShortMaxVal = ushort.MaxValue, UShortMinVal = ushort.MinValue };
+            return new UShortNumbers
+            {
+                UShortMaxVal = ushort.MaxValue,
+                UShortMinVal = ushort.MinValue,
+                NullAble1 = ushort.MaxValue,
+                NullAble2 = null
+            };
+        }
+
+        public bool Equals(UShortNumbers o)
+        {
+            if (o == null) return false;
+
+            return UShortMaxVal == o.UShortMaxVal &&
+                   UShortMinVal == o.UShortMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -86,9 +150,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public ushort UShortMinVal { get; set; }
 
+        [Encrypted]
+        public ushort? NullAble1 { get; set; }
+
+        [Encrypted]
+        public ushort? NullAble2 { get; set; }
+
         public static UShortEncryptedNumbers GetDefault()
         {
-            return new UShortEncryptedNumbers { UShortMaxVal = ushort.MaxValue, UShortMinVal = ushort.MinValue };
+            return new UShortEncryptedNumbers
+            {
+                UShortMaxVal = ushort.MaxValue,
+                UShortMinVal = ushort.MinValue,
+                NullAble2 = null,
+                NullAble1 = ushort.MaxValue
+            };
+        }
+
+        public bool Equals(UShortEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return UShortMaxVal == o.UShortMaxVal &&
+                   UShortMinVal == o.UShortMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -102,9 +188,28 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public int IntMinVal { get; set; }
 
+        public int? NullAble1 { get; set; }
+
+        public int? NullAble2 { get; set; }
+
         public static IntNumbers GetDefault()
         {
-            return new IntNumbers { IntMinVal = int.MinValue, IntMaxVal = int.MaxValue };
+            return new IntNumbers
+            {
+                IntMinVal = int.MinValue,
+                IntMaxVal = int.MaxValue,
+                NullAble2 = null,
+                NullAble1 = int.MinValue
+            };
+        }
+        public bool Equals(IntNumbers o)
+        {
+            if (o == null) return false;
+
+            return IntMaxVal == o.IntMaxVal &&
+                   IntMinVal == o.IntMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -120,9 +225,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public int IntMinVal { get; set; }
 
+        [Encrypted]
+        public int? NullAble1 { get; set; }
+
+        [Encrypted]
+        public int? NullAble2 { get; set; }
+
         public static IntEncryptedNumbers GetDefault()
         {
-            return new IntEncryptedNumbers { IntMinVal = int.MinValue, IntMaxVal = int.MaxValue };
+            return new IntEncryptedNumbers
+            {
+                IntMinVal = int.MinValue,
+                IntMaxVal = int.MaxValue,
+                NullAble2 = null,
+                NullAble1 = int.MinValue
+            };
+        }
+
+        public bool Equals(IntEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return IntMaxVal == o.IntMaxVal &&
+                   IntMinVal == o.IntMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -136,9 +263,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public uint UIntMinVal { get; set; }
 
+        public uint? NullAble1 { get; set; }
+
+        public uint? NullAble2 { get; set; }
+
         public static UIntNumbers GetDefault()
         {
-            return new UIntNumbers { UIntMaxVal = uint.MaxValue, UIntMinVal = uint.MinValue };
+            return new UIntNumbers
+            {
+                UIntMaxVal = uint.MaxValue,
+                UIntMinVal = uint.MinValue,
+                NullAble2 = null,
+                NullAble1 = uint.MinValue
+            };
+        }
+
+        public bool Equals(UIntNumbers o)
+        {
+            if (o == null) return false;
+
+            return UIntMaxVal == o.UIntMaxVal &&
+                   UIntMinVal == o.UIntMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -154,9 +301,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public uint UIntMinVal { get; set; }
 
+        [Encrypted]
+        public uint? NullAble1 { get; set; }
+
+        [Encrypted]
+        public uint? NullAble2 { get; set; }
+
         public static UIntEncryptedNumbers GetDefault()
         {
-            return new UIntEncryptedNumbers { UIntMinVal = uint.MinValue, UIntMaxVal = uint.MaxValue };
+            return new UIntEncryptedNumbers
+            {
+                UIntMinVal = uint.MinValue,
+                UIntMaxVal = uint.MaxValue,
+                NullAble2 = null,
+                NullAble1 = uint.MaxValue
+            };
+        }
+
+        public bool Equals(UIntEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return UIntMaxVal == o.UIntMaxVal &&
+                   UIntMinVal == o.UIntMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -170,9 +339,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public ulong ULongMinVal { get; set; }
 
+        public ulong? NullAble1 { get; set; }
+
+        public ulong? NullAble2 { get; set; }
+
         public static ULongNumbers GetDefault()
         {
-            return new ULongNumbers { ULongMinVal = ulong.MinValue, ULongMaxVal = ulong.MaxValue };
+            return new ULongNumbers
+            {
+                ULongMinVal = ulong.MinValue,
+                ULongMaxVal = ulong.MaxValue,
+                NullAble2 = null,
+                NullAble1 = ulong.MaxValue
+            };
+        }
+
+        public bool Equals(ULongNumbers o)
+        {
+            if (o == null) return false;
+
+            return ULongMaxVal == o.ULongMaxVal &&
+                   ULongMinVal == o.ULongMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -188,9 +377,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public ulong ULongMinVal { get; set; }
 
+        [Encrypted]
+        public ulong? NullAble1 { get; set; }
+
+        [Encrypted]
+        public ulong? NullAble2 { get; set; }
+
         public static ULongEncryptedNumbers GetDefault()
         {
-            return new ULongEncryptedNumbers { ULongMinVal = ulong.MinValue, ULongMaxVal = ulong.MaxValue };
+            return new ULongEncryptedNumbers
+            {
+                ULongMinVal = ulong.MinValue,
+                ULongMaxVal = ulong.MaxValue,
+                NullAble2 = null,
+                NullAble1 = ulong.MaxValue
+            };
+        }
+
+        public bool Equals(ULongEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return ULongMaxVal == o.ULongMaxVal &&
+                   ULongMinVal == o.ULongMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -204,9 +415,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public long LongMinVal { get; set; }
 
+        public long? NullAble1 { get; set; }
+
+        public long? NullAble2 { get; set; }
+
         public static LongNumbers GetDefault()
         {
-            return new LongNumbers { LongMaxVal = long.MaxValue, LongMinVal = long.MinValue };
+            return new LongNumbers
+            {
+                LongMaxVal = long.MaxValue,
+                LongMinVal = long.MinValue,
+                NullAble2 = null,
+                NullAble1 = long.MinValue
+            };
+        }
+
+        public bool Equals(LongNumbers o)
+        {
+            if (o == null) return false;
+
+            return LongMaxVal == o.LongMaxVal &&
+                   LongMinVal == o.LongMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -222,9 +453,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public long LongMinVal { get; set; }
 
+        [Encrypted]
+        public long? NullAble1 { get; set; }
+
+        [Encrypted]
+        public long? NullAble2 { get; set; }
+
         public static LongEncryptedNumbers GetDefault()
         {
-            return new LongEncryptedNumbers { LongMaxVal = long.MaxValue, LongMinVal = long.MinValue };
+            return new LongEncryptedNumbers
+            {
+                LongMaxVal = long.MaxValue,
+                LongMinVal = long.MinValue,
+                NullAble2 = null,
+                NullAble1 = long.MaxValue
+            };
+        }
+
+        public bool Equals(LongEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return LongMaxVal == o.LongMaxVal &&
+                   LongMinVal == o.LongMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -236,8 +489,36 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public DateTime Date { get; set; }
 
+        public DateTime? NullAbleDate { get; set; }
+
+        public bool Equals(DateTimeTable o)
+        {
+            if (o == null) return false;
+
+            return Date == o.Date &&
+                   NullAbleDate == o.NullAbleDate;
+        }
+    }
+
+    [CryptoTable("DateTimeEncryptedTable")]
+    internal class DateTimeEncryptedTable
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
         [Encrypted]
-        public DateTime EncryptedDate { get; set; }
+        public DateTime Date { get; set; }
+
+        [Encrypted]
+        public DateTime? NullAbleDate { get; set; }
+
+        public bool Equals(DateTimeEncryptedTable o)
+        {
+            if (o == null) return false;
+
+            return Date == o.Date &&
+                   NullAbleDate == o.NullAbleDate;
+        }
     }
 
     [CryptoTable("FloatNumbers")]
@@ -250,9 +531,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public float FloatMinVal { get; set; }
 
+        public float? NullAble1 { get; set; }
+
+        public float? NullAble2 { get; set; }
+
         public static FloatNumbers GetDefault()
         {
-            return new FloatNumbers { FloatMinVal = float.MinValue, FloatMaxVal = float.MaxValue };
+            return new FloatNumbers
+            {
+                FloatMinVal = float.MinValue,
+                FloatMaxVal = float.MaxValue,
+                NullAble2 = null,
+                NullAble1 = float.MaxValue
+            };
+        }
+
+        public bool Equals(FloatNumbers o)
+        {
+            if (o == null) return false;
+
+            return Math.Abs(FloatMaxVal - o.FloatMaxVal) < 0.0001 &&
+                   Math.Abs(FloatMinVal - o.FloatMinVal) < 0.0001 &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -268,9 +569,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public float FloatMinVal { get; set; }
 
+        [Encrypted]
+        public float? NullAble1 { get; set; }
+
+        [Encrypted]
+        public float? NullAble2 { get; set; }
+
         public static FloatEncryptedNumbers GetDefault()
         {
-            return new FloatEncryptedNumbers { FloatMinVal = float.MinValue, FloatMaxVal = float.MaxValue };
+            return new FloatEncryptedNumbers
+            {
+                FloatMinVal = float.MinValue,
+                FloatMaxVal = float.MaxValue,
+                NullAble2 = null,
+                NullAble1 = float.MaxValue
+            };
+        }
+
+        public bool Equals(FloatEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return Math.Abs(FloatMaxVal - o.FloatMaxVal) < 0.0001 &&
+                   Math.Abs(FloatMinVal - o.FloatMinVal) < 0.0001 &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -284,9 +607,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public double DoubleMinVal { get; set; }
 
+        public double? NullAble1 { get; set; }
+
+        public double? NullAble2 { get; set; }
+
         public static DoubleNumbers GetDefault()
         {
-            return new DoubleNumbers { DoubleMaxVal = double.MaxValue, DoubleMinVal = double.MinValue };
+            return new DoubleNumbers
+            {
+                DoubleMaxVal = double.MaxValue,
+                DoubleMinVal = double.MinValue,
+                NullAble2 = null,
+                NullAble1 = double.MinValue
+            };
+        }
+
+        public bool Equals(DoubleNumbers o)
+        {
+            if (o == null) return false;
+
+            return Math.Abs(DoubleMaxVal - o.DoubleMaxVal) < 0.000001 &&
+                   Math.Abs(DoubleMinVal - o.DoubleMinVal) < 0.000001 &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -302,9 +645,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public double DoubleMinVal { get; set; }
 
+        [Encrypted]
+        public double? NullAble1 { get; set; }
+
+        [Encrypted]
+        public double? NullAble2 { get; set; }
+
         public static DoubleEncryptedNumbers GetDefault()
         {
-            return new DoubleEncryptedNumbers { DoubleMaxVal = double.MaxValue, DoubleMinVal = double.MinValue };
+            return new DoubleEncryptedNumbers
+            {
+                DoubleMaxVal = double.MaxValue,
+                DoubleMinVal = double.MinValue,
+                NullAble2 = null,
+                NullAble1 = double.MaxValue
+            };
+        }
+
+        public bool Equals(DoubleEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return Math.Abs(DoubleMaxVal - o.DoubleMaxVal) < 0.000001 &&
+                   Math.Abs(DoubleMinVal - o.DoubleMinVal) < 0.000001 &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -324,9 +689,43 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public bool B4 { get; set; }
 
+        public bool? B5 { get; set; }
+
+        [Encrypted]
+        public bool? B6 { get; set; }
+
+        public bool? B7 { get; set; }
+
+        [Encrypted]
+        public bool? B8 { get; set; }
+
         public static BoolEncryptedNumbers GetDefault()
         {
-            return new BoolEncryptedNumbers { B1 = false, B2 = true, B3 = false, B4 = true };
+            return new BoolEncryptedNumbers
+            {
+                B1 = false,
+                B2 = true,
+                B3 = false,
+                B4 = true,
+                B5 = null,
+                B6 = null,
+                B7 = false,
+                B8 = true
+            };
+        }
+
+        public bool Equals(BoolEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return B1 == o.B1 &&
+                   B2 == o.B2 &&
+                   B3 == o.B3 &&
+                   B4 == o.B4 &&
+                   B5 == o.B5 &&
+                   B6 == o.B6 &&
+                   B7 == o.B7 &&
+                   B8 == o.B8;
         }
     }
 
@@ -342,9 +741,31 @@ namespace CryptoSQLite.CrossTests.Tables
         [Encrypted]
         public byte ByteMinVal { get; set; }
 
+        [Encrypted]
+        public byte? NullAble1 { get; set; }
+
+        [Encrypted]
+        public byte? NullAble2 { get; set; }
+
         public static ByteEncryptedNumbers GetDefault()
         {
-            return new ByteEncryptedNumbers { ByteMaxVal = byte.MaxValue, ByteMinVal = Byte.MinValue };
+            return new ByteEncryptedNumbers
+            {
+                ByteMaxVal = byte.MaxValue,
+                ByteMinVal = byte.MinValue,
+                NullAble2 = null,
+                NullAble1 = byte.MaxValue
+            };
+        }
+
+        public bool Equals(ByteEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return ByteMaxVal == o.ByteMaxVal &&
+                   ByteMinVal == o.ByteMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -358,9 +779,29 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public byte ByteMinVal { get; set; }
 
+        public byte? NullAble1 { get; set; }
+
+        public byte? NullAble2 { get; set; }
+
         public static ByteNumbers GetDefault()
         {
-            return new ByteNumbers { ByteMaxVal = byte.MaxValue, ByteMinVal = byte.MinValue };
+            return new ByteNumbers
+            {
+                ByteMaxVal = byte.MaxValue,
+                ByteMinVal = byte.MinValue,
+                NullAble2 = null,
+                NullAble1 = byte.MaxValue
+            };
+        }
+
+        public bool Equals(ByteNumbers o)
+        {
+            if (o == null) return false;
+
+            return ByteMaxVal == o.ByteMaxVal &&
+                   ByteMinVal == o.ByteMinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
         }
     }
 
@@ -426,9 +867,22 @@ namespace CryptoSQLite.CrossTests.Tables
     {
         public static bool IsTableEqualsTo(this AccountsData ac1, AccountsData ac2)
         {
+            var namesAreEqual = false;
+
+            if (ac1.AccountName == null && ac2.AccountName == null)
+                namesAreEqual = true;
+            else if (ac1.AccountName != null && ac2.AccountName != null)
+                namesAreEqual = ac1.AccountName == ac2.AccountName;
+
+            var passwordsAreEqual = false;
+
+            if (ac1.AccountName == null && ac2.AccountName == null)
+                passwordsAreEqual = true;
+            else if (ac1.AccountPassword != null && ac2.AccountPassword != null)
+                passwordsAreEqual = ac1.AccountPassword == ac2.AccountPassword;
+
             return ac1.IsAdministrator == ac2.IsAdministrator &&
-                   ac1.AccountName == ac2.AccountName &&
-                   ac1.AccountPassword == ac2.AccountPassword &&
+                   namesAreEqual && passwordsAreEqual &&
                    ac1.Age == ac2.Age &&
                    ac1.SocialSecureId == ac2.SocialSecureId;
         }
