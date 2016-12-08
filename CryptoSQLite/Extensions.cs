@@ -16,6 +16,12 @@ namespace CryptoSQLite
                 buf[i] = 0;
         }
 
+        public static void ZeroMemory(this ulong[] buf)
+        {
+            for (var i = 0; i < buf.Length; i++)
+                buf[i] = 0;
+        }
+
         public static void MemCpy(this byte[] destination, byte[] source, int len, int destinationStartIndex = 0, int sourceStartIndex = 0)
         {
             if(destination.Length < len + destinationStartIndex || source.Length < len + sourceStartIndex)
@@ -44,6 +50,15 @@ namespace CryptoSQLite
         }
 
         public static void Xor(this uint[] destination, uint[] source, int len)
+        {
+            if (destination.Length < len || source.Length < len)
+                throw new ArgumentException(nameof(len));
+
+            for (var i = 0; i < len; i++)
+                destination[i] ^= source[i];
+        }
+
+        public static void Xor(this ulong[] destination, ulong[] source, int len)
         {
             if (destination.Length < len || source.Length < len)
                 throw new ArgumentException(nameof(len));

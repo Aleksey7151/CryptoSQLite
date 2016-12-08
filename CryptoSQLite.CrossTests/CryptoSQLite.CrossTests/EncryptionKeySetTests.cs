@@ -32,28 +32,151 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetKeyWithIncorrectLen()
+        public void SetSmallKeyToGost()
         {
-            foreach (var db in GetOnlyConnections())
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey))
             {
+                var smallKey = new byte[31];
+
                 try
                 {
-                    var key = new byte[31];
-                    db.SetEncryptionKey(key);
+                    db.SetEncryptionKey(smallKey);
                 }
-                catch (ArgumentException ae)
+                catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ae.Message.IndexOf("Key length must be 32 bytes.", StringComparison.Ordinal)>=0);
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    return;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Assert.Fail(ex.Message);
+                    Assert.Fail();
                 }
-                finally
-                {
-                    db.Dispose();
-                }
+                Assert.Fail();
             }
+
+        }
+
+        [Test]
+        public void SetBigKeyToGost()
+        {
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey))
+            {
+                var bigKey = new byte[33];
+
+                try
+                {
+                    db.SetEncryptionKey(bigKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void SetSmallKeyToAes()
+        {
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.AesWith256BitsKey))
+            {
+                var smallKey = new byte[31];
+
+                try
+                {
+                    db.SetEncryptionKey(smallKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+
+        }
+
+        [Test]
+        public void SetBigKeyToAes()
+        {
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.AesWith256BitsKey))
+            {
+                var bigKey = new byte[33];
+
+                try
+                {
+                    db.SetEncryptionKey(bigKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void SetSmallKeyToDes()
+        {
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.DesWith56BitsKey))
+            {
+                var smallKey = new byte[7];
+
+                try
+                {
+                    db.SetEncryptionKey(smallKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for DES must be at least 8 bytes", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+
+        }
+
+        [Test]
+        public void SetSmallKeyToTripleDes()
+        {
+            using (var db = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.TripleDesWith168BitsKey))
+            {
+                var smallKey = new byte[23];
+
+                try
+                {
+                    db.SetEncryptionKey(smallKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for 3DES must be at least 24 bytes.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+
         }
 
         [Test]
@@ -98,7 +221,7 @@ namespace CryptoSQLite.CrossTests
 
                     foreach (var task in tasks)
                         db.InsertItem(task);
-                    
+
                 }
                 catch (CryptoSQLiteException cex)
                 {

@@ -38,10 +38,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
+    <Compile Include="CryptoProviders\BaseDesAlgoritm.cs" />
+    <Compile Include="CryptoProviders\DesCryptoProvider.cs" />
     <Compile Include="CryptoProviders\ICryptoProvider.cs" />
     <Compile Include="CryptoProviders\SoltGenerator.cs" />
     <Compile Include="CryptoProviders\AesCryptoProvider.cs" />
     <Compile Include="CryptoProviders\GostCryptoProvider.cs" />
+    <Compile Include="CryptoProviders\TripleDesCryptoProvider.cs" />
     <Compile Include="CryptoSQLiteConnection.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="OrmUtils.cs" />

@@ -1,85 +1,87 @@
 ﻿using System;
 using CryptoSQLite.CrossTests.Tables;
-using Xamarin.Forms;
 
 namespace CryptoSQLite.CrossTests
 {
     public class BaseTest
     {
-        private readonly byte[] _key =
-        {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
-        };
-
-        private static readonly IDatabaseFolderPathGetter Folder;
-
-        static BaseTest()
-        {
-            Folder = DependencyService.Get<IDatabaseFolderPathGetter>();
-        }
-
+        private readonly byte[] _key = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                                        18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 
 
         public const string GostDbFile = "TestGost.db3";
         public const string AesDbFile = "TestAes.db3";
+        public const string DesDbFile = "TestDes.db3";
+        public const string TripleDesDbFile = "TestTripleDes.db3";
 
         public CryptoSQLiteConnection GetAesConnection()
         {
-            CryptoSQLiteConnection conn = null;
-            try
-            {
-                conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(AesDbFile), CryptoAlgoritms.AesWith256BitsKey);
-                conn.SetEncryptionKey(_key);
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.Message;
-            }
-
+            var conn = new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
+            conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public CryptoSQLiteConnection GetGostConnection()
         {
-            CryptoSQLiteConnection conn = null;
-            try
-            {
-                conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgoritms.Gost28147With256BitsKey);
-                conn.SetEncryptionKey(_key);
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.Message;
-            }
-            
+            var conn = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteConnection GetDesConnection()
+        {
+            var conn = new CryptoSQLiteConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteConnection GetTripleDesConnection()
+        {
+            var conn = new CryptoSQLiteConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey);
+            conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public CryptoSQLiteConnection[] GetConnections()
         {
-            return new[] {GetGostConnection(), GetAesConnection()};
+            return new[] { GetGostConnection(), GetAesConnection(), GetDesConnection(), GetTripleDesConnection() };
         }
 
         public CryptoSQLiteConnection[] GetOnlyConnections()
         {
             return new[]
             {
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(AesDbFile), CryptoAlgoritms.AesWith256BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgoritms.Gost28147With256BitsKey)
+                new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey),
+                new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey),
+                new CryptoSQLiteConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey),
+                new CryptoSQLiteConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey)
             };
         }
 
         public CryptoSQLiteAsyncConnection GetGostAsyncConnection()
         {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgoritms.Gost28147With256BitsKey);
+            var conn = new CryptoSQLiteAsyncConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public CryptoSQLiteAsyncConnection GetAesAsyncConnection()
         {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(AesDbFile), CryptoAlgoritms.AesWith256BitsKey);
+            var conn = new CryptoSQLiteAsyncConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetDesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetTripleDesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
@@ -89,7 +91,9 @@ namespace CryptoSQLite.CrossTests
             return new[]
             {
                 GetAesAsyncConnection(),
-                GetGostAsyncConnection()
+                GetGostAsyncConnection(),
+                GetDesAsyncConnection(),
+                GetTripleDesAsyncConnection()
             };
         }
 
@@ -227,7 +231,7 @@ namespace CryptoSQLite.CrossTests
         {
             var ln = len == 0 ? destination.Length : len;
 
-            if (destination.Length < ln + destinationStartIndex )
+            if (destination.Length < ln + destinationStartIndex)
                 throw new ArgumentException(nameof(len));
 
             for (var i = 0; i < ln; i++)
@@ -236,7 +240,7 @@ namespace CryptoSQLite.CrossTests
 
         public static int MemCmp(this byte[] buff1, byte[] buff2, int len = 0)
         {
-            if(buff1 == null || buff2 == null)
+            if (buff1 == null || buff2 == null)
                 throw new ArgumentNullException();
 
             var ln = len == 0 ? buff1.Length : len;

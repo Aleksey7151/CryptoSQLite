@@ -12,6 +12,9 @@ namespace Tests
 
         public const string GostDbFile = "TestGost.db3";
         public const string AesDbFile = "TestAes.db3";
+        public const string DesDbFile = "TestDes.db3";
+        public const string TripleDesDbFile = "TestTripleDes.db3";
+
         public CryptoSQLiteConnection GetAesConnection()
         {
             var conn = new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
@@ -26,9 +29,23 @@ namespace Tests
             return conn;
         }
 
+        public CryptoSQLiteConnection GetDesConnection()
+        {
+            var conn = new CryptoSQLiteConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteConnection GetTripleDesConnection()
+        {
+            var conn = new CryptoSQLiteConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
         public CryptoSQLiteConnection[] GetConnections()
         {
-            return new[] {GetGostConnection(), GetAesConnection()};
+            return new[] {GetGostConnection(), GetAesConnection(), GetDesConnection(), GetTripleDesConnection()};
         }
 
         public CryptoSQLiteConnection[] GetOnlyConnections()
@@ -36,7 +53,9 @@ namespace Tests
             return new[]
             {
                 new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey),
-                new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey)
+                new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey),
+                new CryptoSQLiteConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey),
+                new CryptoSQLiteConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey)
             };
         }
 
@@ -54,12 +73,28 @@ namespace Tests
             return conn;
         }
 
+        public CryptoSQLiteAsyncConnection GetDesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetTripleDesAsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
         public CryptoSQLiteAsyncConnection[] GetAsyncConnections()
         {
             return new[]
             {
                 GetAesAsyncConnection(),
-                GetGostAsyncConnection()
+                GetGostAsyncConnection(),
+                GetDesAsyncConnection(),
+                GetTripleDesAsyncConnection()
             };
         }
 

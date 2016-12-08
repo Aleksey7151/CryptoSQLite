@@ -45,7 +45,17 @@ namespace CryptoSQLite
         /// <summary>
         /// USA encryption algoritm. It uses the 256 bit encryption key. 
         /// </summary>
-        AesWith256BitsKey
+        AesWith256BitsKey,
+
+        /// <summary>
+        /// USA encryption algoritm. It uses the 56 bit encryption key. And this algoritm is VERY FAST.
+        /// </summary>
+        DesWith56BitsKey,
+
+        /// <summary>
+        /// USA encryption algoritm. It uses the 168 bit encryption key. And this algoritm is FAST but not so fast as DES.
+        /// </summary>
+        TripleDesWith168BitsKey
     }
 
     /// <summary>
@@ -561,6 +571,8 @@ namespace CryptoSQLite
 
         private readonly ISoltGenerator _solter;
 
+        private readonly CryptoAlgoritms _algoritm;
+
         private readonly Dictionary<string, TableMap> _tables;
 
         private const string SoltColumnName = "SoltColumn";
@@ -577,7 +589,9 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
+            
             _cryptor = new AesCryptoProvider();
+            _algoritm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -601,10 +615,19 @@ namespace CryptoSQLite
                     _cryptor = new GostCryptoProvider();
                     break;
 
+                case CryptoAlgoritms.DesWith56BitsKey:
+                    _cryptor = new DesCryptoProvider();
+                    break;
+
+                case CryptoAlgoritms.TripleDesWith168BitsKey:
+                    _cryptor = new TripleDesCryptoProvider();
+                    break;
+
                 default:
                     _cryptor = new AesCryptoProvider();
                     break;
             }
+            _algoritm = cryptoAlgoritm;
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -644,8 +667,14 @@ namespace CryptoSQLite
             if(key == null)
                 throw new ArgumentNullException();
 
-            if (key.Length != 32)
-                throw new ArgumentException("Key length must be 32 bytes.");
+            if((_algoritm == CryptoAlgoritms.AesWith256BitsKey || _algoritm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length != 32)
+                throw new ArgumentException("Key length for AES and GOST must be 32 bytes.");
+
+            if(_algoritm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
+                throw new ArgumentException("Key length for DES must be at least 8 bytes.");
+
+            if(_algoritm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
+                throw new ArgumentException("Key length for 3DES must be at least 24 bytes.");
 
             _cryptor?.SetKey(key);
         }
