@@ -795,7 +795,7 @@ namespace CryptoSQLite
         {
             CheckTable<TTable>();
 
-            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue).FirstOrDefault();
+            return FindInTableUsingColumnValue<TTable>(columnName, columnValue).FirstOrDefault();
         }
 
         /// <summary>
@@ -817,7 +817,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            return GetRowFromTableUsingColumnName<TTable>(idProperty.GetColumnName(), id).FirstOrDefault();
+            return FindInTableUsingColumnValue<TTable>(idProperty.GetColumnName(), id).FirstOrDefault();
         }
 
         /// <summary>
@@ -836,7 +836,7 @@ namespace CryptoSQLite
 
             var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
 
-            return GetRowFromTableUsingColumnName<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
+            return FindInTableUsingColumnValue<TTable>(notDefaultValue.GetColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
         }
 
         /// <summary>
@@ -932,7 +932,7 @@ namespace CryptoSQLite
         {
             CheckTable<TTable>();
 
-            return GetRowFromTableUsingColumnName<TTable>(columnName, columnValue);
+            return FindInTableUsingColumnValue<TTable>(columnName, columnValue);
         }
 
         #endregion
@@ -1107,13 +1107,15 @@ namespace CryptoSQLite
             }
         }
 
-        private List<TTable> GetRowFromTableUsingColumnName<TTable>(string columnName, object columnValue) where TTable : class, new()
+        private List<TTable> FindInTableUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
 
-            if(columnValue == null)
+            /*
+            if (columnValue == null)
                 throw new CryptoSQLiteException("Column value can't be null.");
+                */
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
 
@@ -1125,7 +1127,11 @@ namespace CryptoSQLite
             if(properties.Any(p=>p.GetColumnName()==columnName && p.IsEncrypted()))
                 throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            var cmd = SqlCmds.CmdSelect(tableName, columnName);
+            string cmd;
+
+            if (columnValue != null)
+                cmd = SqlCmds.CmdSelect(tableName, columnName);
+            else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
 
             var table = ReadRowsFromTable(cmd, tableName, columnValue);
 
@@ -1217,8 +1223,8 @@ namespace CryptoSQLite
             {
                 var notNullValues = values.Where(v => v != null).ToArray();
 
-
                 var queryable = notNullValues.Length == 0 ? _connection.Query(cmd) : _connection.Query(cmd, notNullValues);
+
                 foreach (var row in queryable)
                 {
                     var columnsFromFile = new List<SqlColumnInfo>();

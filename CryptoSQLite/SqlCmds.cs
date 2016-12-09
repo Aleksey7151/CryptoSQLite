@@ -80,6 +80,11 @@ namespace CryptoSQLite
             return $"SELECT * FROM {tableName}";    // all table
         }
 
+        public static string CmdFindNullInTable(string tableName, string columnName)
+        {
+            return $"SELECT * FROM {tableName} WHERE {columnName} IS NULL";
+        }
+
         public static string CmdDeleteRow(string tableName, string columnName)
         {
             var cmd = $"DELETE FROM {tableName} WHERE {columnName} = (?)";
@@ -102,7 +107,7 @@ namespace CryptoSQLite
             if (column.IsAutoIncremental())
                 clmnMap += " AUTOINCREMENT";
 
-            if (column.IsNotNullable())
+            if (column.IsNotNull())
                 clmnMap += " NOT NULL";
 
             if (column.HasDefaultValue())

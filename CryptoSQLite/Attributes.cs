@@ -88,18 +88,31 @@ namespace CryptoSQLite
     }
 
     /// <summary>
-    /// This attribute used to indicate, that column can't be NULLABLE 
+    /// This attribute used to indicate NOT NULL column. If Default value is set, this value will be used as a default value for column. 
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class NotNullAttribute : Attribute
     {
-        
+        /// <summary>
+        /// Default value that is used when property doesn't have value.
+        /// </summary>
+        public object DefaultValue { get; }
+
+        /// <summary>
+        /// Ctor. The default value will be added to all new records, if no other value is specified
+        /// </summary>
+        /// <param name="defaultValue">Default value for the property that is used if property doesn't have value</param>
+        public NotNullAttribute(object defaultValue)
+        {
+            DefaultValue = defaultValue;
+        }
     }
 
     /// <summary>
     /// This attribute used to indicate, that column has default value, that must be written to database 
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
+    [Obsolete("This class is deprecated. You should use NotNullAttribute instead.", false)]
     public class HasDefaultValueAttribute : Attribute
     {
         /// <summary>

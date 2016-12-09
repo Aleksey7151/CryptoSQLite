@@ -12,6 +12,47 @@ namespace Tests
     public class FindTests : BaseTest
     {
         [Test]
+        public async Task FindRowsInTableThatHaveNullValues()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<AccountsData>();
+                    await db.CreateTableAsync<AccountsData>();
+
+                    accounts[0].AccountName = null;
+                    accounts[1].AccountName = null;
+                    accounts[2].AccountName = null;
+
+                    foreach (var account in accounts)
+                        await db.InsertItemAsync(account);
+
+                    var result = await db.FindByValueAsync<AccountsData>("Name", null);
+
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 3);
+                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
+                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
+                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[2]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public async Task FindFunctionUsingUpperValue()
         {
             var accounts = GetAccounts();
@@ -49,7 +90,6 @@ namespace Tests
             }
         }
     
-
         [Test]
         public async Task FindFunctionUsingLowerValue()
         {
@@ -199,9 +239,11 @@ namespace Tests
             }
         }
 
+        /*
         [Test]
         public async Task FindByValueFunctionWithoutUsingValues()
         {
+            
             foreach (var db in GetAsyncConnections())
             {
                 try
@@ -229,6 +271,8 @@ namespace Tests
                 }
             }
         }
+
+        */
 
         [Test]
         public async Task FindFunctionUsingInvalidColumnName()

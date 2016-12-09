@@ -55,10 +55,16 @@ namespace CryptoSQLite
             return attributes.Any();
         }
 
-        public static bool IsNotNullable(this PropertyInfo property)
+        public static bool IsNotNull(this PropertyInfo property)
         {
             var attributes = property.GetCustomAttributes<NotNullAttribute>();
             return attributes.Any();
+        }
+
+        public static object GetDefaultValue(this PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttribute<NotNullAttribute>();
+            return attribute?.DefaultValue;
         }
 
         public static bool HasDefaultValue(this PropertyInfo property)
@@ -66,13 +72,13 @@ namespace CryptoSQLite
             var attributes = property.GetCustomAttributes<HasDefaultValueAttribute>();
             return attributes.Any();
         }
-
+        /*
         public static object GetDefaultValue(this PropertyInfo property)
         {
             var attributes = property.GetCustomAttributes<HasDefaultValueAttribute>().ToArray();
             return attributes.Length == 0 ? null : attributes[0].DefaultValue;
         }
-
+        */
         public static string GetColumnName(this PropertyInfo property)
         {
             var attrs = property.GetCustomAttributes<ColumnAttribute>().ToArray();
