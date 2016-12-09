@@ -33,27 +33,31 @@ namespace CryptoSQLite
     }
 
     /// <summary>
-    /// Enumerates the crypto algoritms, that can be used for data protection in CryptoSQLite library
+    /// Enumerates crypto algorithms, that can be used for data encryption in CryptoSQLite library
     /// </summary>
     public enum CryptoAlgoritms
     {
         /// <summary>
-        /// USSR encryption algoritm. It uses the 256 bit encryption key.
+        /// USSR encryption algorithm. It uses the 256 bit encryption key.
+        /// <para/>This algorithm is reliable. Many exsoviet union countries use this algorithm for secret data protection.
         /// </summary>
         Gost28147With256BitsKey,
 
         /// <summary>
-        /// USA encryption algoritm. It uses the 256 bit encryption key. 
+        /// USA encryption algorithm. It uses the 256 bit encryption key. 
+        /// <para/>This algorithm is reliable.
         /// </summary>
         AesWith256BitsKey,
 
         /// <summary>
-        /// USA encryption algoritm. It uses the 56 bit encryption key. And this algoritm is VERY FAST.
+        /// USA encryption algorithm. It uses the 56 bit encryption key.
+        /// <para/>This algorithm is Very Fast, but not reliable.
         /// </summary>
         DesWith56BitsKey,
 
         /// <summary>
-        /// USA encryption algoritm. It uses the 168 bit encryption key. And this algoritm is FAST but not so fast as DES.
+        /// USA encryption algorithm. It uses the 168 bit encryption key.
+        /// <para/>This algorithm is Fast and more reliable than DES, but not so fast as DES.
         /// </summary>
         TripleDesWith168BitsKey
     }
@@ -64,9 +68,12 @@ namespace CryptoSQLite
     public interface ICryptoSQLiteConnection
     {
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
-        /// 
-        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
+        /// <para/>AES key length must be 32 bytes.
+        /// <para/>DES key length must be 8 bytes.
+        /// <para/>3DES key length must be 24 bytes.
+        /// <para/>GOST key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
         /// of <paramref name="key"/> immediately after you finish work with it.
         /// </summary>
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
@@ -78,7 +85,7 @@ namespace CryptoSQLite
         /// 
         /// Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing one more column: "SoltColumn". This column 
-        /// is used in encryption algoritms. If you change value of this column you
+        /// is used in encryption algorithms. If you change value of this column you
         /// won't be able to decrypt data.
         /// 
         /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
@@ -203,10 +210,14 @@ namespace CryptoSQLite
     public interface ICryptoSQLiteAsyncConnection
     {
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
-        /// </summary>
-        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
+        /// <para/>AES key length must be 32 bytes.
+        /// <para/>DES key length must be 8 bytes.
+        /// <para/>3DES key length must be 24 bytes.
+        /// <para/>GOST key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
         /// of <paramref name="key"/> immediately after you finish work with it.
+        /// </summary>
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
         /// <exception cref="NullReferenceException"></exception>
         void SetEncryptionKey(byte[] key);
@@ -216,7 +227,7 @@ namespace CryptoSQLite
         /// 
         /// Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing one more column: "SoltColumn". This column 
-        /// is used in encryption algoritms. If you change value of this column you
+        /// is used in encryption algorithms. If you change value of this column you
         /// won't be able to decrypt data.
         /// 
         /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
@@ -355,16 +366,20 @@ namespace CryptoSQLite
         /// Constructor. Creates connection to SQLite datebase file with data encryption.
         /// </summary>
         /// <param name="dbFileName">Path to database file</param>
-        /// <param name="cryptoAlgoritms">Type of crypto algoritm that will be used for data encryption</param>
+        /// <param name="cryptoAlgoritms">Type of crypto algorithm that will be used for data encryption</param>
         public CryptoSQLiteAsyncConnection(string dbFileName, CryptoAlgoritms cryptoAlgoritms)
         {
             _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
         }
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
-        /// </summary>
-        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
+        /// <para/>AES key length must be 32 bytes.
+        /// <para/>DES key length must be 8 bytes.
+        /// <para/>3DES key length must be 24 bytes.
+        /// <para/>GOST key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
         /// of <paramref name="key"/> immediately after you finish work with it.
+        /// </summary>
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
         /// <exception cref="NullReferenceException"></exception>
         public void SetEncryptionKey(byte[] key)
@@ -571,7 +586,7 @@ namespace CryptoSQLite
 
         private readonly ISoltGenerator _solter;
 
-        private readonly CryptoAlgoritms _algoritm;
+        private readonly CryptoAlgoritms _algorithm;
 
         private readonly Dictionary<string, TableMap> _tables;
 
@@ -591,7 +606,7 @@ namespace CryptoSQLite
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             
             _cryptor = new AesCryptoProvider();
-            _algoritm = CryptoAlgoritms.AesWith256BitsKey;
+            _algorithm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -600,12 +615,12 @@ namespace CryptoSQLite
         /// Constructor. Creates connection to SQLite datebase file with data encryption.
         /// </summary>
         /// <param name="dbFilename">Path to database file</param>
-        /// <param name="cryptoAlgoritm">Type of crypto algoritm that will be used for data encryption</param>
-        public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgoritm)
+        /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
+        public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgorithm)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             
-            switch (cryptoAlgoritm)
+            switch (cryptoAlgorithm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
                     _cryptor = new AesCryptoProvider();
@@ -627,7 +642,7 @@ namespace CryptoSQLite
                     _cryptor = new AesCryptoProvider();
                     break;
             }
-            _algoritm = cryptoAlgoritm;
+            _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
             _tables = new Dictionary<string, TableMap>();
         }
@@ -655,9 +670,12 @@ namespace CryptoSQLite
         #region Implementation of ICryptoSQLite
 
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algoritms for data encryption.
-        /// 
-        /// !! WARNING !! <paramref name="key"/> is a secret parameter. You must clean content
+        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
+        /// <para/>AES key length must be 32 bytes.
+        /// <para/>DES key length must be 8 bytes.
+        /// <para/>3DES key length must be 24 bytes.
+        /// <para/>GOST key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
         /// of <paramref name="key"/> immediately after you finish work with it.
         /// </summary>
         /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
@@ -667,13 +685,13 @@ namespace CryptoSQLite
             if(key == null)
                 throw new ArgumentNullException();
 
-            if((_algoritm == CryptoAlgoritms.AesWith256BitsKey || _algoritm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length != 32)
+            if((_algorithm == CryptoAlgoritms.AesWith256BitsKey || _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length != 32)
                 throw new ArgumentException("Key length for AES and GOST must be 32 bytes.");
 
-            if(_algoritm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
+            if(_algorithm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
                 throw new ArgumentException("Key length for DES must be at least 8 bytes.");
 
-            if(_algoritm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
+            if(_algorithm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
                 throw new ArgumentException("Key length for 3DES must be at least 24 bytes.");
 
             _cryptor?.SetKey(key);
@@ -684,7 +702,7 @@ namespace CryptoSQLite
         /// 
         /// Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing one more column: "SoltColumn". This column 
-        /// is used in encryption algoritms. If you change value of this column you
+        /// is used in encryption algorithms. If you change value of this column you
         /// won't be able to decrypt data.
         /// 
         /// Warning! If you insert element in the table, and then change Properties order in table type, you won't be able
