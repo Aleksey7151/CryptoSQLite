@@ -192,16 +192,39 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
+        [Obsolete("This method is deprecated. Use FindBetweenValues() method", false)]
         IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
-        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// <para/>If <paramref name="lowerValue"/> == null, then it will find all rows which <paramref name="columnName"/> values less than or equal <paramref name="upperValue"/>
+        /// <para/>If <paramref name="upperValue"/> == null, then it will find all rows which <paramref name="columnName"/> values more than or equal <paramref name="lowerValue"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <param name="lowerValue">Lower value (inclusive).</param>
+        /// <param name="upperValue">Upper value (inclusive).</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        IEnumerable<TTable> FindBetweenValues<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
+        /// <para/>If <paramref name="columnValue"/> == null, it will find all rows which <paramref name="columnName"/> value is null.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
-        /// <returns></returns>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
         IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
+        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
+        IEnumerable<TTable> FindByNotNullValue<TTable>(string columnName) where TTable : class, new();
     }
 
     /// <summary>

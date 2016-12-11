@@ -85,6 +85,11 @@ namespace CryptoSQLite
             return $"SELECT * FROM {tableName} WHERE {columnName} IS NULL";
         }
 
+        public static string CmdFindNotNullInTable(string tableName, string columnName)
+        {
+            return $"SELECT * FROM {tableName} WHERE {columnName} IS NOT NULL";
+        }
+
         public static string CmdDeleteRow(string tableName, string columnName)
         {
             var cmd = $"DELETE FROM {tableName} WHERE {columnName} = (?)";
