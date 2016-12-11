@@ -22,9 +22,9 @@ namespace Tests
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
-                    accounts[0].AccountName = null;
-                    accounts[1].AccountName = null;
-                    accounts[2].AccountName = null;
+                    accounts[0].Name = null;
+                    accounts[1].Name = null;
+                    accounts[2].Name = null;
 
                     foreach (var account in accounts)
                         await db.InsertItemAsync(account);

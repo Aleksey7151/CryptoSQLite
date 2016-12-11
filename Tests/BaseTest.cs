@@ -135,71 +135,89 @@ namespace Tests
 
         public AccountsData[] GetAccounts()
         {
-            var account0 = new AccountsData
+            return new[]
             {
-                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = 174376512,
-                AccountName = "Barbarian",
-                AccountPassword = "Bct ghjcnj 1",
-                Age = 21,
-                IsAdministrator = false,
+                new AccountsData
+                {
+                    Name = "Account0",
+                    Password = "Password0",
+                    SocialSecureId = 1,
+                    Posts = 45,
+                    Age = 20,
+                    Salary = 2500,
+                    IsAdministrator = true
+                },
+                new AccountsData
+                {
+                    Name = "Account1",
+                    Password = "Password1",
+                    SocialSecureId = 2,
+                    Posts = 50,
+                    Age = 21,
+                    Salary = 2700,
+                    IsAdministrator = false
+                },
+                new AccountsData
+                {
+                    Name = "Account2",
+                    Password = "Password2",
+                    SocialSecureId = null,
+                    Posts = 40,
+                    Age = 18,
+                    Salary = 1900,
+                    IsAdministrator = false
+                },
+                new AccountsData
+                {
+                    Name = "Account3",
+                    Password = "Password3",
+                    SocialSecureId = 3,
+                    Posts = 30,
+                    Age = 27,
+                    Salary = null,
+                    IsAdministrator = true
+                },
+                new AccountsData
+                {
+                    Name = "Account4",
+                    Password = "Password4",
+                    SocialSecureId = 4,
+                    Posts = 70,
+                    Age = 33,
+                    Salary = 3200,
+                    IsAdministrator = true
+                },
+                new AccountsData
+                {
+                    Name = "Account5",
+                    Password = "Password5",
+                    SocialSecureId = null,
+                    Posts = 45,
+                    Age = 22,
+                    Salary = null,
+                    IsAdministrator = false
+                },
+                new AccountsData
+                {
+                    Name = "Account6",
+                    Password = "Password6",
+                    SocialSecureId = 5,
+                    Posts = 60,
+                    Age = 25,
+                    Salary = 1500,
+                    IsAdministrator = true
+                },
+                new AccountsData
+                {
+                    Name = "Account7",
+                    Password = "Password7",
+                    SocialSecureId = null,
+                    Posts = 65,
+                    Age = 29,
+                    Salary = null,
+                    IsAdministrator = true
+                }
             };
-
-            var account1 = new AccountsData
-            {
-                Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = 174376512,
-                AccountName = "Frodo Beggins",
-                AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
-                Age = 22,
-                IsAdministrator = false,
-                IgnoredString = "Some string that i can't will be ignored in table mapping"
-            };
-
-            var account2 = new AccountsData
-            {
-                Id = 66,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = uint.MaxValue,
-                AccountName = "Gendalf Gray",
-                AccountPassword = "I am master of Anor flame.",
-                Age = 23,
-                IsAdministrator = true,
-                IgnoredString = "Some string that'll be ignored in table mapping"
-            };
-
-            var account3 = new AccountsData
-            {
-                Id = 166,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = 123462,
-                AccountName = "Andariel",
-                AccountPassword = "Big monster with big teeth.",
-                Age = 23,
-                IsAdministrator = true,
-                IgnoredString = "Some string that'll be ignored in table mapping"
-            };
-
-            var account4 = new AccountsData
-            {
-                Id = 666,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = 7292362,
-                AccountName = "Little Bug",
-                AccountPassword = "I'm little bug. And you won't find me.",
-                Age = 24,
-                IsAdministrator = true,
-                IgnoredString = "Some string that'll be ignored in table mapping"
-            };
-
-            var account5 = new AccountsData
-            {
-                Id = 666,    // will be ignored in table mapping, because it's market as autoincremental
-                SocialSecureId = 7292362,
-                AccountName = "Big Bug",
-                AccountPassword = "I'm big bug.",
-                Age = 25,
-                IsAdministrator = false
-            };
-
-            return new[] { account0, account1, account2, account3, account4, account5 };
         }
     }
 

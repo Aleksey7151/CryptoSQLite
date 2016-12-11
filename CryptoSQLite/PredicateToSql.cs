@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,7 +13,11 @@ namespace CryptoSQLite
 
         private PropertyInfo[] _compatibleProperties;
 
-        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties)
+        private string _tableName;
+
+        private List<object> _values;
+
+        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values)
         {
             if (whereExpression == null)
                 throw new ArgumentNullException(nameof(whereExpression));
@@ -20,7 +25,10 @@ namespace CryptoSQLite
             if (compatibleProperties == null)
                 throw new ArgumentNullException(nameof(compatibleProperties));
 
+            _tableName = tableName;
             _compatibleProperties = compatibleProperties;
+
+            _values = new List<object>();
 
             _builder.Clear();
 
@@ -30,6 +38,8 @@ namespace CryptoSQLite
 
             _builder.Replace("= NULL", "IS NULL");
             _builder.Replace("<> NULL", "IS NOT NULL");
+
+            values = _values.ToArray();
 
             return _builder.ToString();
         }
@@ -50,6 +60,8 @@ namespace CryptoSQLite
         private Expression TranslateConstantExpression(ConstantExpression constExp)
         {
             _builder.Append(constExp.Value == null ? "NULL" : "(?)");
+            if(constExp.Value != null)
+                _values.Add(constExp.Value);    // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL.
 
             return constExp;
         }
@@ -62,7 +74,10 @@ namespace CryptoSQLite
                 //Get real column name:
                 var prop = _compatibleProperties.FirstOrDefault(p => p.Name == memberExp.Member.Name);
                 if(prop == null)
-                    throw new ArgumentException("Table column names are incorect");
+                    throw new ArgumentException($"Table {_tableName} doesn't contain column with name {memberExp.Member.Name}.");
+
+                if(prop.IsEncrypted())
+                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column {prop.GetColumnName()} is Encrypted.");
 
                 _builder.Append(prop.GetColumnName());  // set real column name
 
