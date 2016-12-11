@@ -144,7 +144,7 @@ namespace Tests
                     SocialSecureId = 1,
                     Posts = 45,
                     Age = 20,
-                    Salary = 2500,
+                    Salary = null,
                     IsAdministrator = true
                 },
                 new AccountsData

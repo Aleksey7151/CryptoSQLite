@@ -856,8 +856,8 @@ namespace CryptoSQLite.CrossTests
             {
                 Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = 174376512,
-                AccountName = "Frodo Beggins",
-                AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
+                Name = "Frodo Beggins",
+                Password = "A_B_R_A_C_A_D_A_B_R_A",
                 Age = 27,
                 IsAdministrator = false,
                 IgnoredString = "Some string that i can't will be ignored in table mapping"
@@ -867,8 +867,8 @@ namespace CryptoSQLite.CrossTests
             {
                 Id = 66,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = uint.MaxValue,
-                AccountName = "Gendalf Gray",
-                AccountPassword = "I am master of Anor flame.",
+                Name = "Gendalf Gray",
+                Password = "I am master of Anor flame.",
                 Age = 27,
                 IsAdministrator = true,
                 IgnoredString = "Some string that'll be ignored in table mapping"
@@ -911,8 +911,8 @@ namespace CryptoSQLite.CrossTests
             {
                 Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = 174376512,
-                AccountName = null,
-                AccountPassword = "A_B_R_A_C_A_D_A_B_R_A",
+                Name = null,
+                Password = "A_B_R_A_C_A_D_A_B_R_A",
                 Age = 27,
                 IsAdministrator = false,
                 IgnoredString = "Some string that i can't will be ignored in table mapping"
@@ -954,8 +954,8 @@ namespace CryptoSQLite.CrossTests
             {
                 Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = 174376512,
-                AccountName = null,
-                AccountPassword = null,
+                Name = null,
+                Password = null,
                 Age = 27,
                 IsAdministrator = false,
                 IgnoredString = "Some string that i can't will be ignored in table mapping"

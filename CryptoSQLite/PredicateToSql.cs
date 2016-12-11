@@ -46,16 +46,22 @@ namespace CryptoSQLite
 
         private Expression TranslateUnaryExpression(UnaryExpression unaryExp)
         {
-            if (unaryExp.NodeType != ExpressionType.Not)
+            if (unaryExp.NodeType == ExpressionType.Convert)
+            {
+                TranslateExpression(unaryExp.Operand);
+            }
+            else if (unaryExp.NodeType == ExpressionType.Not)
+            {
+                _builder.Append(" NOT ");
+                TranslateExpression(unaryExp.Operand);
+            }
+            else
                 throw new NotSupportedException($"Operator {unaryExp.NodeType} not supported.");
-
-            _builder.Append(" NOT ");
-
-            TranslateExpression(unaryExp.Operand);
 
             return unaryExp;
 
         }
+
 
         private Expression TranslateConstantExpression(ConstantExpression constExp)
         {
@@ -154,6 +160,7 @@ namespace CryptoSQLite
             switch (expression.NodeType)
             {                                                   //  SQL Commands:
                 case ExpressionType.Not:                        //  NOT
+                case ExpressionType.Convert:
                     return TranslateUnaryExpression((UnaryExpression)expression);
 
                 case ExpressionType.Equal:                      //  ==

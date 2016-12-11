@@ -73,7 +73,8 @@ namespace Tests
                     Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
                     Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
                     Assert.IsTrue(table[2].IsTableEqualsTo(accounts[2]));
-                    Assert.IsTrue(table[3].IsTableEqualsTo(accounts[3]));
+                    Assert.IsTrue(table[3].IsTableEqualsTo(accounts[5]));
+
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -104,12 +105,13 @@ namespace Tests
                     foreach (var account in accounts)
                         await db.InsertItemAsync(account);
 
-                    var result = await db.FindAsync<AccountsData>("Age", 24);
+                    var result = await db.FindAsync<AccountsData>("Age", 27);
 
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[4]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[5]));
+                    Assert.IsTrue(table.Length == 3);
+                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[3]));
+                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[4]));
+                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[7]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -140,14 +142,13 @@ namespace Tests
                     foreach (var account in accounts)
                         await db.InsertItemAsync(account);
 
-                    var result = await db.FindAsync<AccountsData>("Age", 22, 24);
+                    var result = await db.FindAsync<AccountsData>("Age", 20, 24);
 
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[1]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[2]));
-                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[3]));
-                    Assert.IsTrue(table[3].IsTableEqualsTo(accounts[4]));
+                    Assert.IsTrue(table.Length == 3);
+                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
+                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
+                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[5]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -178,12 +179,11 @@ namespace Tests
                     foreach (var account in accounts)
                         await db.InsertItemAsync(account);
 
-                    var result = await db.FindByValueAsync<AccountsData>("Age", 23);
+                    var result = await db.FindByValueAsync<AccountsData>("Age", 20);
 
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[2]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[3]));
+                    Assert.IsTrue(table.Length == 1);
+                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -239,40 +239,6 @@ namespace Tests
             }
         }
 
-        /*
-        [Test]
-        public async Task FindByValueFunctionWithoutUsingValues()
-        {
-            
-            foreach (var db in GetAsyncConnections())
-            {
-                try
-                {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
-
-                    
-                    var result = await db.FindByValueAsync<AccountsData>("Age", null);
-
-                    var table = result.ToArray();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Column value can't be null.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-            }
-        }
-
-        */
 
         [Test]
         public async Task FindFunctionUsingInvalidColumnName()

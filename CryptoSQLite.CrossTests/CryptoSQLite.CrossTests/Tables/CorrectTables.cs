@@ -847,15 +847,18 @@ namespace CryptoSQLite.CrossTests.Tables
         public int Id { get; set; }
 
         [Column("Name")]
-        public string AccountName { get; set; }
+        public string Name { get; set; }
 
         [Encrypted, Column("Password")]
-        public string AccountPassword { get; set; }
+        public string Password { get; set; }
 
-        [Encrypted]
-        public uint SocialSecureId { get; set; }
+        public uint? SocialSecureId { get; set; }
 
-        public int Age { get; set; }
+        public int Posts { get; set; }
+
+        public ushort Age { get; set; }
+
+        public ulong? Salary { get; set; }
 
         public bool IsAdministrator { get; set; }
 
@@ -869,17 +872,17 @@ namespace CryptoSQLite.CrossTests.Tables
         {
             var namesAreEqual = false;
 
-            if (ac1.AccountName == null && ac2.AccountName == null)
+            if (ac1.Name == null && ac2.Name == null)
                 namesAreEqual = true;
-            else if (ac1.AccountName != null && ac2.AccountName != null)
-                namesAreEqual = ac1.AccountName == ac2.AccountName;
+            else if (ac1.Name != null && ac2.Name != null)
+                namesAreEqual = ac1.Name == ac2.Name;
 
             var passwordsAreEqual = false;
 
-            if (ac1.AccountName == null && ac2.AccountName == null)
+            if (ac1.Password == null && ac2.Password == null)
                 passwordsAreEqual = true;
-            else if (ac1.AccountPassword != null && ac2.AccountPassword != null)
-                passwordsAreEqual = ac1.AccountPassword == ac2.AccountPassword;
+            else if (ac1.Password != null && ac2.Password != null)
+                passwordsAreEqual = ac1.Password == ac2.Password;
 
             return ac1.IsAdministrator == ac2.IsAdministrator &&
                    namesAreEqual && passwordsAreEqual &&

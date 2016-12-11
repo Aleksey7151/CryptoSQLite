@@ -563,7 +563,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
+        [Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
@@ -581,7 +581,7 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.")]
+        [Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.")]
         public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
             where TTable : class, new()
         {
