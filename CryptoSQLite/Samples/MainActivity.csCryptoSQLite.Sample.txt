@@ -1,0 +1,84 @@
+﻿using System;
+using System.IO;
+using Android.App;
+using Android.OS;
+using CryptoSQLite;
+
+
+namespace CryptoSQLiteSample.Droid
+{
+    [CryptoTable("MyTasks")]
+    public class Tasks
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string Task { get; set; }
+
+        public string Description { get; set; }
+
+        public double? Price { get; set; }
+
+        public bool IsDone { get; set; }
+    }
+
+    [Activity(Label = "CryptoSQLiteSample.Droid", MainLauncher = true, Icon = "@drawable/icon")]
+    public class MainActivity : Activity
+    {
+        private string fileName = "MySqlDb.db3";
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            // Set our view from the "main" layout resource
+            SetContentView(Resource.Layout.Main);
+
+			// ! IMPORTANT ! This function determines how to talk to a specific instance of the native SQLite3 library.
+            // You can call this function in Application::OnCreate() function or in Application ctor.
+            SQLitePCL.Batteries_V2.Init(); // From NuGet package SQLitePCLRaw.batteries_green
+
+            var pathToDatabaseFile = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, fileName);
+
+            try
+            {
+				var db = new CryptoSQLiteConnection(pathToDatabaseFile, CryptoAlgoritms.AesWith256BitsKey);
+
+                db.SetEncryptionKey(new byte[32]);
+
+                db.CreateTable<Tasks>();
+
+				// All Properties that have [Encrypted] attribute properties will be automatically encrypted or decrypted
+
+                db.InsertItem(new Tasks { Task = "Task1", Description = "Description_1", Price = 1234.41, IsDone = false });
+                db.InsertItem(new Tasks { Task = "Task2", Description = "Description_2", Price = 1307.69, IsDone = true });
+                db.InsertItem(new Tasks { Task = "Task3", Description = "Description_1", Price = null, IsDone = true });
+                db.InsertItem(new Tasks { Task = "Task4", Description = "Description_2", Price = 1100.99, IsDone = false });
+                db.InsertItem(new Tasks { Task = "Task5", Description = "Description_2", Price = 1718.99, IsDone = false });
+                db.InsertItem(new Tasks { Task = "Task6", Description = "Description_3", Price = null, IsDone = true });
+
+				// FIND ELEMENTS IN LINQ MANNER:
+
+                var completedTasks = db.Find<Tasks>(t => t.IsDone);             // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 1)
+
+                var notCompletedTasks = db.Find<Tasks>(t => !t.IsDone);         // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 0)
+
+                var tasksWithoutPrice = db.Find<Tasks>(t => t.Price == null);   // SQL Request will be: SELECT * FROM MyTasks WHERE (Price IS NULL) 
+
+                var tasksWithPrice = db.Find<Tasks>(t => t.Price != null);      // SQL Request will be: SELECT * FROM MyTasks WHERE (Price IS NOT NULL) 
+
+                var completedTasksWithPriceLessThanValue = db.Find<Tasks>(t => t.IsDone && t.Price < 1400); // SQL Request will be: SELECT * FROM MyTasks WHERE ((IsDone = 1) AND (Price < 1400))
+
+                var taskWithExplisitDescription = db.Find<Tasks>(t => t.Description == "Description_3");    // SQL Request will be: SELECT * FROM MyTasks WHERE (Description = 'Description_3')
+
+                var exampleWithThreeRules = db.Find<Tasks>(t => t.IsDone && t.Price > 1000 && t.Price < 1300);  // SQL Request will be: SELECT * FROM MyTasks WHERE (((IsDone = 1) AND (Price > 1000)) AND (Price < 1300))
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+            }
+		}
+	}
+}
+
+

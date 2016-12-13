@@ -14,6 +14,7 @@ namespace CryptoSQLite
 
     internal static class OrmUtils
     {
+        /*
         public static Type[] CompatibleTypes =
         {
             typeof(DateTime), typeof(bool), typeof(string), typeof(byte[]), typeof(byte),
@@ -24,6 +25,42 @@ namespace CryptoSQLite
             typeof(short?), typeof(ushort?), typeof(int?), typeof(uint?), typeof(long?), typeof(ulong?),
             typeof(float?), typeof(double?)
         };
+        */
+
+        public static Type[] ClrTextTypes = { typeof(string) };
+
+        public static Type[] ClrRealTypes =
+        {
+            typeof(double), typeof(float), typeof(double?), typeof(float?)
+        };
+
+        public static Type[] ClrIntegerTypes =
+        {
+            typeof(int), typeof(short), typeof(byte), typeof(uint), typeof(ushort), typeof(bool), typeof(int?),
+            typeof(short?), typeof(byte?), typeof(uint?), typeof(ushort?), typeof(bool?)
+        };
+        
+        public static Type[] ClrBlobTypes =
+        {
+            typeof(long), typeof(ulong), typeof(DateTime), typeof(byte[]),
+            typeof(long?), typeof(ulong?), typeof(DateTime?)
+        };
+
+        public static Type[] ForbiddenTypesInFindRequests =
+        {
+            typeof(long), typeof(ulong), typeof(DateTime)
+        };
+
+        public static Type[] TypesForOnlyNullFindRequests =
+        {
+            typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[])
+        };
+
+        public static bool IsTypeCompatible(Type type)
+        {
+            return ClrIntegerTypes.Contains(type) || ClrTextTypes.Contains(type) || ClrBlobTypes.Contains(type) ||
+                   ClrRealTypes.Contains(type);
+        }
 
         public static bool IsEncrypted(this PropertyInfo property)
         {
@@ -92,26 +129,22 @@ namespace CryptoSQLite
 
             var type = property.PropertyType;
 
-            if (type == typeof(int) || type == typeof(short) || type == typeof(byte) ||
-                type == typeof(uint) || type == typeof(ushort) || type == typeof(bool) ||
-                type == typeof(int?) || type == typeof(short?) || type == typeof(byte?) ||
-                type == typeof(uint?) || type == typeof(ushort?) || type == typeof(bool?))
+            if (ClrIntegerTypes.Contains(type))
                 return "INTEGER";
 
-            if (type == typeof(string))
+            if (ClrTextTypes.Contains(type))
                 return "TEXT";
 
-            if (type == typeof(double) || type == typeof(float) ||
-                type == typeof(double?) || type == typeof(float?))
+            if (ClrRealTypes.Contains(type))
                 return "REAL";
 
-            if (type == typeof(long) || type == typeof(ulong) || type == typeof(DateTime) || type == typeof(byte[]) ||
-                type == typeof(long?) || type == typeof(ulong?) || type == typeof(DateTime?))
+            if (ClrBlobTypes.Contains(type))
                 return "BLOB";
 
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
 
+       
 
 
         public static IEnumerable<PropertyInfo> GetCompatibleProperties<TTable>()

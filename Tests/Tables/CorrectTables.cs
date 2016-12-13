@@ -855,6 +855,8 @@ namespace Tests.Tables
 
         public uint? SocialSecureId { get; set; }
 
+        public double? Productivity { get; set; }
+
         public int Posts { get; set; }
 
         public ushort Age { get; set; }

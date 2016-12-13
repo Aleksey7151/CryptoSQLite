@@ -20,7 +20,7 @@ namespace CryptoSQLite
         public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values)
         {
             if (whereExpression == null)
-                throw new ArgumentNullException(nameof(whereExpression));
+                throw new ArgumentNullException(nameof(whereExpression), "Predicate can't be null");
 
             if (compatibleProperties == null)
                 throw new ArgumentNullException(nameof(compatibleProperties));
@@ -66,13 +66,18 @@ namespace CryptoSQLite
         private Expression TranslateConstantExpression(ConstantExpression constExp)
         {
             _builder.Append(constExp.Value == null ? "NULL" : "(?)");
-            if(constExp.Value != null)
-                _values.Add(constExp.Value);    // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL.
-
+            if (constExp.Value != null)
+            {
+                if(OrmUtils.TypesForOnlyNullFindRequests.Contains(_memberAccessLastType))
+                    throw new CryptoSQLiteException("Properties with types 'UInt64?', 'Int64?', 'DateTime?' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements.");
+                
+                // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL in SQL request.
+                _values.Add(constExp.Value);
+            }
             return constExp;
         }
 
-
+        private Type _memberAccessLastType;
         private Expression TranslateMemberAccess(MemberExpression memberExp)
         {
             if (memberExp.Expression != null && memberExp.Expression.NodeType == ExpressionType.Parameter)
@@ -81,6 +86,12 @@ namespace CryptoSQLite
                 var prop = _compatibleProperties.FirstOrDefault(p => p.Name == memberExp.Member.Name);
                 if(prop == null)
                     throw new ArgumentException($"Table {_tableName} doesn't contain column with name {memberExp.Member.Name}.");
+
+                _memberAccessLastType = prop.PropertyType;
+
+                // Check forbidden types, they can't be used in Predicate to find items, because they are stored in database in BLOB view.
+                if(OrmUtils.ForbiddenTypesInFindRequests.Contains(prop.PropertyType))
+                    throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.");
 
                 if(prop.IsEncrypted())
                     throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column {prop.GetColumnName()} is Encrypted.");

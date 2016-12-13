@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -89,7 +88,7 @@ namespace CryptoSQLite
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
         /// won't be able to decrypt data.
         /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table type is importent thing.
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -113,6 +112,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
+        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -184,37 +184,39 @@ namespace CryptoSQLite
         IEnumerable<TTable> Table<TTable>() where TTable : class, new();
 
         /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
+        /// <summary>
         /// Finds all the elements whose <paramref name="columnName"/>-values lie between
         /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
         /// <para/>If <paramref name="columnValue"/> == null, it will find all rows which <paramref name="columnName"/> value is null.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.")]
+        //[Obsolete("This method is deprecated and soon will be removed. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
 
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        IEnumerable<TTable> Where<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
     }
 
     /// <summary>
@@ -242,7 +244,7 @@ namespace CryptoSQLite
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
         /// won't be able to decrypt data.
         /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table type is importent thing.
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -266,6 +268,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
+        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -337,38 +340,39 @@ namespace CryptoSQLite
         Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new();
 
         /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
+        /// <summary>
         /// Finds all the elements whose <paramref name="columnName"/>-values lie between
         /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
         /// <para/>If <paramref name="columnValue"/> == null, it will find all rows which <paramref name="columnName"/> value is null.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next version of library. Use LINQ Where<T>(Predicate<T> p) method instead.")]
         Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
 
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        Task<IEnumerable<TTable>> WhereAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
     }
 
     /// <summary>
@@ -419,7 +423,7 @@ namespace CryptoSQLite
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
         /// won't be able to decrypt data.
         /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table type is importent thing.
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -452,6 +456,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
+        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -552,36 +557,51 @@ namespace CryptoSQLite
             return table;
         }
 
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate)
+            where TTable : class, new()
+        {
+            var elements = await Task.Run(() => _connection.Find(predicate));
+            return elements;
+        }
 
         /// <summary>
         /// Finds all the elements whose <paramref name="columnName"/>-values lie between
         /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
+        /// <para/>If <paramref name="lowerValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are less or equal <paramref name="upperValue"/>
+        /// <para/>If <paramref name="upperValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are greater or equal <paramref name="lowerValue"/>
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="CryptoSQLiteException"></exception>
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Find<TTable>(columnName, lowerValue, upperValue));
             return elements;
         }
-
-
+        
         /// <summary>
-        /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
-        /// <para/>THIS METHOD IS DEPRECATED. It will be removed in the next version of library. Use LINQ Where() method instead.
-        /// <para/>If <paramref name="columnValue"/> == null, it will find all rows which <paramref name="columnName"/> value is null.
+        /// Finds all elements in table whose <paramref name="columnName"/> value equal to<paramref name="columnValue"/>
+        /// <para/>If <paramref name="columnValue"/> == null, it will find all elements which <paramref name="columnName"/> value is null.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.")]
+        //[Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
             where TTable : class, new()
         {
@@ -589,18 +609,7 @@ namespace CryptoSQLite
             return elements;
         }
 
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> WhereAsync<TTable>(Expression<Predicate<TTable>> predicate)
-            where TTable : class, new()
-        {
-            var elements = await Task.Run(() => _connection.Where(predicate));
-            return elements;
-        }
+
 
         /// <summary>
         /// Closes connection to SQLite database file. And cleans internal copies of encryption keys.
@@ -745,7 +754,7 @@ namespace CryptoSQLite
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
         /// won't be able to decrypt data.
         /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table type is importent thing.
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
         /// </summary>
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
@@ -809,6 +818,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
+        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -944,8 +954,49 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// 
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
+        {
+            CheckTable<TTable>();
+
+            var tableName = GetTableName<TTable>();
+
+            PropertyInfo[] compatibleProperties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
+
+            var predicateTraslator = new PredicateToSql();
+            object[] values;
+
+            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, compatibleProperties, out values);
+
+            var table = ReadRowsFromTable(cmd, values);
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+                ProcessRow(compatibleProperties, row, item);
+                items.Add(item);
+            }
+
+            return items;
+        }
+
+        /// <summary>
+        /// Finds all the elements whose <paramref name="columnName"/>-values are lying between
         /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
+        /// <para/>If <paramref name="lowerValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are less or equal <paramref name="upperValue"/>
+        /// <para/>If <paramref name="upperValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are greater or equal <paramref name="lowerValue"/>
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
@@ -961,12 +1012,13 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Finds all elements in table whose <paramref name="columnName"/> contain value <paramref name="columnValue"/>
+        /// Finds all elements in table whose <paramref name="columnName"/> value equal to <paramref name="columnValue"/>
+        /// <para/>If <paramref name="columnValue"/> == null, it will find all elements which <paramref name="columnName"/> value is null.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
-        /// <returns></returns>
+        /// <returns>All elements from table that are satisfying conditions.</returns>
         public IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -975,38 +1027,7 @@ namespace CryptoSQLite
         }
 
 
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public IEnumerable<TTable> Where<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
-        {
-            CheckTable<TTable>();
 
-            var tableName = GetTableName<TTable>();
-
-            PropertyInfo[] compatibleProperties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
-
-            var predicateTraslator = new PredicateToSql();
-            object[] values;
-
-            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, compatibleProperties, out values);
-            
-            var table = ReadRowsFromTable(cmd, values);
-
-            var items = new List<TTable>();
-
-            foreach (var row in table)
-            {
-                var item = new TTable();
-                ProcessRow(compatibleProperties, row, item);
-                items.Add(item);
-            }
-
-            return items;
-        }
 
         #endregion
 
@@ -1073,7 +1094,7 @@ namespace CryptoSQLite
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToList();
 
-            if (properties.Any(property => !OrmUtils.CompatibleTypes.Contains(property.PropertyType)))
+            if (properties.Any(property => !OrmUtils.IsTypeCompatible(property.PropertyType)))
                 throw new CryptoSQLiteException($"Table {tableName} contains incompatible type of property.", "Compatible types: bool, DateTime, string, byte[], byte, short, ushort, int, uint, long, ulong, float, double");
             
             if (properties.Any(p => p.GetColumnName() == SoltColumnName))
@@ -1184,11 +1205,6 @@ namespace CryptoSQLite
         {
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
-
-            /*
-            if (columnValue == null)
-                throw new CryptoSQLiteException("Column value can't be null.");
-                */
 
             var properties = OrmUtils.GetCompatibleProperties<TTable>().ToArray();
 

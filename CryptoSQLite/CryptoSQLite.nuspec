@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>1.0.9</version>
+    <version>2.0.0</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -18,9 +18,9 @@ Supported Xamarin platforms:
 Just add [CryptoTable("TableName")] attribute to your class definition (Table) and [Encrypted] attribute to a properties in your class that you want to be stored in database file in encrypted view.
 CryptoSQLite will encrypt all [Encrypted] properties automatically when you adding elements in your Table and decrypt all encrypted properties when you getting elements from the Table in database file.
 PCL provides CRUD (Create, Read, Update, Delete) and Find functions.
-In 1.0.9 version implemented support DES and 3DES algorithms for encryption data
+In 2.0.0 version implemented find requests in LINQ manner. Look samples that included in Package.
     </description>
-    <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid winphone monotouch key encrypt aes des gost</tags>
+    <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid winphone monotouch key encrypt aes des gost linq2sql linqtosql linq</tags>
     <dependencies>
       <dependency id="SQLitePCL.pretty" version="1.1.0" />
       <dependency id="SQLitePCL.raw" version="0.9.3" />
@@ -29,7 +29,7 @@ In 1.0.9 version implemented support DES and 3DES algorithms for encryption data
   <files>
     <file src="bin/Release/CryptoSQLite.dll" target="lib/portable-net45+netcore45+wpa81+wp8" />
     <file src="bin/Release/CryptoSQLite.xml" target="lib/portable-net45+netcore45+wpa81+wp8" />
-    <file src="Sample.MainActivity.cs.txt" target="content"/>
-	<file src="Sample.ViewController.cs.txt" target="content"/>
+    <file src="Samples/MainActivity.cs.CryptoSQLite.Sample.txt" target="content"/>
+	  <file src="Samples/ViewController.cs.CryptoSQLite.Sample.txt" target="content"/>
   </files>
 </package>

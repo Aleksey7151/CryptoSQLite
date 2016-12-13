@@ -306,7 +306,7 @@ namespace CryptoSQLite.CrossTests
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
-                    await db.FindAsync<AccountsData>(null);
+                    await db.FindAsync<AccountsData>(null, null, null);
                 }
                 catch (CryptoSQLiteException cex)
                 {
