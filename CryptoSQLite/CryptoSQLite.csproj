@@ -68,7 +68,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Samples\MainActivity.csCryptoSQLite.Sample.txt" />
+    <Content Include="Samples\MainActivity.cs.CryptoSQLite.Sample.txt" />
     <Content Include="Samples\ViewController.cs.CryptoSQLite.Sample.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
