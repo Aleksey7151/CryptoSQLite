@@ -1,0 +1,23 @@
+﻿namespace CryptoSQLite.Samples
+{
+    // Very soon [ForeingKey] attribute will be implemented.
+      
+    [CryptoTable("MyTable")]
+    public class TableDeffinitions
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Column("Price"), NotNull(99.99)]   // Column name will be 'Price' Default value for price will be 99.99, and price can'be null. 
+        public double? DoubleValue { get; set; }
+
+        [Encrypted, NotNull]       // Ecrypted columns can be Not Null, BUT they can't have DEFAULT VALUE, so this [Encrypted, NotNull("Secret String")] is WRONG!
+        public string SecretString { get; set; }
+
+        [Encrypted, Column("SecretData")]
+        public byte[] SecretBlobData { get; set; }
+
+        [Ignored]               // this property won't be mapped in table
+        public string IgnoredString { get; set; }
+    }
+}

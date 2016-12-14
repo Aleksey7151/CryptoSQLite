@@ -50,6 +50,7 @@
     <Compile Include="OrmUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mapping\TableMap.cs" />
+    <Content Include="Samples\TableDeffinitions.cs.txt" />
     <Compile Include="SqlCmds.cs" />
     <Compile Include="PredicateToSql.cs" />
   </ItemGroup>

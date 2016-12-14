@@ -93,18 +93,6 @@ namespace CryptoSQLite
             return attribute?.DefaultValue;
         }
 
-        public static bool HasDefaultValue(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<HasDefaultValueAttribute>();
-            return attributes.Any();
-        }
-        /*
-        public static object GetDefaultValue(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<HasDefaultValueAttribute>().ToArray();
-            return attributes.Length == 0 ? null : attributes[0].DefaultValue;
-        }
-        */
         public static string GetColumnName(this PropertyInfo property)
         {
             var attrs = property.GetCustomAttributes<ColumnAttribute>().ToArray();

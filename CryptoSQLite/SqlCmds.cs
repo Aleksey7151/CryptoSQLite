@@ -7,11 +7,11 @@ namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(TableMap table, IList<object> defaultValues, string soltColumn = null)
+        public static string CmdCreateTable(TableMap table, string soltColumn = null)
         {
             var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
 
-            var cols = table.Columns.Select(col => col.CmdMapColumn(defaultValues)).ToList();
+            var cols = table.Columns.Select(col => col.CmdMapColumn()).ToList();
 
             if (soltColumn != null)
                 cols.Add($"{soltColumn} BLOB");
@@ -96,9 +96,8 @@ namespace CryptoSQLite
         /// Maps the PropertyInfo to SQL column, that uses in Table creation
         /// </summary>
         /// <param name="column">ColumnAttribute map</param>
-        /// <param name="defaultValues">List with default values for columns</param>
         /// <returns>string with column map</returns>
-        public static string CmdMapColumn(this PropertyInfo column, IList<object> defaultValues)
+        public static string CmdMapColumn(this PropertyInfo column)
         {
             string clmnMap = $"{column.GetColumnName()} {column.GetSqlType()}";
 
@@ -110,23 +109,10 @@ namespace CryptoSQLite
             {
                 clmnMap += " NOT NULL";
                 var defaultValue = column.DefaultValue();
-                // Because if default value is set, this column is always will be NOT NULL
                 if (defaultValue != null)
                 {
                     clmnMap += $" DEFAULT \"{defaultValue}\"";
-                    /*
-                    if (column.PropertyType == typeof(string))
-                        clmnMap += $" DEFAULT \"{defaultValue}\"";
-                    else clmnMap += $" DEFAULT ({defaultValue})";
-                    */
-                    //defaultValues.Add(defaultValue);
                 }
-
-                /*else
-                {
-                    clmnMap += " NOT NULL";
-                }
-                */
             }
 
             return clmnMap;

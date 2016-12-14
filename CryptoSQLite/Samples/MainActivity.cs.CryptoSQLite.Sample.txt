@@ -13,11 +13,13 @@ namespace CryptoSQLiteSample.Droid
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
 
-        [Encrypted]
+        [Encrypted, NotNull]
         public string Task { get; set; }
 
+		[NotNull("Default Description")]
         public string Description { get; set; }
 
+		[Column("PriceForTask")]
         public double? Price { get; set; }
 
         public bool IsDone { get; set; }
@@ -44,7 +46,7 @@ namespace CryptoSQLiteSample.Droid
             {
 				var db = new CryptoSQLiteConnection(pathToDatabaseFile, CryptoAlgoritms.AesWith256BitsKey);
 
-                db.SetEncryptionKey(new byte[32]);
+                db.SetEncryptionKey(new byte[32]);		// Here you must set your secret encryption key
 
                 db.CreateTable<Tasks>();
 

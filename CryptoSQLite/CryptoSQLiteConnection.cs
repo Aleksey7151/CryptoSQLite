@@ -781,16 +781,11 @@ namespace CryptoSQLite
 
             var map = MapTable<TTable>(tableName);
 
-            var defaultValues = new List<object>();
-
-            var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, defaultValues, SoltColumnName) : SqlCmds.CmdCreateTable(map, defaultValues);
+            var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, SoltColumnName) : SqlCmds.CmdCreateTable(map);
 
             try
             {
-                if(defaultValues.Count > 0)
-                    _connection.Execute(cmd, defaultValues);
-                else
-                    _connection.Execute(cmd);
+                _connection.Execute(cmd);
             }
             catch (Exception ex)
             {
@@ -1139,6 +1134,9 @@ namespace CryptoSQLite
             if (properties.Any(p => p.IsAutoIncremental() && p.IsEncrypted()))
                 throw new CryptoSQLiteException("Column with AutoIncremental Attribute can't be Encrypted.");
 
+            if(properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
+                throw new CryptoSQLiteException("Encrypted columns can't have default value, but they can be Not Null.");
+
             for (var i = 0; i < properties.Count; i++)
                 for (var j = i + 1; j < properties.Count; j++)
                     if (properties[i].GetColumnName() == properties[j].GetColumnName())
@@ -1178,15 +1176,12 @@ namespace CryptoSQLite
 
                 var value = col.GetValue(row);  // column value
 
-                if (value == null && col.DefaultValue() != null)
+                if (value == null && col.DefaultValue() != null)    // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
                     continue;
 
                 columns.Add(col.GetColumnName());
                 
                 var type = col.PropertyType;
-
-                //if (col.IsNotNull() && col.DefaultValue() == null && value == null)
-                //    throw new CryptoSQLiteException($"Column {col.GetColumnName()} is marked as NOT NULL, but the passed value of column is NULL.");
 
                 object sqlValue = null;
 
@@ -1363,13 +1358,11 @@ namespace CryptoSQLite
                                     tmp.SqlValue = column.ToBlob();
                                     break;
                                 case "REAL":
-                                    if (column.SQLiteType == SQLiteType.Text)   // for default values
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
                                     {
                                         var str = column.ToString();
                                         double val;
-                                        if (!double.TryParse(str, out val))
-                                            tmp.SqlValue = column.ToDouble();
-                                        else tmp.SqlValue = val;
+                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
                                     }
                                     else
                                         tmp.SqlValue = column.ToDouble();

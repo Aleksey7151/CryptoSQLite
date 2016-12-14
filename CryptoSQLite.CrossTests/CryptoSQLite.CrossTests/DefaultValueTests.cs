@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using CryptoSQLite;
 using NUnit.Framework;
 
-
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [CryptoTable("TableWithNotNullAttrs")]
     public class TableWithNotNullAttrs
@@ -33,7 +30,7 @@ namespace Tests
             else if (NotNullDouble != null && o.NotNullDouble != null)
                 doubleEquals = Math.Abs(NotNullDouble.Value - o.NotNullDouble.Value) < 0.000001;
 
-            return  NotNullInt == o.NotNullInt && NotNullString == o.NotNullString &&
+            return NotNullInt == o.NotNullInt && NotNullString == o.NotNullString &&
                 NotNullBytes.MemCmp(o.NotNullBytes) == 0 && doubleEquals;
         }
     }
@@ -73,7 +70,7 @@ namespace Tests
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
 
-                    var item1 = new TableWithNotNullAttrs {NotNullInt = 5, NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
+                    var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                     var elements = db.Find<TableWithNotNullAttrs>(i => i.NotNullInt == 5).ToArray();
                     Assert.IsNotNull(elements);
@@ -105,7 +102,7 @@ namespace Tests
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
 
-                    var item1 = new TableWithNotNullAttrs {/*NotNullInt = 5,*/ NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882};
+                    var item1 = new TableWithNotNullAttrs {/*NotNullInt = 5,*/ NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                 }
                 catch (CryptoSQLiteException cex)
@@ -135,7 +132,7 @@ namespace Tests
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
 
-                    var item1 = new TableWithNotNullAttrs {NotNullInt = 5, /*NotNullString = "Hello",*/ NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
+                    var item1 = new TableWithNotNullAttrs { NotNullInt = 5, /*NotNullString = "Hello",*/ NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                 }
                 catch (CryptoSQLiteException cex)
@@ -225,7 +222,7 @@ namespace Tests
                     db.DeleteTable<TableWithDefaultValue>();
                     db.CreateTable<TableWithDefaultValue>();
 
-                    var item1 = new TableWithDefaultValue {NotNullDouble = 1234.1231, NotNullInt = 1234567};
+                    var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullInt = 1234567 };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
                     Assert.IsNotNull(elements);
@@ -260,7 +257,7 @@ namespace Tests
                     db.DeleteTable<TableWithDefaultValue>();
                     db.CreateTable<TableWithDefaultValue>();
 
-                    var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullString = "Frodo"};
+                    var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullString = "Frodo" };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
                     Assert.IsNotNull(elements);
@@ -295,7 +292,7 @@ namespace Tests
                     db.DeleteTable<TableWithDefaultValue>();
                     db.CreateTable<TableWithDefaultValue>();
 
-                    var item1 = new TableWithDefaultValue {NotNullInt = 123441, NotNullString = "Frodo" };
+                    var item1 = new TableWithDefaultValue { NotNullInt = 123441, NotNullString = "Frodo" };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
                     Assert.IsNotNull(elements);

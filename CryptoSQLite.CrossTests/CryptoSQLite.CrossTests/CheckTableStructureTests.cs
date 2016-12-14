@@ -270,6 +270,51 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
+        public void EncryptedColumnCanNotHaveDefaultValue()
+        {
+            using (var db = GetGostConnection())
+            {
+                try
+                {
+                    db.CreateTable<TableWithEncryptedDefaultValue>();
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(
+                        cex.Message.IndexOf("Encrypted columns can't have default value, but they can be Not Null", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void EncryptedColumnCanBeNotNull()
+        {
+            using (var db = GetGostConnection())
+            {
+                try
+                {
+                    db.CreateTable<TableWithEncryptedNotNullValue>();
+                    db.DeleteTable<TableWithEncryptedNotNullValue>();
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+
+            }
+        }
+
+        [Test]
         public void TableCanNotContainTwoColumnsWithSameNames()
         {
             using (var db = GetGostConnection())

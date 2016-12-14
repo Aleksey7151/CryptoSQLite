@@ -76,6 +76,26 @@ namespace Tests.Tables
         public int AnotherId { get; set; }
     }
 
+    [CryptoTable("TableWithEncryptedDefaultValue")]
+    internal class TableWithEncryptedDefaultValue
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [NotNull(123), Encrypted]
+        public int AnotherId { get; set; }
+    }
+
+    [CryptoTable("TableWithEncryptedNotNullValue")]
+    internal class TableWithEncryptedNotNullValue
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [NotNull, Encrypted]
+        public int? AnotherId { get; set; }
+    }
+
     [CryptoTable("TableWithEncryptedByteColumn")]
     internal class TableWithEncryptedByteColumn
     {
