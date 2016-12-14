@@ -19,7 +19,7 @@ namespace Tests
         [NotNull]
         public string NotNullString { get; set; }
 
-        [Encrypted, NotNull]
+        [NotNull, Encrypted]
         public byte[] NotNullBytes { get; set; }
 
         [NotNull, Encrypted]
@@ -35,11 +35,11 @@ namespace Tests
     [CryptoTable("TableWithDefaultValue")]
     public class TableWithDefaultValue
     {
-        public const int DefaultInt = 7;
+        public const int DefaultInt = 71223;
 
         public const string DefaultString = "Hello World";
 
-        public const double DefaultDouble = 7.7;
+        public const double DefaultDouble = 71211.732346;
 
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
@@ -215,7 +215,7 @@ namespace Tests
         }
 
         [Test]
-        public void NotNullAttribute_With_DefaultValue()
+        public void String_NotNullAttribute_With_DefaultValue()
         {
             foreach (var db in GetConnections())
             {
@@ -233,6 +233,75 @@ namespace Tests
                                   0.000001 &&
                                   elements[0].NotNullInt == 1234567 &&
                                   elements[0].NotNullString == TableWithDefaultValue.DefaultString);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void Int_NotNullAttribute_With_DefaultValue()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<TableWithDefaultValue>();
+                    db.CreateTable<TableWithDefaultValue>();
+
+                    var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullString = "Frodo"};
+                    db.InsertItem(item1);
+                    var elements = db.Table<TableWithDefaultValue>().ToArray();
+                    Assert.IsNotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+                    Assert.IsTrue(Math.Abs(elements[0].NotNullDouble.Value - 1234.1231) <
+                                  0.000001 &&
+                                  elements[0].NotNullInt == TableWithDefaultValue.DefaultInt &&
+                                  elements[0].NotNullString == "Frodo");
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void Double_NotNullAttribute_With_DefaultValue()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<TableWithDefaultValue>();
+                    db.CreateTable<TableWithDefaultValue>();
+
+                    var item1 = new TableWithDefaultValue {NotNullInt = 123441, NotNullString = "Frodo" };
+                    db.InsertItem(item1);
+                    var elements = db.Table<TableWithDefaultValue>().ToArray();
+                    Assert.IsNotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+                    Assert.IsTrue(Math.Abs(elements[0].NotNullDouble.Value - TableWithDefaultValue.DefaultDouble) < 0.000001 &&
+                                  elements[0].NotNullInt == 123441 &&
+                                  elements[0].NotNullString == "Frodo");
                 }
                 catch (CryptoSQLiteException cex)
                 {

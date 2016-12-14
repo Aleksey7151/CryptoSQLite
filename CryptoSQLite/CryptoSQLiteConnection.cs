@@ -1363,7 +1363,16 @@ namespace CryptoSQLite
                                     tmp.SqlValue = column.ToBlob();
                                     break;
                                 case "REAL":
-                                    tmp.SqlValue = column.ToDouble();
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default values
+                                    {
+                                        var str = column.ToString();
+                                        double val;
+                                        if (!double.TryParse(str, out val))
+                                            tmp.SqlValue = column.ToDouble();
+                                        else tmp.SqlValue = val;
+                                    }
+                                    else
+                                        tmp.SqlValue = column.ToDouble();
                                     break;
                                 case "INTEGER":
                                     tmp.SqlValue = column.ToInt64();
