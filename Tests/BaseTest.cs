@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CryptoSQLite;
 using Tests.Tables;
 
@@ -24,6 +25,7 @@ namespace Tests
 
         public CryptoSQLiteConnection GetGostConnection()
         {
+            //var dir = Directory.GetCurrentDirectory();
             var conn = new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;

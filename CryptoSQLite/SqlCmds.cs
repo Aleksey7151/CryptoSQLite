@@ -7,11 +7,11 @@ namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(TableMap table, string soltColumn = null)
+        public static string CmdCreateTable(TableMap table, IList<object> defaultValues, string soltColumn = null)
         {
             var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
 
-            var cols = table.Columns.Select(col => col.CmdMapColumn()).ToList();
+            var cols = table.Columns.Select(col => col.CmdMapColumn(defaultValues)).ToList();
 
             if (soltColumn != null)
                 cols.Add($"{soltColumn} BLOB");
@@ -96,22 +96,38 @@ namespace CryptoSQLite
         /// Maps the PropertyInfo to SQL column, that uses in Table creation
         /// </summary>
         /// <param name="column">ColumnAttribute map</param>
+        /// <param name="defaultValues">List with default values for columns</param>
         /// <returns>string with column map</returns>
-        public static string CmdMapColumn(this PropertyInfo column)
+        public static string CmdMapColumn(this PropertyInfo column, IList<object> defaultValues)
         {
             string clmnMap = $"{column.GetColumnName()} {column.GetSqlType()}";
 
-            if (column.IsPrimaryKey())
-                clmnMap += " PRIMARY KEY";
-
-            if (column.IsAutoIncremental())
-                clmnMap += " AUTOINCREMENT";
-
-            if (column.IsNotNull())
+            if (column.IsPrimaryKey() && column.IsAutoIncremental())
+                clmnMap += " PRIMARY KEY AUTOINCREMENT";
+            else if(column.IsPrimaryKey() && !column.IsAutoIncremental())
+                clmnMap += " PRIMARY KEY NOT NULL";
+            else if (column.IsNotNull())
+            {
                 clmnMap += " NOT NULL";
+                var defaultValue = column.DefaultValue();
+                // Because if default value is set, this column is always will be NOT NULL
+                if (defaultValue != null)
+                {
+                    clmnMap += $" DEFAULT \"{defaultValue}\"";
+                    /*
+                    if (column.PropertyType == typeof(string))
+                        clmnMap += $" DEFAULT \"{defaultValue}\"";
+                    else clmnMap += $" DEFAULT ({defaultValue})";
+                    */
+                    //defaultValues.Add(defaultValue);
+                }
 
-            if (column.HasDefaultValue())
-                clmnMap += $" DEFAULT \"{column.GetDefaultValue()}\"";
+                /*else
+                {
+                    clmnMap += " NOT NULL";
+                }
+                */
+            }
 
             return clmnMap;
         }

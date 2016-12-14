@@ -99,6 +99,14 @@ namespace CryptoSQLite
         public object DefaultValue { get; }
 
         /// <summary>
+        /// Ctor. Default value will be NULL.
+        /// </summary>
+        public NotNullAttribute()
+        {
+            DefaultValue = null;
+        }
+
+        /// <summary>
         /// Ctor. The default value will be added to all new records, if no other value is specified
         /// </summary>
         /// <param name="defaultValue">Default value for the property that is used if property doesn't have value</param>
@@ -110,9 +118,10 @@ namespace CryptoSQLite
 
     /// <summary>
     /// This attribute used to indicate, that column has default value, that must be written to database 
+    /// <para/>This Attribute is deprecated. You should use NotNullAttribute instead.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    [Obsolete("This class is deprecated. You should use NotNullAttribute instead.", false)]
+    [Obsolete("This class is deprecated. You should use NotNull Attribute instead.", false)]
     public class HasDefaultValueAttribute : Attribute
     {
         /// <summary>

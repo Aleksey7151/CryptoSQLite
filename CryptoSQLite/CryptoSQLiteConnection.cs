@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -127,6 +128,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -137,6 +139,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         TTable GetItem<TTable>(int id) where TTable : class, new();
 
         /// <summary>
@@ -147,6 +150,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         TTable GetItem<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -277,32 +281,38 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
         /// Gets element from database using element <paramref name="id"/>.
         /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new();
 
         /// <summary>
         /// Gets element from table <typeparamref name="TTable"/> in database.
         /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -470,12 +480,14 @@ namespace CryptoSQLite
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
         /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
         /// In this case use find function.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
@@ -485,11 +497,13 @@ namespace CryptoSQLite
         /// <summary>
         /// Gets element from database using element <paramref name="id"/>.
         /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public async Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(id));
@@ -499,11 +513,13 @@ namespace CryptoSQLite
         /// <summary>
         /// Gets element from table <typeparamref name="TTable"/> in database.
         /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public async Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem(item));
@@ -601,7 +617,6 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        //[Obsolete("This method is deprecated. It will be remove in the next versions of library. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
             where TTable : class, new()
         {
@@ -766,11 +781,16 @@ namespace CryptoSQLite
 
             var map = MapTable<TTable>(tableName);
 
-            var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, SoltColumnName) : SqlCmds.CmdCreateTable(map);
+            var defaultValues = new List<object>();
+
+            var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, defaultValues, SoltColumnName) : SqlCmds.CmdCreateTable(map, defaultValues);
 
             try
             {
-                _connection.Execute(cmd);
+                if(defaultValues.Count > 0)
+                    _connection.Execute(cmd, defaultValues);
+                else
+                    _connection.Execute(cmd);
             }
             catch (Exception ex)
             {
@@ -834,12 +854,14 @@ namespace CryptoSQLite
         /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
         /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
         /// In this case use find function.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         ///  </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="columnName">column name.</param>
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -850,11 +872,13 @@ namespace CryptoSQLite
         /// <summary>
         /// Gets element from database using element <paramref name="id"/>.
         /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public TTable GetItem<TTable>(int id) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -872,11 +896,13 @@ namespace CryptoSQLite
         /// <summary>
         /// Gets element from table <typeparamref name="TTable"/> in database.
         /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
+        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
         /// </summary>
         /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated. Use Find<TTable> methods methods.", false)]
         public TTable GetItem<TTable>(TTable item) where TTable : class, new()
         {
             CheckTable<TTable>();
@@ -1150,9 +1176,17 @@ namespace CryptoSQLite
                 if (col.IsAutoIncremental() && !replaceRowIfExisits)
                     continue;       // if column is AutoIncremental and we don't want to replace this row
 
+                var value = col.GetValue(row);  // column value
+
+                if (value == null && col.DefaultValue() != null)
+                    continue;
+
                 columns.Add(col.GetColumnName());
-                var value = col.GetValue(row);
+                
                 var type = col.PropertyType;
+
+                //if (col.IsNotNull() && col.DefaultValue() == null && value == null)
+                //    throw new CryptoSQLiteException($"Column {col.GetColumnName()} is marked as NOT NULL, but the passed value of column is NULL.");
 
                 object sqlValue = null;
 
@@ -1184,7 +1218,7 @@ namespace CryptoSQLite
                 }
                 catch (Exception ex)
                 {
-                    throw new CryptoSQLiteException(ex.Message, "Apparently table doesn't exist in database.");
+                    throw new CryptoSQLiteException(ex.Message, "Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.");
                 }
             }
             else
@@ -1196,7 +1230,7 @@ namespace CryptoSQLite
                 }
                 catch (Exception ex)
                 {
-                    throw new CryptoSQLiteException(ex.Message, "Apparently new element is already exists in table");
+                    throw new CryptoSQLiteException(ex.Message, "Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.");
                 }
             }
         }

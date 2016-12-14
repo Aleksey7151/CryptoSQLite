@@ -14,19 +14,6 @@ namespace CryptoSQLite
 
     internal static class OrmUtils
     {
-        /*
-        public static Type[] CompatibleTypes =
-        {
-            typeof(DateTime), typeof(bool), typeof(string), typeof(byte[]), typeof(byte),
-            typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong),
-            typeof(float), typeof(double),
-            //NULL ABLE:
-            typeof(DateTime?), typeof(bool?), typeof(byte?),
-            typeof(short?), typeof(ushort?), typeof(int?), typeof(uint?), typeof(long?), typeof(ulong?),
-            typeof(float?), typeof(double?)
-        };
-        */
-
         public static Type[] ClrTextTypes = { typeof(string) };
 
         public static Type[] ClrRealTypes =
@@ -51,6 +38,8 @@ namespace CryptoSQLite
             typeof(long), typeof(ulong), typeof(DateTime)
         };
 
+        // In Find requests this types can be used only in equal to null or not equal to null Predicates,
+        // because this types stored in database in BLOB type.
         public static Type[] TypesForOnlyNullFindRequests =
         {
             typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[])
@@ -98,7 +87,7 @@ namespace CryptoSQLite
             return attributes.Any();
         }
 
-        public static object GetDefaultValue(this PropertyInfo property)
+        public static object DefaultValue(this PropertyInfo property)
         {
             var attribute = property.GetCustomAttribute<NotNullAttribute>();
             return attribute?.DefaultValue;
