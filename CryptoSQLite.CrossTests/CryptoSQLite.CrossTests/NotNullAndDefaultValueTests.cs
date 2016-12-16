@@ -58,7 +58,7 @@ namespace CryptoSQLite.CrossTests
     }
 
     [TestFixture]
-    public class DefaultValueTests : BaseTest
+    public class NotNullAndDefaultValueTests : BaseTest
     {
         [Test]
         public void NotNullAttribute_Without_DefaultValue_Doing_Nothing()

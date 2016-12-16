@@ -654,9 +654,9 @@ namespace CryptoSQLite
 
         private readonly CryptoAlgoritms _algorithm;
 
-        private readonly Dictionary<string, TableMap> _tables;
+        private readonly IList<string> _checkedTables;
 
-        private const string SoltColumnName = "SoltColumn";
+        internal const string SoltColumnName = "SoltColumn";
 
         #endregion
 
@@ -674,7 +674,7 @@ namespace CryptoSQLite
             _cryptor = new AesCryptoProvider();
             _algorithm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
-            _tables = new Dictionary<string, TableMap>();
+            _checkedTables = new List<string>();
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace CryptoSQLite
             }
             _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
-            _tables = new Dictionary<string, TableMap>();
+            _checkedTables = new List<string>();
         }
 
         #endregion
@@ -726,7 +726,7 @@ namespace CryptoSQLite
         public void Dispose()
         {
             _cryptor.Dispose();     // clear encryption key!
-            _tables.Clear();
+            _checkedTables.Clear();
             _connection.Dispose();
         }
 
@@ -776,11 +776,13 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public void CreateTable<TTable>() where TTable : class
         {
-            var tableName = typeof(TTable).CryptoTableName();
+            var table = typeof(TTable);
 
-            if (_tables.ContainsKey(tableName)) return; // table already created
+            var tableName = table.TableName();
 
-            var map = MapTable(typeof(TTable));
+            CheckTable(table, false);   // here we don't check if table exists in database file
+
+
 
             var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, SoltColumnName) : SqlCmds.CmdCreateTable(map);
 
@@ -793,7 +795,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(ex.Message,
                     "Apparently table name or names of columns contain forbidden symbols.");
             }
-            _tables.Add(tableName, map);
+            _checkedTables.Add(tableName, map);
         }
 
         /// <summary>
@@ -801,9 +803,11 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
-        public void DeleteTable<TTable>() where TTable : class 
+        public void DeleteTable<TTable>() where TTable : class
         {
-            var tableName = typeof(TTable).CryptoTableName();
+            var table = typeof(TTable);
+
+            var tableName = table.TableName();
 
             try
             {
@@ -815,8 +819,8 @@ namespace CryptoSQLite
             }
 
 
-            if (_tables.ContainsKey(tableName))
-                _tables.Remove(tableName);
+            if (_checkedTables.Contains(table.ToString()))
+                _checkedTables.Remove(tableName);
         }
 
         /// <summary>
@@ -879,7 +883,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToArray();
+            var properties = typeof(TTable).GetColumns().ToArray();
 
             var idProperty = properties.First(p => p.ColumnName().ToLower() == "id");
             if (idProperty == null)
@@ -903,7 +907,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable));
+            var properties = typeof(TTable).GetColumns().ToArray();
 
             var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
 
@@ -935,7 +939,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable));
+            var properties = typeof(TTable).GetColumns().ToArray();
 
             var idProperty = properties.First(p => p.ColumnName().ToLower() == "id");
             if (idProperty == null)
@@ -956,7 +960,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable));
+            var properties = typeof(TTable).GetColumns().ToArray();
 
             var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));
 
@@ -991,14 +995,14 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            var tableName = typeof(TTable).CryptoTableName();
+            var tableName = typeof(TTable).TableName();
 
-            PropertyInfo[] compatibleProperties = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToArray();
+            PropertyInfo[] columns = typeof(TTable).GetColumns().ToArray();
 
             var predicateTraslator = new PredicateToSql();
             object[] values;
 
-            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, compatibleProperties, out values);
+            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values);
 
             var table = ReadRowsFromTable(cmd, values);
 
@@ -1007,7 +1011,7 @@ namespace CryptoSQLite
             foreach (var row in table)
             {
                 var item = new TTable();
-                ProcessRow(compatibleProperties, row, item);
+                ProcessRow(columns, row, item);
                 items.Add(item);
             }
 
@@ -1060,21 +1064,29 @@ namespace CryptoSQLite
         /// Checks if table has correct columns structure.
         /// And adds type of <paramref name="tableType"/> to list of registered tables.
         /// </summary>
-        private void CheckTable(Type tableType)
+        private void CheckTable(Type tableType, bool checkExistanceInDatabase = true)
         {
-            var tableName = tableType.CryptoTableName();
-            if (_tables.ContainsKey(tableName)) return;
-            var map = MapTable(tableType);
-            CheckIfTableExistsInDatabase(map.Name, map.Columns);
-            _tables.Add(tableName, map);
+            var tableName = tableType.TableName();
 
-            foreach (var fk in map.ForeignKeys)     // Check all referenced tables that this table contains
+            if (_checkedTables.Contains(tableType.ToString())) return;
+
+            var columns = tableType.GetColumns().ToList();
+
+            CheckAttributes(tableName, columns);
+
+            if(checkExistanceInDatabase)
+                CheckIfTableExistsInDatabase(tableName, columns);
+
+            _checkedTables.Add(tableType.ToString());
+
+            foreach (var fk in columns.ForeignKeys())     // Check all referenced tables that this table contains
             {
-                if(!_tables.ContainsKey(fk.ReferencedTableName))
+                if(!_checkedTables.Contains(fk.TypeOfReferencedTable.ToString()))
                     CheckTable(fk.TypeOfReferencedTable);
             }
         }
 
+        //TODO think about this function. This function takes time and reads data from database file
         /// <summary>
         /// Checks if table with corresponds columns exists in database
         /// </summary>
@@ -1108,18 +1120,14 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"SQL Database doesn't contain table with column structure that specified in {tableName}.");
         }
-
+        
         /// <summary>
-        /// Checks structure of attributes for table. And if they all right, maps table
+        /// Checks the structure of attributes for columns (properties) in table
         /// </summary>
-        /// <param name="tableType"></param>
-        /// <returns></returns>
-        private static TableMap MapTable(Type tableType)
+        /// <param name="tableName">table name</param>
+        /// <param name="properties">list of compatible properties</param>
+        private static /*TableMap*/void CheckAttributes(string tableName, IList<PropertyInfo> properties)
         {
-            var tableName = tableType.CryptoTableName();
-
-            var properties = OrmUtils.GetCompatibleProperties(tableType).ToList();
-
             if (properties.Any(property => !OrmUtils.IsTypeCompatible(property.PropertyType)))
                 throw new CryptoSQLiteException($"Table {tableName} contains incompatible type of property.", "Compatible types: bool, DateTime, string, byte[], byte, short, ushort, int, uint, long, ulong, float, double");
             
@@ -1149,13 +1157,6 @@ namespace CryptoSQLite
                         throw new CryptoSQLiteException(
                             $"Table {tableName} contains columns with same names {properties[i].ColumnName()}.",
                             "Table can't contain two columns with same names.");
-
-
-            var foreignKeys = GetForeignKeysInfo(properties);
-
-            var tableMap = new TableMap(tableName, tableType, properties, properties.Any(p => p.IsEncrypted()), foreignKeys);
-
-            return tableMap;
         }
 
         /// <summary>
@@ -1171,7 +1172,8 @@ namespace CryptoSQLite
             byte[] solt = null;
             ICryptoProvider encryptor = null;
 
-            var columnsToAdd = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToList();
+            var columnsToAdd = typeof(TTable).GetColumns().ToList();
+
             if (columnsToAdd.Find(p => p.IsEncrypted()) != null)
             {
                 solt = GetSolt();
@@ -1187,6 +1189,9 @@ namespace CryptoSQLite
 
                 if (value == null && col.DefaultValue() != null)    // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
                     continue;
+
+                if(value == null && col.IsNotNull() && col.DefaultValue() == null)
+                    throw new CryptoSQLiteException($"You are trying to pass NULL-value for Column '{col.ColumnName()}', but this column has NotNull atribute and Default Value is not defined.");
 
                 columns.Add(col.ColumnName());
                 
@@ -1212,13 +1217,13 @@ namespace CryptoSQLite
                 values.Add(solt);
             }
 
-            var name = typeof(TTable).CryptoTableName();
+            var name = typeof(TTable).TableName();
             if (replaceRowIfExisits)
             {
                 var cmd = SqlCmds.CmdInsertOrReplace(name, columns);
                 try
                 {
-                    _connection.Execute(cmd, values.ToArray());
+                    _connection.Execute(cmd, values);
                 }
                 catch (Exception ex)
                 {
@@ -1230,7 +1235,7 @@ namespace CryptoSQLite
                 var cmd = SqlCmds.CmdInsert(name, columns);
                 try
                 {
-                    _connection.Execute(cmd, values.ToArray());
+                    _connection.Execute(cmd, values);
                 }
                 catch (Exception ex)
                 {
@@ -1244,9 +1249,9 @@ namespace CryptoSQLite
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToArray();
+            var properties = typeof(TTable).GetColumns().ToArray();
 
-            var tableName = typeof(TTable).CryptoTableName();
+            var tableName = typeof(TTable).TableName();
 
             if (properties.All(p => p.ColumnName() != columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
@@ -1282,9 +1287,9 @@ namespace CryptoSQLite
             if (columnValue == null)
                 throw new CryptoSQLiteException("Column value can't be null.");
 
-            var tableName = typeof(TTable).CryptoTableName();
+            var tableName = typeof(TTable).TableName();
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToArray();
+            var properties = typeof(TTable).GetColumns().ToArray();
 
             if (properties.All(p => p.ColumnName() != columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
@@ -1307,11 +1312,11 @@ namespace CryptoSQLite
         
         private IEnumerable<TTable> FindInTable<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : new()
         {
-            var tableName = typeof(TTable).CryptoTableName();
+            var tableName = typeof(TTable).TableName();
 
-            var properties = OrmUtils.GetCompatibleProperties(typeof(TTable)).ToList();
+            var properties = typeof(TTable).GetColumns().ToArray();
 
-            if(columnName == null)
+            if (columnName == null)
                 throw new CryptoSQLiteException("Column name can't be null.");
 
             if (!string.IsNullOrEmpty(columnName))  
@@ -1610,69 +1615,6 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes);
                 property.SetValue(item, bytes[0]);
             }
-        }
-
-
-        /// <summary>
-        /// Finds all ForeignKey Attributes and for each of them creates info class that contains all information
-        /// </summary>
-        /// <param name="properties">List of compatible properties</param>
-        /// <returns>List of ForeignKey infos</returns>
-        private static IList<ForeignKey> GetForeignKeysInfo(IEnumerable<PropertyInfo> properties)
-        {
-            var compatibleProperties = properties.ToArray();
-
-            var propertiesWithForeignKey = compatibleProperties.Where(p => p.ForeignKey() != null);
-
-            var list = new List<ForeignKey>();
-
-            foreach (var property in propertiesWithForeignKey)
-            {
-                if (property.PropertyType == typeof(int) || property.PropertyType == typeof(uint))       // If Foreign Key attribute applied to INT property
-                {
-                    var navigationPropertyNameToReferencedTable = property.ForeignKey().Name;
-
-                    var navigationProperty = compatibleProperties.FirstOrDefault(p => p.Name == navigationPropertyNameToReferencedTable);
-                    if (navigationProperty == null)
-                        throw new CryptoSQLiteException($"ForeignKey attribute for property '{property.Name}' has incorrect property name, that must navigate to referenced table.");
-
-                    if(navigationProperty.ForeignKey() != null)
-                        throw new CryptoSQLiteException($"You have already defined ForeignKey Attribute for {property.Name}.");
-
-                    list.Add(CreateForeignKeyInfo(property, navigationProperty));
-                }
-                else if (property.PropertyType.GetCryptoTableAttribute() != null)   // If Foreign Key Attribute applied to Navigation property
-                {
-                    var foreignKeyPropertyName = property.ForeignKey().Name;
-
-                    var foreignProperty = compatibleProperties.FirstOrDefault(p => p.Name == foreignKeyPropertyName);
-                    if (foreignProperty == null)
-                        throw new CryptoSQLiteException($"ForeignKey attribute for property '{property.Name}' has incorrect property name, that must navigate to referenced table.");
-
-                    if (foreignProperty.ForeignKey() != null)
-                        throw new CryptoSQLiteException($"You have already defined ForeignKey Attribute for {property.Name}.");
-
-                    list.Add(CreateForeignKeyInfo(foreignProperty, property));  // changed param orders
-                }
-                else throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32' properties, or to property, Type of which has CryptoTable attribute.");
-            }
-
-            return list;
-        }
-
-        private static ForeignKey CreateForeignKeyInfo(PropertyInfo foreignKeyProperty, PropertyInfo navigationProperty)
-        {
-            var tableType = navigationProperty.GetType();
-
-            var tableName = tableType.CryptoTableName();
-
-            var primaryKey = tableType.GetRuntimeProperties().FirstOrDefault(p => p.IsPrimaryKey());  // check if table has PrimaryKey Attribute
-            if (primaryKey == null)
-                throw new CryptoSQLiteException($"Table {tableName} doesn't contain property with PrimaryKey Attribute");
-
-            var columnName = primaryKey.ColumnName();
-
-            return new ForeignKey(tableName, columnName, foreignKeyProperty.Name, tableType);
         }
 
         private ICryptoProvider GetEncryptor(byte[] solt = null)

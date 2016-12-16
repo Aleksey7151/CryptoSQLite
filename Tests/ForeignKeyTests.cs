@@ -101,14 +101,15 @@ namespace Tests
         [Test]
         public void ForeignKeyAttributeNameCanNotBeEmpty()
         {
+            var accounts = GetAccounts();
             using (var db = GetGostConnection())
             {
                 try
                 {
                     db.DeleteTable<AccountsData>();
                     db.CreateTable<AccountsData>();
-
-                    db.FindByValue<AccountsData>(null, 123);
+                    accounts[0].Name = null;
+                    db.InsertItem(accounts[0]);
                 }
                 catch (CryptoSQLiteException cex)
                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CryptoSQLite.Mapping;
@@ -7,19 +8,21 @@ namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(TableMap table, string soltColumn = null)
+        public static string CmdCreateTable(Type table)
         {
+            var columns = table.GetColumns().ToArray();
+
             var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
 
-            var cols = table.Columns.Select(col => col.CmdMapColumn()).ToList();
+            var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 
-            if (soltColumn != null)
-                cols.Add($"{soltColumn} BLOB");
+            if (columns.Any(p => p.IsEncrypted()))
+                mappedColumns.Add($"{CryptoSQLiteConnection.SoltColumnName} BLOB");
 
-            var columns = string.Join(",\n", cols);
+            var joinedColumns = string.Join(",\n", mappedColumns);
 
-            cmd += columns + ")";
-
+            cmd += joinedColumns + ")";
+            //TODO ForeignKey
             return cmd;
         }
 
@@ -97,10 +100,11 @@ namespace CryptoSQLite
         /// </summary>
         /// <param name="column">ColumnAttribute map</param>
         /// <returns>string with column map</returns>
-        public static string CmdMapColumn(this PropertyInfo column)
+        public static string MapPropertyToColumn(this PropertyInfo column)
         {
             string clmnMap = $"{column.ColumnName()} {column.GetSqlType()}";
 
+            //TODO you need think here a lot
             if (column.IsPrimaryKey() && column.IsAutoIncremental())
                 clmnMap += " PRIMARY KEY AUTOINCREMENT";
             else if(column.IsPrimaryKey() && !column.IsAutoIncremental())

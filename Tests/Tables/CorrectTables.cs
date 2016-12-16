@@ -847,7 +847,7 @@ namespace Tests.Tables
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
 
-        [Column("Name")]
+        [Column("Name"), NotNull]
         public string Name { get; set; }
 
         [Encrypted, Column("Password")]

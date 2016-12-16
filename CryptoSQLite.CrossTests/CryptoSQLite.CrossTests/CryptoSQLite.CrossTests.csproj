@@ -38,7 +38,7 @@
     <Compile Include="AsyncTests.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="CheckTableStructureTests.cs" />
-    <Compile Include="DefaultValueTests.cs" />
+    <Compile Include="NotNullAndDefaultValueTests.cs" />
     <Compile Include="DeleteItemTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />
     <Compile Include="FindTests.cs" />
