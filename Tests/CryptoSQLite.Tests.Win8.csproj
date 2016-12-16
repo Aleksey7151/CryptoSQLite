@@ -67,6 +67,7 @@
     <Compile Include="DeleteItemTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />
     <Compile Include="FindTests.cs" />
+    <Compile Include="ForeignKeyTests.cs" />
     <Compile Include="GetItemTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="Tables\CorrectTables.cs" />

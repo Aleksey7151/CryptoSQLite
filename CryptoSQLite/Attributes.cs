@@ -79,6 +79,29 @@ namespace CryptoSQLite
     }
 
     /// <summary>
+    /// Defining a FOREIGN KEY constraint.
+    /// <para/>You can have a different name of a foreign key property name than the primary key of a dependent class
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ForeignKeyAttribute : Attribute
+    {
+        /// <summary>
+        /// Column name that will be Foreing Key in table 
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Ctor.
+        /// <para/>You can have a different name of a foreign key property name than the primary key of a dependent class
+        /// </summary>
+        /// <param name="name">Foreign key property name. Or name of key property to specify which navigation property it points to.</param>
+        public ForeignKeyAttribute(string name)
+        {
+            Name = name;
+        }
+    }
+
+    /// <summary>
     /// This attribute used to indicate property that won't be added in table in database file
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
