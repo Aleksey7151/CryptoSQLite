@@ -94,9 +94,9 @@ namespace CryptoSQLite
                     throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.");
 
                 if(prop.IsEncrypted())
-                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column {prop.GetColumnName()} is Encrypted.");
+                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column {prop.ColumnName()} is Encrypted.");
 
-                _builder.Append(prop.GetColumnName());  // set real column name
+                _builder.Append(prop.ColumnName());  // set real column name
 
                 return memberExp;
             }

@@ -99,7 +99,7 @@ namespace CryptoSQLite
         /// <returns>string with column map</returns>
         public static string CmdMapColumn(this PropertyInfo column)
         {
-            string clmnMap = $"{column.GetColumnName()} {column.GetSqlType()}";
+            string clmnMap = $"{column.ColumnName()} {column.GetSqlType()}";
 
             if (column.IsPrimaryKey() && column.IsAutoIncremental())
                 clmnMap += " PRIMARY KEY AUTOINCREMENT";

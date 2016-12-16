@@ -93,7 +93,7 @@ namespace CryptoSQLite
             return attribute?.DefaultValue;
         }
 
-        public static string GetColumnName(this PropertyInfo property)
+        public static string ColumnName(this PropertyInfo property)
         {
             var attrs = property.GetCustomAttributes<ColumnAttribute>().ToArray();
             return attrs.Length == 0 ? property.Name : attrs[0].ColumnName;
@@ -110,7 +110,20 @@ namespace CryptoSQLite
             var attribute = type.GetTypeInfo().GetCustomAttribute<CryptoTableAttribute>();
             return attribute;
         }
-        
+
+        public static string CryptoTableName(this Type table)
+        {
+            var tableAttribute = table.GetCryptoTableAttribute();
+
+            if (tableAttribute == null)
+                throw new CryptoSQLiteException($"Table {table} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}.");
+
+            if (string.IsNullOrEmpty(tableAttribute.TableName))
+                throw new CryptoSQLiteException("Table name can't be null or empty.");
+
+            return tableAttribute.TableName;
+        }
+
 
         public static string GetSqlType(this PropertyInfo property)
         {
@@ -137,14 +150,12 @@ namespace CryptoSQLite
        
 
 
-        public static IEnumerable<PropertyInfo> GetCompatibleProperties<TTable>()
+        public static IEnumerable<PropertyInfo> GetCompatibleProperties(Type tableType)
         {
             // Point of this method is to find those properties, that can be used as column in table.
             // Only properties, that have public getter and public setter can be used as column in table.
 
-            var type = typeof(TTable);
-
-            var compatibleProperties = type.GetRuntimeProperties().Where(pr => pr.CanRead &&
+            var compatibleProperties = tableType.GetRuntimeProperties().Where(pr => pr.CanRead &&
                                                                                pr.CanWrite &&
                                                                                pr.GetMethod != null &&
                                                                                pr.SetMethod != null &&
@@ -183,7 +194,7 @@ namespace CryptoSQLite
             var i = 0;
             foreach (var property in properties)
             {
-                columnsMapping[i] = new SqlColumnInfo {Name = property.GetColumnName(), SqlType = property.GetSqlType()};
+                columnsMapping[i] = new SqlColumnInfo {Name = property.ColumnName(), SqlType = property.GetSqlType()};
                 i++;
             }
             return columnsMapping;

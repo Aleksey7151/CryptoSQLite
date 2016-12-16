@@ -1,24 +1,36 @@
-﻿namespace CryptoSQLite.Mapping
+﻿using System;
+
+namespace CryptoSQLite.Mapping
 {
     internal class ForeignKey
     {
-        public string ReferenceTable { get; }
+        public Type TypeOfReferencedTable { get; }
 
-        public string ReferenceColumn { get; }
+        public string ReferencedTableName { get; }
 
-        public string ForeignKeyColumnName { get; }
+        public string ReferencedColumnName { get; }
 
-        public ForeignKey(string referenceTable, string referenceColumn, string foreignKeyColumnName)
+        public string ForeignKeyPropertyName { get; }
+
+        /// <summary>
+        /// Creates class that contains all data for creating reference to another table using FOREIGN KEY constrait
+        /// </summary>
+        /// <param name="referencedTableName">Another table name in which <paramref name="foreignKeyPropertyName"/> is PRIMARY KEY</param>
+        /// <param name="referencedColumnName">Column name in another table which is PRIMARY KEY column</param>
+        /// <param name="foreignKeyPropertyName">Name of property that has KoreignKey Attribute</param>
+        /// <param name="referencedTable">Type of referenced Table</param>
+        public ForeignKey(string referencedTableName, string referencedColumnName, string foreignKeyPropertyName, Type referencedTable)
         {
-            ReferenceTable = referenceTable;
-            ReferenceColumn = referenceColumn;
-            ForeignKeyColumnName = foreignKeyColumnName;
+            ReferencedTableName = referencedTableName;
+            ReferencedColumnName = referencedColumnName;
+            ForeignKeyPropertyName = foreignKeyPropertyName;
+            TypeOfReferencedTable = referencedTable;
         }
 
         public bool Equal(ForeignKey fk)
         {
-            return ReferenceTable == fk.ReferenceTable && ReferenceColumn == fk.ReferenceColumn &&
-                   ForeignKeyColumnName == fk.ForeignKeyColumnName;
+            return ReferencedTableName == fk.ReferencedTableName && ReferencedColumnName == fk.ReferencedColumnName &&
+                   ForeignKeyPropertyName == fk.ForeignKeyPropertyName;
         }
     }
 }
