@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1137,6 +1138,7 @@ namespace CryptoSQLite
             if(properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Encrypted columns can't have default value, but they can be Not Null.");
 
+            // find columns with equal names
             for (var i = 0; i < properties.Count; i++)
                 for (var j = i + 1; j < properties.Count; j++)
                     if (properties[i].GetColumnName() == properties[j].GetColumnName())
@@ -1144,7 +1146,10 @@ namespace CryptoSQLite
                             $"Table {tableName} contains columns with same names {properties[i].GetColumnName()}.",
                             "Table can't contain two columns with same names.");
 
-            var tableMap = new TableMap(tableName, type, properties, properties.Any(p => p.IsEncrypted()));
+
+            var foreignKeys = GetForeignKeyInfo(properties);
+
+            var tableMap = new TableMap(tableName, type, properties, properties.Any(p => p.IsEncrypted()), foreignKeys);
 
             return tableMap;
         }
@@ -1605,19 +1610,36 @@ namespace CryptoSQLite
 
         private static string GetTableName<TTable>()
         {
-            var type = typeof(TTable);
+            var tableAttribute = typeof(TTable).GetCryptoTableAttribute();
 
-            var cryptoTableAttributes = type.GetTypeInfo().GetCustomAttributes<CryptoTableAttribute>().ToArray();
-
-            if (!cryptoTableAttributes.Any())
+            if (tableAttribute == null)
                 throw new CryptoSQLiteException($"Table {typeof(TTable)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}.");
 
-            if(string.IsNullOrEmpty(cryptoTableAttributes[0].TableName))
+            if(string.IsNullOrEmpty(tableAttribute.TableName))
                 throw new CryptoSQLiteException("Table name can't be null or empty.");
 
-            var tableAttribute = cryptoTableAttributes.First();
-
             return tableAttribute.TableName;
+        }
+
+        private static IList<ForeignKey> GetForeignKeyInfo(IEnumerable<PropertyInfo> compatibleProperties)
+        {
+            var propertiesWithForeignKey = compatibleProperties.Where(p => p.ForeignKey() != null);
+            foreach (var property in propertiesWithForeignKey)
+            {
+                if (property.PropertyType == typeof(int) || property.PropertyType == typeof(uint))       // If Foreign Key attribute applied to INT property
+                {
+                    
+                }
+                else if (property.PropertyType.GetCryptoTableAttribute() != null)   // If Foreign Key Attribute applied to Navigation property
+                {
+                    
+                }
+                else throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32' properties, or to property, Type of which has CryptoTable attribute.");
+                
+                    
+                
+            }
+            return new List<ForeignKey>();
         }
 
         private ICryptoProvider GetEncryptor(byte[] solt = null)

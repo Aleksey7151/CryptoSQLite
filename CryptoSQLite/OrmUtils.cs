@@ -99,6 +99,19 @@ namespace CryptoSQLite
             return attrs.Length == 0 ? property.Name : attrs[0].ColumnName;
         }
 
+        public static ForeignKeyAttribute ForeignKey(this PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttribute<ForeignKeyAttribute>();
+            return attribute;
+        }
+
+        public static CryptoTableAttribute GetCryptoTableAttribute(this Type type)
+        {
+            var attribute = type.GetTypeInfo().GetCustomAttribute<CryptoTableAttribute>();
+            return attribute;
+        }
+        
+
         public static string GetSqlType(this PropertyInfo property)
         {
             if (property.IsEncrypted())

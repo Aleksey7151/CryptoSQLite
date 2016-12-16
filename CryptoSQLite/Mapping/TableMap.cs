@@ -13,12 +13,15 @@ namespace CryptoSQLite.Mapping
 
         public bool HasEncryptedColumns { get; }
 
-        public TableMap(string name, Type tableType, IEnumerable<PropertyInfo> columns, bool hasEncryptedColumns)
+        public IList<ForeignKey> ForeignKeys { get; }
+
+        public TableMap(string name, Type tableType, IEnumerable<PropertyInfo> columns, bool hasEncryptedColumns, IList<ForeignKey> foreignKeys)
         {
             Name = name;
             TableType = tableType;
             Columns = columns;
             HasEncryptedColumns = hasEncryptedColumns;
+            ForeignKeys = foreignKeys;
         }
 
         public IEnumerable<PropertyInfo> Columns { get; }
