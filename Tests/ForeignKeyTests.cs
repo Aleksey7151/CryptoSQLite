@@ -1,17 +1,38 @@
 ﻿using System;
+using System.Linq;
 using CryptoSQLite;
 using NUnit.Framework;
-using Tests.Tables;
 
 namespace Tests
 {
-    [CryptoTable("TableIncorrectAppliedForeignKeyAttribute")]
-    internal class TableIncorrectAppliedForeignKeyAttribute
+    [CryptoTable("TableForeignKeyNullName")]
+    internal class TableForeignKeyNullName
     {
         [PrimaryKey]
         public int Id { get; set; }
 
-        [ForeignKey("Tra")]
+        [ForeignKey(null)]
+        public int ForeignKey { get; set; }
+    }
+
+    [CryptoTable("TableForeignKeyEmptyName")]
+    internal class TableForeignKeyEmptyName
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [ForeignKey("")]
+        public int ForeignKey { get; set; }
+    }
+
+    [CryptoTable("TableForeignKeyNotIntType")]
+    internal class TableForeignKeyNotIntType
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+
+        [ForeignKey("ForeignKey")]
         public string ForeignKey { get; set; }
     }
 
@@ -31,7 +52,7 @@ namespace Tests
     }
 
     [CryptoTable("Orders")]
-    internal class OrderV1
+    internal class Order
     {
         [PrimaryKey, AutoIncremental]
         public int Id { get; set; }
@@ -42,30 +63,13 @@ namespace Tests
         [Encrypted, Column("Description")]
         public string OrderDescription { get; set; }
 
+        [ForeignKey("PersonNavigation")]
         public int PersonRefId { get; set; }        // This column will be FOREIGN KEY for Person. You can add also Column attribute to this property and NotNull Attribute
 
-        [ForeignKey("PersonRefId")]    // Important, here we must pass real property name, but property can have Column attribute for specifing it name in table
         public Person PersonNavigation { get; set; }      // Navigation property to corresponding Person.
     }
 
-    [CryptoTable("Orders")]
-    internal class OrderV2
-    {
-        [PrimaryKey, AutoIncremental]
-        public int Id { get; set; }
-
-        [Column("OrderIdentify")]
-        public int OrderNumber { get; set; }
-
-        [Encrypted]
-        public string OrderDescription { get; set; }
-
-        [ForeignKey("PersonNavigation")]      // Here we specify property name, that will navigate to corresponding Person. You can add also Column attribute to this property and NotNull Attribute
-        public int PersonRefId { get; set; }    // This column will be FOREIGN KEY for Person.
-        
-        public Person PersonNavigation { get; set; }      // Navigation property to corresponding Person.
-    }
-
+    
     [TestFixture]
     public class ForeignKeyTests : BaseTest
     {
@@ -76,14 +80,12 @@ namespace Tests
             {
                 try
                 {
-                    db.DeleteTable<AccountsData>();
-                    db.CreateTable<AccountsData>();
-
-                    db.FindByValue<AccountsData>(null, 123);
+                    db.DeleteTable<TableForeignKeyNullName>();
+                    db.CreateTable<TableForeignKeyNullName>();
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Foreign Key Attribute in property '", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -101,19 +103,16 @@ namespace Tests
         [Test]
         public void ForeignKeyAttributeNameCanNotBeEmpty()
         {
-            var accounts = GetAccounts();
             using (var db = GetGostConnection())
             {
                 try
                 {
-                    db.DeleteTable<AccountsData>();
-                    db.CreateTable<AccountsData>();
-                    accounts[0].Name = null;
-                    db.InsertItem(accounts[0]);
+                    db.DeleteTable<TableForeignKeyEmptyName>();
+                    db.CreateTable<TableForeignKeyEmptyName>();
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Foreign Key Attribute in property '", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -135,14 +134,12 @@ namespace Tests
             {
                 try
                 {
-                    db.DeleteTable<AccountsData>();
-                    db.CreateTable<AccountsData>();
-
-                    db.FindByValue<AccountsData>(null, 123);
+                    db.DeleteTable<TableForeignKeyNotIntType>();
+                    db.CreateTable<TableForeignKeyNotIntType>();
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Column name can't be null or empty.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("ForeignKey attribute can be applied only to 'Int32', 'UInt32' properties, or to property, Type of which has CryptoTable attribute.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -157,6 +154,44 @@ namespace Tests
             }
         }
 
+        [Test]
+        public void ReferencedTableLoadedAutomatically()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<Person>();
+                    db.CreateTable<Person>();
+                    db.DeleteTable<Order>();
+                    db.CreateTable<Order>();
 
+                    var person1 = new Person {Address = "Tuhachevskogo", Name = "Safonova Anna", Rating = 132};
+                    db.InsertItem(person1);
+
+                    var order1 = new Order {OrderDescription = "Take a rest", OrderNumber = 766446, PersonRefId = 1};
+                    db.InsertItem(order1);
+
+                    var elements = db.Find<Order>(o => o.Id == 1).ToArray();
+
+                    Assert.NotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
     }
 }

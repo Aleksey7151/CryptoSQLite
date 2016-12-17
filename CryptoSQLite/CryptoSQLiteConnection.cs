@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoSQLite.CryptoProviders;
@@ -654,7 +655,7 @@ namespace CryptoSQLite
 
         private readonly CryptoAlgoritms _algorithm;
 
-        private readonly IList<string> _checkedTables;
+        private readonly IDictionary<string, IList<ForeignKey>> _checkedTables;
 
         internal const string SoltColumnName = "SoltColumn";
 
@@ -674,7 +675,7 @@ namespace CryptoSQLite
             _cryptor = new AesCryptoProvider();
             _algorithm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
-            _checkedTables = new List<string>();
+            _checkedTables = new Dictionary<string, IList<ForeignKey>>();
         }
 
         /// <summary>
@@ -710,7 +711,7 @@ namespace CryptoSQLite
             }
             _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
-            _checkedTables = new List<string>();
+            _checkedTables = new Dictionary<string, IList<ForeignKey>>();
         }
 
         #endregion
@@ -778,13 +779,9 @@ namespace CryptoSQLite
         {
             var table = typeof(TTable);
 
-            var tableName = table.TableName();
-
             CheckTable(table, false);   // here we don't check if table exists in database file
-
-
-
-            var cmd = map.HasEncryptedColumns ? SqlCmds.CmdCreateTable(map, SoltColumnName) : SqlCmds.CmdCreateTable(map);
+            
+            var cmd = SqlCmds.CmdCreateTable(table);
 
             try
             {
@@ -792,10 +789,8 @@ namespace CryptoSQLite
             }
             catch (Exception ex)
             {
-                throw new CryptoSQLiteException(ex.Message,
-                    "Apparently table name or names of columns contain forbidden symbols.");
+                throw new CryptoSQLiteException(ex.Message, "Apparently table name or names of columns contain forbidden symbols.");
             }
-            _checkedTables.Add(tableName, map);
         }
 
         /// <summary>
@@ -819,7 +814,7 @@ namespace CryptoSQLite
             }
 
 
-            if (_checkedTables.Contains(table.ToString()))
+            if (_checkedTables.ContainsKey(table.ToString()))
                 _checkedTables.Remove(tableName);
         }
 
@@ -866,7 +861,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            return FindInTableUsingColumnValue<TTable>(columnName, columnValue).FirstOrDefault();
+            return FindUsingColumnValue<TTable>(columnName, columnValue).FirstOrDefault();
         }
 
         /// <summary>
@@ -890,7 +885,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
 
-            return FindInTableUsingColumnValue<TTable>(idProperty.ColumnName(), id).FirstOrDefault();
+            return FindUsingColumnValue<TTable>(idProperty.ColumnName(), id).FirstOrDefault();
         }
 
         /// <summary>
@@ -911,7 +906,7 @@ namespace CryptoSQLite
 
             var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
 
-            return FindInTableUsingColumnValue<TTable>(notDefaultValue.ColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
+            return FindUsingColumnValue<TTable>(notDefaultValue.ColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
         }
 
         /// <summary>
@@ -1000,6 +995,7 @@ namespace CryptoSQLite
             PropertyInfo[] columns = typeof(TTable).GetColumns().ToArray();
 
             var predicateTraslator = new PredicateToSql();
+
             object[] values;
 
             var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values);
@@ -1011,12 +1007,17 @@ namespace CryptoSQLite
             foreach (var row in table)
             {
                 var item = new TTable();
+
                 ProcessRow(columns, row, item);
+
+                FindReferencedTables(item);     // here we get all referenced tables if they exist
+
                 items.Add(item);
             }
 
             return items;
         }
+
 
         /// <summary>
         /// Finds all the elements whose <paramref name="columnName"/>-values are lying between
@@ -1049,7 +1050,7 @@ namespace CryptoSQLite
         {
             CheckTable(typeof(TTable));
 
-            return FindInTableUsingColumnValue<TTable>(columnName, columnValue);
+            return FindUsingColumnValue<TTable>(columnName, columnValue);
         }
 
 
@@ -1068,7 +1069,7 @@ namespace CryptoSQLite
         {
             var tableName = tableType.TableName();
 
-            if (_checkedTables.Contains(tableType.ToString())) return;
+            if (_checkedTables.ContainsKey(tableType.ToString())) return;
 
             var columns = tableType.GetColumns().ToList();
 
@@ -1077,11 +1078,13 @@ namespace CryptoSQLite
             if(checkExistanceInDatabase)
                 CheckIfTableExistsInDatabase(tableName, columns);
 
-            _checkedTables.Add(tableType.ToString());
+            var referencedTables = columns.ForeignKeys(tableType);  // Find all referenced tables
 
-            foreach (var fk in columns.ForeignKeys())     // Check all referenced tables that this table contains
+            _checkedTables.Add(tableType.ToString(), referencedTables);
+
+            foreach (var fk in referencedTables)     // Check all referenced tables that this table contains
             {
-                if(!_checkedTables.Contains(fk.TypeOfReferencedTable.ToString()))
+                if(!_checkedTables.ContainsKey(fk.TypeOfReferencedTable.ToString()))
                     CheckTable(fk.TypeOfReferencedTable);
             }
         }
@@ -1128,9 +1131,11 @@ namespace CryptoSQLite
         /// <param name="properties">list of compatible properties</param>
         private static /*TableMap*/void CheckAttributes(string tableName, IList<PropertyInfo> properties)
         {
+            /*
             if (properties.Any(property => !OrmUtils.IsTypeCompatible(property.PropertyType)))
                 throw new CryptoSQLiteException($"Table {tableName} contains incompatible type of property.", "Compatible types: bool, DateTime, string, byte[], byte, short, ushort, int, uint, long, ulong, float, double");
-            
+            */
+
             if (properties.Any(p => p.ColumnName() == SoltColumnName))
                 throw new CryptoSQLiteException(
                     $"Table can't contain column with name: {SoltColumnName}. This name is reserved for CryptoSQLite needs.");
@@ -1158,6 +1163,7 @@ namespace CryptoSQLite
                             $"Table {tableName} contains columns with same names {properties[i].ColumnName()}.",
                             "Table can't contain two columns with same names.");
         }
+
 
         /// <summary>
         /// Inserts row in table
@@ -1223,7 +1229,7 @@ namespace CryptoSQLite
                 var cmd = SqlCmds.CmdInsertOrReplace(name, columns);
                 try
                 {
-                    _connection.Execute(cmd, values);
+                    _connection.Execute(cmd, values.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
                 }
                 catch (Exception ex)
                 {
@@ -1235,7 +1241,7 @@ namespace CryptoSQLite
                 var cmd = SqlCmds.CmdInsert(name, columns);
                 try
                 {
-                    _connection.Execute(cmd, values);
+                    _connection.Execute(cmd, values.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
                 }
                 catch (Exception ex)
                 {
@@ -1244,7 +1250,7 @@ namespace CryptoSQLite
             }
         }
 
-        private List<TTable> FindInTableUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        private IList<TTable> FindUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
@@ -1278,7 +1284,71 @@ namespace CryptoSQLite
 
             return items;
         }
-        
+
+        private TTable FindFirstUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var properties = typeof(TTable).GetColumns().ToArray();
+
+            var tableName = typeof(TTable).TableName();
+
+            if (properties.All(p => p.ColumnName() != columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            if (properties.Any(p => p.ColumnName() == columnName && p.IsEncrypted()))
+                throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
+
+            string cmd;
+
+            if (columnValue != null)
+                cmd = SqlCmds.CmdSelect(tableName, columnName);
+            else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
+
+            var table = ReadRowsFromTable(cmd, columnValue);
+
+            if (table.Count > 0)
+            {
+                var item = new TTable();
+                ProcessRow(properties, table[0], item);
+                return item;
+            }
+
+            return null;
+        }
+
+        private readonly MethodInfo _methodFindFirstByValue = typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindFirstUsingColumnValue));     // FindFirstByValue Method
+
+        private readonly MethodInfo _methodFindReferencedTables = typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindReferencedTables));   // FindReferencedTables Method
+
+        private void FindReferencedTables<TTable>(TTable table) where TTable : class, new()
+        {
+            if(!_checkedTables.ContainsKey(typeof(TTable).ToString()))
+                return;
+
+            var referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
+
+            foreach (var refTableInfo in referencedTablesInfos)
+            {
+                var foreignProperty = table.GetType().GetRuntimeProperty(refTableInfo.ForeignKeyPropertyName);      // get property that contain value of foreign key, that referenced to another table
+
+                var primaryKeyValue = foreignProperty.GetValue(table);                                              // get value of foreign key
+
+                var genericFindFirstByValue = _methodFindFirstByValue.MakeGenericMethod(refTableInfo.TypeOfReferencedTable);         // create genetic method to get referenced table instance using foreign key column name and value
+
+                var refTable = genericFindFirstByValue.Invoke(this, new[] { refTableInfo.ReferencedColumnName, primaryKeyValue });   // invoking generic method and getting instance of referenced table
+
+                var navigationProperty = table.GetType().GetRuntimeProperty(refTableInfo.NavigationPropertyName);   // get property in current table that must navigate to referenced table
+
+                navigationProperty.SetValue(table, refTable);                                           // pass reference to referenced table to navigation property
+
+                var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
+
+                genericFindReferencedTables.Invoke(this, new[] {refTable});     // Recursive call
+            }
+        }
+
         private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue)
         {
             if (string.IsNullOrEmpty(columnName))

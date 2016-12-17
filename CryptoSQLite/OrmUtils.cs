@@ -46,7 +46,7 @@ namespace CryptoSQLite
             typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[])
         };
 
-        public static bool IsTypeCompatible(Type type)
+        public static bool IsTypeCompatible(this Type type)
         {
             return ClrIntegerTypes.Contains(type) || ClrTextTypes.Contains(type) || ClrBlobTypes.Contains(type) ||
                    ClrRealTypes.Contains(type);
@@ -156,17 +156,35 @@ namespace CryptoSQLite
             // Point of this method is to find those properties, that can be used as column in table.
             // Only properties, that have public getter and public setter can be used as column in table.
 
-            var compatibleProperties = tableType.GetRuntimeProperties().Where(pr => pr.CanRead &&
-                                                                               pr.CanWrite &&
-                                                                               pr.GetMethod != null &&
-                                                                               pr.SetMethod != null &&
+            var compatibleProperties = tableType.GetRuntimeProperties().Where(pr => 
+                                                                               pr.PropertyType.IsTypeCompatible() &&
+                                                                               pr.CanRead             &&
+                                                                               pr.CanWrite            &&
+                                                                               pr.GetMethod != null   &&
+                                                                               pr.SetMethod != null   &&
                                                                                !pr.GetMethod.IsStatic &&
                                                                                !pr.SetMethod.IsStatic &&
-                                                                               !pr.IsIgnorable());
+                                                                               !pr.IsIgnorable()      );     
 
             return compatibleProperties;
         }
 
+        public static PropertyInfo NavigationProperty(this Type tableType, string propertyName)
+        {
+            // Point of this method is to find those properties, that can be used as column in table.
+            // Only properties, that have public getter and public setter can be used as column in table.
+
+            var navigationTableProperty = tableType.GetRuntimeProperties().FirstOrDefault(pr =>
+                                                                               pr.Name == propertyName &&
+                                                                               pr.CanRead &&
+                                                                               pr.CanWrite &&
+                                                                               pr.GetMethod != null &&
+                                                                               pr.SetMethod != null &&
+                                                                               !pr.GetMethod.IsStatic &&
+                                                                               !pr.SetMethod.IsStatic );
+
+            return navigationTableProperty;
+        }
 
         public static bool IsDefaultValue(this PropertyInfo property, object value)
         {
@@ -299,8 +317,9 @@ namespace CryptoSQLite
         /// checks correctness of this attributes and returns information about them.
         /// </summary>
         /// <param name="properties">List of compatible properties</param>
+        /// <param name="table">Type of CryptoTable</param>
         /// <returns>List of ForeignKey infos</returns>
-        public static IList<ForeignKey> ForeignKeys(this IEnumerable<PropertyInfo> properties)
+        public static IList<ForeignKey> ForeignKeys(this IEnumerable<PropertyInfo> properties, Type table)
         {
             var compatibleProperties = properties.ToArray();
 
@@ -314,34 +333,32 @@ namespace CryptoSQLite
                 {
                     var navigationPropertyNameToReferencedTable = property.ForeignKey().Name;
 
-                    var navigationProperty = compatibleProperties.FirstOrDefault(p => p.Name == navigationPropertyNameToReferencedTable);
+                    if (string.IsNullOrEmpty(navigationPropertyNameToReferencedTable))
+                        throw new CryptoSQLiteException($"Foreign Key Attribute in property '{property.Name}' can't have empty name.");
+
+                    var navigationProperty = table.NavigationProperty(navigationPropertyNameToReferencedTable);
                     if (navigationProperty == null)
                         throw new CryptoSQLiteException($"ForeignKey attribute for property '{property.Name}' has incorrect property name, that must navigate to referenced table.");
 
-                    if (navigationProperty.ForeignKey() != null)
-                        throw new CryptoSQLiteException($"You have already defined ForeignKey Attribute for {property.Name}.");
+                    var referencedTable = navigationProperty.PropertyType;
 
-                    list.Add(CreateForeignKeyInfo(property, navigationProperty));
+                    var referencedTableName = referencedTable.TableName();
+
+                    var primaryKeyInReferencedTable = referencedTable.GetRuntimeProperties().FirstOrDefault(p => p.IsPrimaryKey());  // check if table has PrimaryKey Attribute
+                    if (primaryKeyInReferencedTable == null)
+                        throw new CryptoSQLiteException($"Table {referencedTableName} doesn't contain property with PrimaryKey Attribute");
+
+                    var primaryKeyColumnNameInReferencedTable = primaryKeyInReferencedTable.ColumnName();
+
+                    list.Add(new ForeignKey(referencedTableName, primaryKeyColumnNameInReferencedTable, property.Name, property.ColumnName(), navigationProperty.Name, referencedTable));
                 }
-                else if (property.PropertyType.GetCryptoTableAttribute() != null)   // If Foreign Key Attribute applied to Navigation property
-                {
-                    var foreignKeyPropertyName = property.ForeignKey().Name;
-
-                    var foreignProperty = compatibleProperties.FirstOrDefault(p => p.Name == foreignKeyPropertyName);
-                    if (foreignProperty == null)
-                        throw new CryptoSQLiteException($"ForeignKey attribute for property '{property.Name}' has incorrect property name, that must navigate to referenced table.");
-
-                    if (foreignProperty.ForeignKey() != null)
-                        throw new CryptoSQLiteException($"You have already defined ForeignKey Attribute for {property.Name}.");
-
-                    list.Add(CreateForeignKeyInfo(foreignProperty, property));  // changed param orders
-                }
-                else throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32' properties, or to property, Type of which has CryptoTable attribute.");
+                else
+                    throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32' properties, or to property, Type of which has CryptoTable attribute.");
             }
-
             return list;
         }
 
+        /*
         private static ForeignKey CreateForeignKeyInfo(PropertyInfo foreignKeyProperty, PropertyInfo navigationProperty)
         {
             var tableType = navigationProperty.GetType();
@@ -354,8 +371,9 @@ namespace CryptoSQLite
 
             var columnName = primaryKey.ColumnName();
 
-            return new ForeignKey(tableName, columnName, foreignKeyProperty.Name, tableType);
+            return new ForeignKey(tableName, columnName, foreignKeyProperty.Name, foreignKeyProperty.ColumnName(), tableType);
         }
+    */
     }
 
 

@@ -12,7 +12,7 @@ namespace CryptoSQLite
         {
             var columns = table.GetColumns().ToArray();
 
-            var cmd = $"CREATE TABLE IF NOT EXISTS {table.Name}(";
+            var cmd = $"CREATE TABLE IF NOT EXISTS {table.TableName()}(";
 
             var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 
@@ -21,8 +21,13 @@ namespace CryptoSQLite
 
             var joinedColumns = string.Join(",\n", mappedColumns);
 
+            var mappedForeignKeys = string.Join(",\n", columns.ForeignKeys(table).Select(fk => $"FOREIGN KEY (\"{fk.ForeignKeyColumnName}\") REFERENCES \"{fk.ReferencedTableName}\" (\"{fk.ReferencedColumnName}\")"));
+
+            if (mappedForeignKeys.Length > 0)
+                joinedColumns += ",\n" + mappedForeignKeys;
+            
             cmd += joinedColumns + ")";
-            //TODO ForeignKey
+
             return cmd;
         }
 
@@ -105,10 +110,15 @@ namespace CryptoSQLite
             string clmnMap = $"{column.ColumnName()} {column.GetSqlType()}";
 
             //TODO you need think here a lot
+
             if (column.IsPrimaryKey() && column.IsAutoIncremental())
+            {
                 clmnMap += " PRIMARY KEY AUTOINCREMENT";
-            else if(column.IsPrimaryKey() && !column.IsAutoIncremental())
+            }
+            else if (column.IsPrimaryKey())
+            {
                 clmnMap += " PRIMARY KEY NOT NULL";
+            }
             else if (column.IsNotNull())
             {
                 clmnMap += " NOT NULL";
