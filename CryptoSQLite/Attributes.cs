@@ -88,16 +88,15 @@ namespace CryptoSQLite
         /// <summary>
         /// Column name that will be Foreing Key in table 
         /// </summary>
-        public string Name { get; }
+        public string NavigationPropertyName { get; }
 
         /// <summary>
         /// Ctor.
-        /// <para/>You can have a different name of a foreign key property name than the primary key of a dependent class
         /// </summary>
-        /// <param name="name">Foreign key property name. Or name of key property to specify which navigation property it points to.</param>
-        public ForeignKeyAttribute(string name)
+        /// <param name="navigationPropertyName">Name of property (Navigation Property). This property will be containing reference to a instance of foreign Table</param>
+        public ForeignKeyAttribute(string navigationPropertyName)
         {
-            Name = name;
+            NavigationPropertyName = navigationPropertyName;
         }
     }
 

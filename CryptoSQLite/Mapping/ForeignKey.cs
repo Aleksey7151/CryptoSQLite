@@ -23,6 +23,7 @@ namespace CryptoSQLite.Mapping
         /// <param name="referencedColumnName">Column name in another table which is PRIMARY KEY column</param>
         /// <param name="foreignKeyPropertyName">Name of property that has KoreignKey Attribute</param>
         /// <param name="foreignKeyColumnName">Name of column in table that is foreign key</param>
+        /// <param name="navigationPropertyName">Name of navigation property that will be contain reference to referenced Table</param>
         /// <param name="referencedTable">Type of referenced Table</param>
         public ForeignKey(string referencedTableName, string referencedColumnName, string foreignKeyPropertyName, string foreignKeyColumnName, string navigationPropertyName, Type referencedTable)
         {

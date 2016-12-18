@@ -1131,11 +1131,6 @@ namespace CryptoSQLite
         /// <param name="properties">list of compatible properties</param>
         private static /*TableMap*/void CheckAttributes(string tableName, IList<PropertyInfo> properties)
         {
-            /*
-            if (properties.Any(property => !OrmUtils.IsTypeCompatible(property.PropertyType)))
-                throw new CryptoSQLiteException($"Table {tableName} contains incompatible type of property.", "Compatible types: bool, DateTime, string, byte[], byte, short, ushort, int, uint, long, ulong, float, double");
-            */
-
             if (properties.Any(p => p.ColumnName() == SoltColumnName))
                 throw new CryptoSQLiteException(
                     $"Table can't contain column with name: {SoltColumnName}. This name is reserved for CryptoSQLite needs.");
@@ -1154,6 +1149,18 @@ namespace CryptoSQLite
 
             if(properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Encrypted columns can't have default value, but they can be Not Null.");
+
+            if (properties.Any(p => p.IsPrimaryKey() && p.IsForeignKey()))
+                throw new CryptoSQLiteException("Property can't have ForeignKey and PrimaryKey attributes simultaneously.");
+
+            if (properties.Any(p => p.IsEncrypted() && p.IsForeignKey()))
+                throw new CryptoSQLiteException("Property can't have ForeignKey and Encrypted attributes simultaneously.");
+
+            if (properties.Any(p => p.IsAutoIncremental() && p.IsForeignKey()))
+                throw new CryptoSQLiteException("Property can't have ForeignKey and AutoIncrement attributes simultaneously.");
+
+            if (properties.Any(p => p.IsForeignKey() && p.DefaultValue() != null))
+                throw new CryptoSQLiteException("Property with ForeignKey attribute can't have Default Value.");
 
             // find columns with equal names
             for (var i = 0; i < properties.Count; i++)
