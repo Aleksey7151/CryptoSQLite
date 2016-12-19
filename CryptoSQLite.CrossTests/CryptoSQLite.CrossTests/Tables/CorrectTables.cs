@@ -836,6 +836,12 @@ namespace CryptoSQLite.CrossTests.Tables
 
         public bool IsDone { get; set; }
 
+        public bool Equal(SecretTask s)
+        {
+            return SecretToDo == s.SecretToDo && Description == s.Description && Math.Abs(Price - s.Price) < 0.000001 &&
+                   IsDone == s.IsDone;
+        }
+
     }
 
 
@@ -866,41 +872,14 @@ namespace CryptoSQLite.CrossTests.Tables
 
         [Ignored]
         public string IgnoredString { get; set; }
-    }
 
-    internal static class TestExtensions
-    {
-        public static bool IsTableEqualsTo(this AccountsData ac1, AccountsData ac2)
+        public bool Equal(AccountsData ac)
         {
-            var namesAreEqual = false;
-
-            if (ac1.Name == null && ac2.Name == null)
-                namesAreEqual = true;
-            else if (ac1.Name != null && ac2.Name != null)
-                namesAreEqual = ac1.Name == ac2.Name;
-
-            var passwordsAreEqual = false;
-
-            if (ac1.Password == null && ac2.Password == null)
-                passwordsAreEqual = true;
-            else if (ac1.Password != null && ac2.Password != null)
-                passwordsAreEqual = ac1.Password == ac2.Password;
-
-            return ac1.IsAdministrator == ac2.IsAdministrator &&
-                   namesAreEqual && passwordsAreEqual &&
-                   ac1.Age == ac2.Age &&
-                   ac1.SocialSecureId == ac2.SocialSecureId;
-        }
-
-        public static bool IsTaskEqualTo(this SecretTask left, SecretTask right)
-        {
-            if (left == null || right == null)
-                return false;
-
-            return left.IsDone == right.IsDone &&
-                   left.Description == right.Description &&
-                   left.SecretToDo == right.SecretToDo &&
-                   Math.Abs(left.Price - right.Price) < 0.000005;
+            return IsAdministrator == ac.IsAdministrator && Name == ac.Name && Password == ac.Password &&
+                   Age == ac.Age &&
+                   SocialSecureId == ac.SocialSecureId;
         }
     }
+
+   
 }

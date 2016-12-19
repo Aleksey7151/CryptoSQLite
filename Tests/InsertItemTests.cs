@@ -887,8 +887,8 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account2)));
+                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equal(account2)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -931,7 +931,7 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -974,7 +974,7 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {

@@ -30,10 +30,10 @@ namespace Tests
 
                     var table = result.ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[1])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[2])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[3])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[4])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[1])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[2])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
                     await db.DeleteItemAsync<AccountsData>(1);
 
@@ -41,40 +41,40 @@ namespace Tests
 
                     table = result.ToArray();
 
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[1])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[2])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[3])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[4])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[1])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[2])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
                     await db.DeleteItemAsync<AccountsData>(3);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
 
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[1])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[2])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[3])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[4])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[1])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[2])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
                     await db.DeleteItemAsync<AccountsData>(2);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
 
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[1])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[2])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[3])));
-                    Assert.IsTrue(table.Any(e => e.IsTableEqualsTo(accounts[4])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[1])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[2])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
+                    Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
                     await db.DeleteItemAsync<AccountsData>(4);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
 
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[1])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[2])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[3])));
-                    Assert.IsFalse(table.Any(e => e.IsTableEqualsTo(accounts[4])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[1])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[2])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
+                    Assert.IsFalse(table.Any(e => e.Equal(accounts[4])));
                 }
                 catch (CryptoSQLiteException cex)
                 {

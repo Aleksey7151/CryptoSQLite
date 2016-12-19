@@ -195,9 +195,9 @@ namespace Tests
 
                     Assert.IsTrue(elements.Length == tasks.Length - 1);
 
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[0]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
+                    Assert.IsTrue(elements[0].Equal(tasks[0]));
+                    Assert.IsTrue(elements[1].Equal(tasks[2]));
+                    Assert.IsTrue(elements[2].Equal(tasks[3]));
 
                 }
                 catch (CryptoSQLiteException cex)
@@ -236,9 +236,9 @@ namespace Tests
 
                     Assert.IsTrue(elements.Length == tasks.Length - 1);
 
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[1]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
+                    Assert.IsTrue(elements[0].Equal(tasks[1]));
+                    Assert.IsTrue(elements[1].Equal(tasks[2]));
+                    Assert.IsTrue(elements[2].Equal(tasks[3]));
 
                 }
                 catch (CryptoSQLiteException cex)
@@ -278,9 +278,9 @@ namespace Tests
 
                     Assert.IsTrue(elements.Length == tasks.Length - 1);
 
-                    Assert.IsTrue(elements[0].IsTaskEqualTo(tasks[1]));
-                    Assert.IsTrue(elements[1].IsTaskEqualTo(tasks[2]));
-                    Assert.IsTrue(elements[2].IsTaskEqualTo(tasks[3]));
+                    Assert.IsTrue(elements[0].Equal(tasks[1]));
+                    Assert.IsTrue(elements[1].Equal(tasks[2]));
+                    Assert.IsTrue(elements[2].Equal(tasks[3]));
 
                 }
                 catch (CryptoSQLiteException cex)

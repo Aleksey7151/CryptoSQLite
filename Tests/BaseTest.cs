@@ -10,6 +10,10 @@ namespace Tests
         private readonly byte[] _key = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                                         18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 
+        static BaseTest()
+        {
+            SQLitePCL.Batteries_V2.Init();
+        }
 
         public const string GostDbFile = "TestGost.db3";
         public const string AesDbFile = "TestAes.db3";

@@ -33,9 +33,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
-                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[2]));
+                    Assert.IsTrue(table[0].Equal(accounts[0]));
+                    Assert.IsTrue(table[1].Equal(accounts[1]));
+                    Assert.IsTrue(table[2].Equal(accounts[2]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -70,10 +70,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
-                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[2]));
-                    Assert.IsTrue(table[3].IsTableEqualsTo(accounts[5]));
+                    Assert.IsTrue(table[0].Equal(accounts[0]));
+                    Assert.IsTrue(table[1].Equal(accounts[1]));
+                    Assert.IsTrue(table[2].Equal(accounts[2]));
+                    Assert.IsTrue(table[3].Equal(accounts[5]));
 
                 }
                 catch (CryptoSQLiteException cex)
@@ -109,9 +109,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[3]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[4]));
-                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[7]));
+                    Assert.IsTrue(table[0].Equal(accounts[3]));
+                    Assert.IsTrue(table[1].Equal(accounts[4]));
+                    Assert.IsTrue(table[2].Equal(accounts[7]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -146,9 +146,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
-                    Assert.IsTrue(table[1].IsTableEqualsTo(accounts[1]));
-                    Assert.IsTrue(table[2].IsTableEqualsTo(accounts[5]));
+                    Assert.IsTrue(table[0].Equal(accounts[0]));
+                    Assert.IsTrue(table[1].Equal(accounts[1]));
+                    Assert.IsTrue(table[2].Equal(accounts[5]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -183,7 +183,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].IsTableEqualsTo(accounts[0]));
+                    Assert.IsTrue(table[0].Equal(accounts[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -221,7 +221,7 @@ namespace Tests
                     Assert.IsTrue(table.Length == accounts.Length);
 
                     for (var i = 0; i < accounts.Length; i++)
-                        Assert.IsTrue(table[i].IsTableEqualsTo(accounts[i]));
+                        Assert.IsTrue(table[i].Equal(accounts[i]));
                     
                 }
                 catch (CryptoSQLiteException cex)

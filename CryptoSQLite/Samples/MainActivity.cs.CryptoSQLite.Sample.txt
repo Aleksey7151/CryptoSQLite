@@ -38,7 +38,8 @@ namespace CryptoSQLiteSample.Droid
 
 			// ! IMPORTANT ! This function determines how to talk to a specific instance of the native SQLite3 library.
             // You can call this function in Application::OnCreate() function or in Application ctor.
-            SQLitePCL.Batteries_V2.Init(); // From NuGet package SQLitePCLRaw.batteries_green
+            SQLitePCL.Batteries_V2.Init(); // From NuGet package SQLitePCLRaw.bundle_green. 
+			//OR: SQLitePCL.Batteries.Init(); // From NuGet package SQLitePCLRaw.bundle_green
 
             var pathToDatabaseFile = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, fileName);
 

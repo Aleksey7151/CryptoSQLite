@@ -5,7 +5,8 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    //Incorrect tables:
+    #region Incorrect tables
+
     [CryptoTable("TableForeignKeyNullName")]
     internal class TableForeignKeyNullName
     {
@@ -135,8 +136,51 @@ namespace Tests
 
         public int SomeInt { get; set; }
     }
+    #endregion //Incorrect Tables
 
-    // Correct tables:
+
+
+    #region Simpliest Dependency
+
+    // Simpliest Dependency
+    [CryptoTable("SimpleReference")]
+    internal class SimpleReference
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SomeData { get; set; }
+
+        [ForeignKey("Simple"), Column("SIMPLE_ID")]
+        public int InfoRefId { get; set; }
+
+        public Simple Simple { get; set; }
+    }
+
+    [CryptoTable("Simple")]
+    internal class Simple
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SimpleString { get; set; }
+
+        public int SimpleValue { get; set; }
+
+        public bool Equal(Simple s)
+        {
+            return SimpleString == s.SimpleString && SimpleValue == s.SimpleValue;
+        }
+    }
+
+    #endregion
+
+
+
+    #region Dependency sequency
+
     // Dependency diagram:  Order ---> Person ---> Request ---> Data
     [CryptoTable("Datas")]
     internal class Data
@@ -227,14 +271,154 @@ namespace Tests
         }
     }
 
-    // Multiple referenced tables
+    #endregion //Dependency sequency
 
-    [CryptoTable("TableWithTwoReferencedTables")]
-    internal class TableWithTwoReferencedTables
+
+
+    #region Multiple Referenced Tables
+
+    // Multiple referenced tables
+    // Dependency diagram:  
+    //                                     / ---> Account ---> Job                     
+    //
+    //                 ManyRefTables ---> |  ---> Info                          
+    //
+    //                                     \ ---> Client  ---> BankCount                
+    //
+    [CryptoTable("Accounts")]
+    internal class Account
     {
-        
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string AccountData { get; set; }
+
+        [ForeignKey("Job"), Column("JOB_ID")]
+        public int JobRefId { get; set; }
+
+        public Job Job { get; set; }
+
+        public bool Equal(Account ac)
+        {
+            return AccountData == ac.AccountData && JobRefId == ac.JobRefId;
+        }
     }
-    
+
+    [CryptoTable("Jobs")]
+    internal class Job
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string JobDescription { get; set; }
+
+        [Encrypted]
+        public double Price { get; set; }
+
+        public bool Equal(Job j)
+        {
+            return JobDescription == j.JobDescription && Math.Abs(Price - j.Price) < 0.000001;
+        }
+    }
+
+    [CryptoTable("Infos")]
+    internal class Info
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SomeInfo { get; set; }
+
+        [Encrypted]
+        public double SomeValue { get; set; }
+
+        public bool Equal(Info i)
+        {
+            return SomeInfo == i.SomeInfo && Math.Abs(SomeValue - i.SomeValue) < 0.000001;
+        }
+    }
+
+    [CryptoTable("Clients")]
+    internal class Client
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted, NotNull]
+        public string PasswordHash { get; set; }
+
+        [Column("DATE")]
+        public DateTime CreationTime { get; set; }
+
+        [ForeignKey("Count"), Column("COUNT_ID")]
+        public int BankCountRefId { get; set; }
+
+        public BankCount Count { get; set; }
+
+        public bool Equal(Client c)
+        {
+            return PasswordHash == c.PasswordHash && CreationTime == c.CreationTime &&
+                   BankCountRefId == c.BankCountRefId;
+        }
+    }
+
+    [CryptoTable("BankCounts")]
+    internal class BankCount
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public ulong CountId { get; set; }
+
+        [Encrypted]
+        public double Deposit { get; set; }
+
+        public bool Equal(BankCount b)
+        {
+            return CountId == b.CountId && Math.Abs(Deposit - b.Deposit) < 0.000001;
+        }
+    }
+
+    [CryptoTable("ManyRefTables")]
+    internal class ManyRefTables
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted, NotNull]
+        public string SomeStringData { get; set; }
+
+        [ForeignKey("Account"), Column("ACC_ID")]
+        public int RequestRefId { get; set; }
+
+        public Account Account { get; set; }
+
+        [ForeignKey("Info"), Column("INFO_ID")]
+        public int InfoRefId { get; set; }
+
+        public Info Info { get; set; }
+
+        [ForeignKey("Client"), Column("CLIENT_ID")]
+        public int ClientRefId { get; set; }
+
+        public Client Client { get; set; }
+
+        public bool Equal(ManyRefTables m)
+        {
+            return SomeStringData == m.SomeStringData && RequestRefId == m.RequestRefId && InfoRefId == m.InfoRefId &&
+                   ClientRefId == m.ClientRefId;
+        }
+    }
+
+    #endregion //Multiple Referenced Tables
+
+
+
+
     [TestFixture]
     public class ForeignKeyTests : BaseTest
     {
@@ -592,6 +776,228 @@ namespace Tests
                 {
                     db.Dispose();
                 }
+            }
+        }
+
+        [Test]
+        public void MultipleReferencedTables()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    // Dependency diagram:  
+                    //                                     / ---> Account ---> Job                     / ---> 2 ---> 1             / ---> 1 ---> 2
+                    //
+                    //                 ManyRefTables ---> |  ---> Info                          1 ---> |  ---> 1            2 ---> |  ---> 2
+                    //
+                    //                                     \ ---> Client  ---> BankCount                \ ---> 2 ---> 2             \ ---> 1 ---> 1
+                    //
+                    db.DeleteTable<ManyRefTables>();
+                    db.DeleteTable<Account>();
+                    db.DeleteTable<Info>();
+                    db.DeleteTable<Client>();
+                    db.DeleteTable<Job>();
+                    db.DeleteTable<BankCount>();
+
+                    db.CreateTable<Job>();
+                    db.CreateTable<BankCount>();
+                    db.CreateTable<Account>();
+                    db.CreateTable<Client>();
+                    db.CreateTable<Info>();
+                    db.CreateTable<ManyRefTables>();
+
+                    var job1 = new Job {JobDescription = "Job Descriptionen 1", Price = 8223.25};
+                    db.InsertItem(job1);
+                    var job2 = new Job { JobDescription = "Job Descriptionen 2", Price = 1234.25 };
+                    db.InsertItem(job2);
+
+                    var acc1 = new Account {AccountData = "Some Account Data 1", JobRefId = 2};
+                    db.InsertItem(acc1);
+                    var acc2 = new Account { AccountData = "Some Account Data 2", JobRefId = 1 };
+                    db.InsertItem(acc2);
+
+                    var info1 = new Info {SomeInfo = "Some Info Descriptionen 1", SomeValue = -823782.123122};
+                    db.InsertItem(info1);
+                    var info2 = new Info { SomeInfo = "Some Info Descriptionen 2", SomeValue = 1234782.234566 };
+                    db.InsertItem(info2);
+
+                    var count1 = new BankCount {CountId = 1298374892738422, Deposit = 2938489.86};
+                    db.InsertItem(count1);
+                    var count2 = new BankCount {CountId = 2309458934830942, Deposit = 3.99};
+                    db.InsertItem(count2);
+
+                    var client1 = new Client
+                    {
+                        CreationTime = DateTime.Now,
+                        PasswordHash = "JHJIOIEUOIWEYTYTVUDBVJRHFJDHFDHJHFJDHFYYEE",
+                        BankCountRefId = 1
+                    };
+                    db.InsertItem(client1);
+                    var client2 = new Client
+                    {
+                        CreationTime = DateTime.Now,
+                        PasswordHash = "KEIU92098293GKJLDJLGJEIEIU92384092293LKGJ",
+                        BankCountRefId = 2
+                    };
+                    db.InsertItem(client2);
+
+                    var manyRefTables1 = new ManyRefTables {SomeStringData = "Some Data Descriptionen 1", RequestRefId = 2, InfoRefId = 1, ClientRefId = 2};
+                    db.InsertItem(manyRefTables1);
+
+                    var manyRefTables2 = new ManyRefTables { SomeStringData = "Some Data Descriptionen 2", RequestRefId = 1, InfoRefId = 2, ClientRefId = 1 };
+                    db.InsertItem(manyRefTables2);
+
+                    var manyRefs = db.Find<ManyRefTables>(mrt => mrt.Id == 1).ToArray();
+
+                    Assert.NotNull(manyRefs);
+                    Assert.IsTrue(manyRefs.Length == 1);
+                    Assert.IsTrue(manyRefs[0].Equal(manyRefTables1));
+                    Assert.IsTrue(manyRefs[0].Account.Equal(acc2));
+                    Assert.IsTrue(manyRefs[0].Account.Job.Equal(job1));
+                    Assert.IsTrue(manyRefs[0].Info.Equal(info1));
+                    Assert.IsTrue(manyRefs[0].Client.Equal(client2));
+                    Assert.IsTrue(manyRefs[0].Client.Count.Equal(count2));
+
+                    manyRefs = null;
+                    manyRefs = db.Find<ManyRefTables>(mrt => mrt.Id == 2).ToArray();
+
+                    Assert.NotNull(manyRefs);
+                    Assert.IsTrue(manyRefs.Length == 1);
+                    Assert.IsTrue(manyRefs[0].Equal(manyRefTables2));
+                    Assert.IsTrue(manyRefs[0].Account.Equal(acc1));
+                    Assert.IsTrue(manyRefs[0].Account.Job.Equal(job2));
+                    Assert.IsTrue(manyRefs[0].Info.Equal(info2));
+                    Assert.IsTrue(manyRefs[0].Client.Equal(client1));
+                    Assert.IsTrue(manyRefs[0].Client.Count.Equal(count1));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void ReferencedRowInTableDoesNotExist()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<Simple>();
+                    db.DeleteTable<SimpleReference>();
+
+
+                    db.CreateTable<Simple>();
+                    db.CreateTable<SimpleReference>();
+
+
+                    var simple1 = new Simple {SimpleString = "Some Simple String 1", SimpleValue = 283423};
+                    db.InsertItem(simple1);
+
+                    var simpleRef1 = new SimpleReference
+                    {
+                        SomeData = "Some Data Descriptionen 1",
+                        InfoRefId = 2 /*Row Doesn't exist in Infos!!!*/
+                    };
+
+                    db.InsertItem(simpleRef1);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.ProbableCause.IndexOf("Column with ForeignKey constrait has invalid value or table doesn't exist in database.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void ReferencedTableDoesNotExistInDataBase()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SimpleReference>();
+                    db.DeleteTable<Simple>();
+
+                    // db.CreateTable<Simple>();
+                    db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("Database doesn't contain table with name: Simple.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void DeleteTableWhenItIsForeignKeyDependencyForOtherTables()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SimpleReference>();
+                    db.DeleteTable<Simple>();
+
+                    db.CreateTable<Simple>();
+                    db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
+
+                    var simple1 = new Simple { SimpleString = "Some Simple String 1", SimpleValue = 283423 };
+                    db.InsertItem(simple1);
+
+                    var simpleRef1 = new SimpleReference
+                    {
+                        SomeData = "Some Data Descriptionen 1",
+                        InfoRefId = 1 /*Row Doesn't exist in Infos!!!*/
+                    };
+                    db.InsertItem(simpleRef1);
+
+                    db.DeleteTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("because other tables referenced on her, using ForeignKey Constrait.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
             }
         }
     }

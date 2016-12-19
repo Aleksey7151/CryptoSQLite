@@ -192,11 +192,11 @@ namespace Tests
                     var element = db.GetItem<SecretTask>("Id", 2);
                     
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(tasks[1].IsTaskEqualTo(element));
+                    Assert.IsTrue(tasks[1].Equal(element));
 
                     element = db.GetItem<SecretTask>("IsDone", true);
                     Assert.IsNotNull(element);
-                    Assert.IsTrue(element.IsTaskEqualTo(tasks[0]));
+                    Assert.IsTrue(element.Equal(tasks[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -231,7 +231,7 @@ namespace Tests
                     {
                         var element = db.GetItem<SecretTask>(i);
                         Assert.IsNotNull(element);
-                        Assert.IsTrue(tasks[i-1].IsTaskEqualTo(element));
+                        Assert.IsTrue(tasks[i-1].Equal(element));
                     }
                 }
                 catch (CryptoSQLiteException cex)
@@ -267,13 +267,13 @@ namespace Tests
                     item = db.GetItem(item);
 
                     Assert.IsNotNull(item);
-                    Assert.IsTrue(item.IsTaskEqualTo(tasks[1]));
+                    Assert.IsTrue(item.Equal(tasks[1]));
 
                     var item2 = new SecretTask {Description = "It's the fourth task" };
                     item2 = db.GetItem(item2);
 
                     Assert.IsNotNull(item2);
-                    Assert.IsTrue(item2.IsTaskEqualTo(tasks[3]));
+                    Assert.IsTrue(item2.Equal(tasks[3]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -351,7 +351,7 @@ namespace Tests
                     Assert.IsNotNull(elements);
                     Assert.IsTrue(tasks.Length == elements.Length);
                     for (var i = 0; i < elements.Length; i++)
-                        Assert.IsTrue(tasks[i].IsTaskEqualTo(elements[i]));
+                        Assert.IsTrue(tasks[i].Equal(elements[i]));
                 }
                 catch (CryptoSQLiteException cex)
                 {

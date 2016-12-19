@@ -12,7 +12,7 @@ namespace CryptoSQLite
         {
             var columns = table.GetColumns().ToArray();
 
-            var cmd = $"CREATE TABLE IF NOT EXISTS {table.TableName()}(";
+            var cmd = $"CREATE TABLE IF NOT EXISTS {table.TableName()}\n(\n";
 
             var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 
@@ -21,12 +21,13 @@ namespace CryptoSQLite
 
             var joinedColumns = string.Join(",\n", mappedColumns);
 
-            var mappedForeignKeys = string.Join(",\n", columns.ForeignKeys(table).Select(fk => $"FOREIGN KEY (\"{fk.ForeignKeyColumnName}\") REFERENCES \"{fk.ReferencedTableName}\" (\"{fk.ReferencedColumnName}\")"));
+            
+            var mappedForeignKeys = string.Join(",\n", columns.ForeignKeys(table).Select(fk => $"FOREIGN KEY({fk.ForeignKeyColumnName}) REFERENCES {fk.ReferencedTableName}({fk.ReferencedColumnName})"));
 
             if (mappedForeignKeys.Length > 0)
                 joinedColumns += ",\n" + mappedForeignKeys;
             
-            cmd += joinedColumns + ")";
+            cmd += joinedColumns + "\n)";
 
             return cmd;
         }

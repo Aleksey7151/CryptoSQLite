@@ -789,7 +789,7 @@ namespace CryptoSQLite
             }
             catch (Exception ex)
             {
-                throw new CryptoSQLiteException(ex.Message, "Apparently table name or names of columns contain forbidden symbols.");
+                throw new CryptoSQLiteException("Apparently table name or names of columns contain forbidden symbols");
             }
         }
 
@@ -806,11 +806,13 @@ namespace CryptoSQLite
 
             try
             {
-                _connection.Execute(SqlCmds.CmdDeleteTable(tableName));
+                _connection.Execute(SqlCmds.CmdDeleteTable(tableName));     // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
-            catch (Exception ex)
+            catch (SQLitePCL.pretty.SQLiteException ex)
             {
-                throw new CryptoSQLiteException(ex.Message, "Apparently name of table contains forbidden symbols.");
+                if(ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
+                    throw new CryptoSQLiteException($"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.");
+                throw new CryptoSQLiteException(ex.Message, "Unknown");
             }
 
 
@@ -1240,7 +1242,7 @@ namespace CryptoSQLite
                 }
                 catch (Exception ex)
                 {
-                    throw new CryptoSQLiteException(ex.Message, "Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.");
+                    throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
                 }
             }
             else
@@ -1252,7 +1254,7 @@ namespace CryptoSQLite
                 }
                 catch (Exception ex)
                 {
-                    throw new CryptoSQLiteException(ex.Message, "Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.");
+                    throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
                 }
             }
         }
@@ -1350,9 +1352,12 @@ namespace CryptoSQLite
 
                 navigationProperty.SetValue(table, refTable);                                           // pass reference to referenced table to navigation property
 
-                var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
+                if (refTable != null)
+                {
+                    var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
 
-                genericFindReferencedTables.Invoke(this, new[] {refTable});     // Recursive call
+                    genericFindReferencedTables.Invoke(this, new[] { refTable });     // Recursive call
+                }
             }
         }
 
