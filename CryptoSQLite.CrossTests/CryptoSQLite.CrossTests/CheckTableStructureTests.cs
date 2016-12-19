@@ -337,29 +337,5 @@ namespace CryptoSQLite.CrossTests
                 Assert.Fail();
             }
         }
-
-        [Test]
-        public void TableWithIncompatibleColumnType()
-        {
-            using (var db = GetGostConnection())
-            {
-                try
-                {
-                    db.CreateTable<TableWithInCompatibleColumnType>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("contains incompatible type of property.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
-            }
-        }
     }
 }
