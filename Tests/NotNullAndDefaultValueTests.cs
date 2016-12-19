@@ -173,7 +173,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.ProbableCause.IndexOf("Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -203,7 +203,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.ProbableCause.IndexOf("Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -233,7 +233,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.ProbableCause.IndexOf("Causes: 1. Table doesn't exist in database.\n2. Value for NOT NULL column is not set.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)

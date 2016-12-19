@@ -14,28 +14,25 @@ namespace Tests
         [Test]
         public async Task FindRowsInTableThatHaveNullValues()
         {
-            var accounts = GetAccounts();
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
+            var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
             foreach (var db in GetAsyncConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                    await db.DeleteTableAsync<SecretTask>();
+                    await db.CreateTableAsync<SecretTask>();
 
-                    accounts[0].Name = null;
-                    accounts[1].Name = null;
-                    accounts[2].Name = null;
+                    await db.InsertItemAsync(st1);
+                    await db.InsertItemAsync(st2);
+                    await db.InsertItemAsync(st3);
 
-                    foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
-
-                    var result = await db.FindByValueAsync<AccountsData>("Name", null);
+                    var result = await db.FindByValueAsync<SecretTask>("Description", null);
 
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[1]));
-                    Assert.IsTrue(table[2].Equal(accounts[2]));
+                    Assert.IsTrue(table.Length == 1);
+                    Assert.IsTrue(table[0].Equal(st1));
                 }
                 catch (CryptoSQLiteException cex)
                 {

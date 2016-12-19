@@ -912,8 +912,8 @@ namespace Tests
             {
                 Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = 174376512,
-                Name = null,
-                Password = "A_B_R_A_C_A_D_A_B_R_A",
+                Name = "Frodo Beggins",
+                Password = null,
                 Age = 27,
                 IsAdministrator = false,
                 IgnoredString = "Some string that i can't will be ignored in table mapping"
@@ -955,7 +955,7 @@ namespace Tests
             {
                 Id = 33,    // will be ignored in table mapping, because it's market as autoincremental
                 SocialSecureId = 174376512,
-                Name = null,
+                Name = "Simple Name",
                 Password = null,
                 Age = 27,
                 IsAdministrator = false,
