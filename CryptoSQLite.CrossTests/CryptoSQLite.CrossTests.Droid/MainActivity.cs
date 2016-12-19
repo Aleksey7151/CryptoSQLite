@@ -44,7 +44,6 @@ namespace CryptoSQLite.CrossTests.Droid
             {
                 var msg = ex.Message;
             }
-            
 
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 

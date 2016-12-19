@@ -900,7 +900,7 @@ namespace CryptoSQLite.CrossTests
                     db.CreateTable<SimpleReference>();
 
 
-                    var simple1 = new Simple { SimpleString = "Some Simple String 1", SimpleValue = 283423 };
+                    var simple1 = new Simple {SimpleString = "Some Simple String 1", SimpleValue = 283423};
                     db.InsertItem(simple1);
 
                     var simpleRef1 = new SimpleReference
