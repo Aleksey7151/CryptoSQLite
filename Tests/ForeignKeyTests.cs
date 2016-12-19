@@ -893,10 +893,9 @@ namespace Tests
             {
                 try
                 {
-                    db.DeleteTable<Simple>();
                     db.DeleteTable<SimpleReference>();
-
-
+                    db.DeleteTable<Simple>();
+                    
                     db.CreateTable<Simple>();
                     db.CreateTable<SimpleReference>();
 

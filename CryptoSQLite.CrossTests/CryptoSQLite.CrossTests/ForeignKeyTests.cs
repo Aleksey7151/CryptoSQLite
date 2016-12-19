@@ -892,13 +892,11 @@ namespace CryptoSQLite.CrossTests
             {
                 try
                 {
-                    db.DeleteTable<Simple>();
                     db.DeleteTable<SimpleReference>();
-
+                    db.DeleteTable<Simple>();
 
                     db.CreateTable<Simple>();
                     db.CreateTable<SimpleReference>();
-
 
                     var simple1 = new Simple {SimpleString = "Some Simple String 1", SimpleValue = 283423};
                     db.InsertItem(simple1);
