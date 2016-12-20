@@ -39,7 +39,6 @@ namespace CryptoSQLiteSample.iOS
             SQLitePCL.Batteries_V2.Init(); // From NuGet package SQLitePCLRaw.bundle_green. 
 			//OR: SQLitePCL.Batteries.Init(); // From NuGet package SQLitePCLRaw.bundle_green
 
-
             try
             {
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal); // Documents folder
@@ -62,6 +61,7 @@ namespace CryptoSQLiteSample.iOS
                 db.InsertItem(new Tasks { Task = "Task4", Description = "Description_2", Price = 1100.99, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task5", Description = "Description_2", Price = 1718.99, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task6", Description = "Description_3", Price = null, IsDone = true });
+			
 
 				// FIND ELEMENTS IN LINQ MANNER:
 
@@ -80,6 +80,9 @@ namespace CryptoSQLiteSample.iOS
                 var exampleWithThreeRules = db.Find<Tasks>(t => t.IsDone && t.Price > 1000 && t.Price < 1300);  // SQL Request will be: SELECT * FROM MyTasks WHERE (((IsDone = 1) AND (Price > 1000)) AND (Price < 1300))
 
 
+				// NOW WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
+                
+				var selectedItem = db.Select<Tasks>(t => t.IsDone, "Task" /*Property Name!*/, "Price" /*Property Name!*/);    // It will get values for only 'Task' and 'Price' properties
             }
             catch (Exception ex)
             {

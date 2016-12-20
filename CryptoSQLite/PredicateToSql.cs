@@ -17,7 +17,7 @@ namespace CryptoSQLite
 
         private List<object> _values;
 
-        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values)
+        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values, string[] selectedPropertyNames = null)
         {
             if (whereExpression == null)
                 throw new ArgumentNullException(nameof(whereExpression), "Predicate can't be null");
@@ -32,7 +32,36 @@ namespace CryptoSQLite
 
             _builder.Clear();
 
-            _builder.Append($"SELECT * FROM {tableName} WHERE ");
+            if (selectedPropertyNames != null && selectedPropertyNames.Length > 0)      // if selected columns defined, then take only them
+            {
+                IList<string> columnNames = new List<string>();
+                var hasEncrypted = false;
+                foreach (var propertyName in selectedPropertyNames)
+                {
+                    if(string.IsNullOrEmpty(propertyName))
+                        throw new CryptoSQLiteException("Property Name for 'Select' can't be Null or Empty.");
+
+                    var clmn = compatibleProperties.FirstOrDefault(cp => cp.Name == propertyName);
+
+                    if (clmn == null)
+                        throw new CryptoSQLiteException($"Table '{tableName}' doesn't contain property with name: '{propertyName}'.");
+
+                    if (clmn.IsEncrypted())
+                        hasEncrypted = true;
+
+                    columnNames.Add(clmn.ColumnName());
+                }
+
+                if(hasEncrypted)
+                    columnNames.Add(CryptoSQLiteConnection.SoltColumnName);
+
+                var joinedColumnNames = string.Join(", ", columnNames);
+
+                _builder.Append($"SELECT {joinedColumnNames} FROM {tableName} WHERE ");
+            }
+
+            else
+                _builder.Append($"SELECT * FROM {tableName} WHERE ");   // take all columns
 
             TranslateExpression(whereExpression);
 

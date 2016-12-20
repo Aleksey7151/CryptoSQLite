@@ -222,7 +222,17 @@ namespace CryptoSQLite
         //[Obsolete("This method is deprecated and soon will be removed. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
 
-
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new();
     }
 
     /// <summary>
@@ -383,7 +393,17 @@ namespace CryptoSQLite
         /// <returns>All elements from table that are satisfying conditions.</returns>
         Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
-
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new();
 
     }
 
@@ -623,6 +643,23 @@ namespace CryptoSQLite
             where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.FindByValue<TTable>(columnName, columnValue));
+            return elements;
+        }
+
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            params string[] selectedProperties) where TTable : class, new()
+        {
+            var elements = await Task.Run(() => _connection.Select<TTable>(predicate, selectedProperties));
             return elements;
         }
 
@@ -1055,7 +1092,48 @@ namespace CryptoSQLite
             return FindUsingColumnValue<TTable>(columnName, columnValue);
         }
 
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate,
+            params string[] selectedProperties) where TTable : class, new()
+        {
+            CheckTable(typeof(TTable));
 
+            var tableName = typeof(TTable).TableName();
+
+            PropertyInfo[] columns = typeof(TTable).GetColumns().ToArray();
+
+            var predicateTraslator = new PredicateToSql();
+
+            object[] values;
+
+            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values, selectedProperties);
+
+            var table = ReadRowsFromTable(cmd, values);
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+
+                ProcessRow(columns, row, item);
+
+                FindReferencedTables(item, selectedProperties);     // here we get all referenced tables if they exist
+
+                items.Add(item);
+            }
+
+            return items;
+        }
 
 
         #endregion
@@ -1331,12 +1409,20 @@ namespace CryptoSQLite
 
         private readonly MethodInfo _methodFindReferencedTables = typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindReferencedTables));   // FindReferencedTables Method
 
-        private void FindReferencedTables<TTable>(TTable table) where TTable : class, new()
+        private void FindReferencedTables<TTable>(TTable table, string[] selectedProperties = null) where TTable : class, new()
         {
             if(!_checkedTables.ContainsKey(typeof(TTable).ToString()))
                 return;
 
-            var referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
+            IList<ForeignKey> referencedTablesInfos;
+
+            if (selectedProperties != null)
+                referencedTablesInfos = _checkedTables[typeof(TTable).ToString()].Where(fk => selectedProperties.Contains(fk.ForeignKeyPropertyName)).ToList();
+            else
+                referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
+            
+            if(referencedTablesInfos == null)
+                return;
 
             foreach (var refTableInfo in referencedTablesInfos)
             {
@@ -1356,7 +1442,7 @@ namespace CryptoSQLite
                 {
                     var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
 
-                    genericFindReferencedTables.Invoke(this, new[] { refTable });     // Recursive call
+                    genericFindReferencedTables.Invoke(this, new[] { refTable, null });     // Recursive call
                 }
             }
         }
@@ -1505,12 +1591,9 @@ namespace CryptoSQLite
             foreach (var property in properties)
             {
                 var column = columns.Find(c => c.Name == property.ColumnName());
-                if (column == null)
-                    throw new CryptoSQLiteException(
-                        $"Can't find appropriate column in database for property: {property.ColumnName()}");
 
-                if (column.SqlValue == null)
-                    continue;   // NULL value will stay NULL value
+                if (column?.SqlValue == null)   // NULL value will stay NULL value
+                    continue;
 
                 if (property.IsEncrypted())
                     GetDecryptedValue(property, item, column.SqlValue, encryptor);

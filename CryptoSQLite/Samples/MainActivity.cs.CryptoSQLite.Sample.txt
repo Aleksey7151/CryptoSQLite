@@ -75,7 +75,12 @@ namespace CryptoSQLiteSample.Droid
                 var taskWithExplisitDescription = db.Find<Tasks>(t => t.Description == "Description_3");    // SQL Request will be: SELECT * FROM MyTasks WHERE (Description = 'Description_3')
 
                 var exampleWithThreeRules = db.Find<Tasks>(t => t.IsDone && t.Price > 1000 && t.Price < 1300);  // SQL Request will be: SELECT * FROM MyTasks WHERE (((IsDone = 1) AND (Price > 1000)) AND (Price < 1300))
-            }
+			
+			
+				// NOW WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
+                
+				var selectedItem = db.Select<Tasks>(t => t.IsDone, "Task" /*Property Name!*/, "Price" /*Property Name!*/);    // It will get values for only 'Task' and 'Price' properties
+			}
             catch (Exception ex)
             {
                 var msg = ex.Message;
