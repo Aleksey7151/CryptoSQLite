@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 
+// IMPORTANT ALL [Encrypted] COLUMNS STORED IN DATABASE AS A BLOB TYPE
+
 namespace CryptoSQLite.Samples
 {
     [CryptoTable("MyTable")]

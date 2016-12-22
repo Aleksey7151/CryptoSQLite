@@ -7,6 +7,8 @@ using CryptoSQLite;
 
 namespace CryptoSQLiteSample.Droid
 {
+	// IMPORTANT ALL [Encrypted] COLUMNS STORED IN DATABASE AS A BLOB TYPE
+
     [CryptoTable("MyTasks")]
     public class Tasks
     {
@@ -42,10 +44,12 @@ namespace CryptoSQLiteSample.Droid
 			//OR: SQLitePCL.Batteries.Init(); // From NuGet package SQLitePCLRaw.bundle_green
 
             var pathToDatabaseFile = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, fileName);
-
-            try
+			
+			CryptoSQLiteConnection db = null;
+            
+			try
             {
-				var db = new CryptoSQLiteConnection(pathToDatabaseFile, CryptoAlgoritms.AesWith256BitsKey);
+				db = new CryptoSQLiteConnection(pathToDatabaseFile, CryptoAlgoritms.AesWith256BitsKey);
 
                 db.SetEncryptionKey(new byte[32]);		// Here you must set your secret encryption key
 
@@ -78,12 +82,24 @@ namespace CryptoSQLiteSample.Droid
 			
 			
 				// NOW WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
-                
 				var selectedItem = db.Select<Tasks>(t => t.IsDone, "Task" /*Property Name!*/, "Price" /*Property Name!*/);    // It will get values for only 'Task' and 'Price' properties
+			
+				// DELETE USING PREDICATES
+                db.Delete<Tasks>(t => t.IsDone);    // It will removes from table all completed tasks.
+
+                db.Delete<Tasks>(t => t.Price == null);     // Removes all tasks for which Price is not set
+
+                db.Delete<Tasks>(t => t.Price == null || t.IsDone);
+
+                db.Delete<Tasks>(t => t.Price < 1300 && t.Description == "Description_1");
 			}
             catch (Exception ex)
             {
                 var msg = ex.Message;
+            }
+			finally
+            {
+                db?.Dispose(); // Here all internal copies of Encryption Key will be removed from memory (ZeroMemory).
             }
 		}
 	}

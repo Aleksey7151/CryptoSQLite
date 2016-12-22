@@ -127,7 +127,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         TTable GetItem<TTable>(int id) where TTable : class, new();
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         TTable GetItem<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -157,6 +157,8 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
         /// <param name="predicate">condition for column values</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         void Delete<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class;
 
         /// <summary>
@@ -215,6 +217,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
@@ -306,7 +309,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -318,7 +321,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new();
 
         /// <summary>
@@ -330,7 +333,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -339,6 +342,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
         /// <param name="predicate">condition for column values</param>
         /// <exception cref="CryptoSQLiteException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         Task DeleteAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class;
 
         /// <summary>
@@ -348,6 +352,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task DeleteItemAsync<TTable>(TTable item) where TTable : class;
 
         /// <summary>
@@ -366,6 +371,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task DeleteItemAsync<TTable>(int id) where TTable : class;
 
         /// <summary>
@@ -395,6 +401,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
@@ -523,7 +530,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
         public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
@@ -539,7 +546,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
         public async Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(id));
@@ -555,13 +562,20 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
         public async Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem(item));
             return await table;
         }
 
+        /// <summary>
+        /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
+        /// <param name="predicate">condition for column values</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         public async Task DeleteAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
         {
             await Task.Run(() => _connection.Delete(predicate));
@@ -574,7 +588,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
         public async Task DeleteItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem(item));
@@ -599,7 +613,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
         public async Task DeleteItemAsync<TTable>(int id) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem<TTable>(id));
@@ -645,6 +659,7 @@ namespace CryptoSQLite
         /// <returns>All elements from table that are satisfying conditions.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
@@ -920,7 +935,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead", false)]
         public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -937,7 +952,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         public TTable GetItem<TTable>(int id) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -961,7 +976,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         public TTable GetItem<TTable>(TTable item) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -978,12 +993,14 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
         /// <param name="predicate">condition for column values</param>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         public void Delete<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
         {
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
 
-            CheckTable(typeof(TTable), false);
+            CheckTable(typeof(TTable));
 
             var tableName = typeof(TTable).TableName();
 
@@ -1125,6 +1142,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
         public IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
