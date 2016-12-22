@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
-    public class LinqTests : BaseTest
+    public class FindLinqTests : BaseTest
     {
         [Test]
         public async Task Empty_If_Not_Found()
@@ -194,7 +193,7 @@ namespace Tests
         [Test]
         public async Task Strings_Find_Using_Equal_To_Null_Predicate()
         {
-            var st1 = new SecretTask {IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task"};
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
             foreach (var db in GetAsyncConnections())
@@ -1330,7 +1329,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal)>=0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)

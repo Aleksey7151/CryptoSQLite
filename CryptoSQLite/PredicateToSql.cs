@@ -15,20 +15,38 @@ namespace CryptoSQLite
 
         private string _tableName;
 
-        private List<object> _values;
+        private readonly List<object> _values = new List<object>();
+
+        public string DeleteToSqlCmd(LambdaExpression deleteExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values)
+        {
+            _tableName = tableName;
+            _compatibleProperties = compatibleProperties;
+
+            _values.Clear();
+
+            _builder.Clear();
+
+            _builder.Append($"DELETE FROM {tableName} WHERE ");
+
+            TranslateExpression(deleteExpression);
+
+            _builder.Replace("= NULL", "IS NULL");
+            _builder.Replace("<> NULL", "IS NOT NULL");
+
+            values = _values.ToArray();
+
+            return _builder.ToString();
+        }
 
         public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values, string[] selectedPropertyNames = null)
         {
-            if (whereExpression == null)
-                throw new ArgumentNullException(nameof(whereExpression), "Predicate can't be null");
-
             if (compatibleProperties == null)
                 throw new ArgumentNullException(nameof(compatibleProperties));
 
             _tableName = tableName;
             _compatibleProperties = compatibleProperties;
 
-            _values = new List<object>();
+            _values.Clear();
 
             _builder.Clear();
 

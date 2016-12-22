@@ -46,7 +46,7 @@
     <Compile Include="GetItemTests.cs" />
     <Compile Include="IDatabaseFolderPathGetter.cs" />
     <Compile Include="InsertItemTests.cs" />
-    <Compile Include="LinqTests.cs" />
+    <Compile Include="FindLinqTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables\CorrectTables.cs" />
     <Compile Include="Tables\IncorrectTables.cs" />
