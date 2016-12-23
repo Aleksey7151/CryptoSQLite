@@ -34,6 +34,10 @@ namespace CryptoSQLite.CryptoProviders
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
+            _key1 = 0;
+            _key2 = 0;
+            _key3 = 0;
+
             _key1 = BitConverter.ToUInt64(key, 0);
             _key2 = BitConverter.ToUInt64(key, 8);
             _key3 = BitConverter.ToUInt64(key, 16);

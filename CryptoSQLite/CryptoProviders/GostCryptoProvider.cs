@@ -172,6 +172,7 @@ namespace CryptoSQLite.CryptoProviders
             for (var i = 0; i < tmp.Length; i++)
                 tmp[i] = BitConverter.ToUInt32(key, 4 * i);
             
+            _roundKeysForEncrypt.ZeroMemory();
 
             //keys schedule
             for (var i = 0; i < 24; i++)

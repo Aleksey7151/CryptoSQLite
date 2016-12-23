@@ -9,9 +9,9 @@ namespace CryptoSQLite.CryptoProviders
         private readonly byte[] _solt;
         private readonly Aes _aes;
 
-        public AesCryptoProvider()
+        public AesCryptoProvider(Aes.AesKeyType keyType)
         {
-            _aes = new Aes(Aes.AesKeyType.Aes256);
+            _aes = new Aes(keyType);
             _solt = new byte[16];
         }
 
@@ -151,20 +151,23 @@ namespace CryptoSQLite.CryptoProviders
             switch (keyType)
             {
                 case AesKeyType.Aes128:
-                    if (key.Length < (int)AesKeyType.Aes128) return false;
+                    if (key.Length < 4*(int)AesKeyType.Aes128) return false;
                     _nRounds = 10;
                     break;
                 case AesKeyType.Aes192:
-                    if (key.Length < (int)AesKeyType.Aes192) return false;
+                    if (key.Length < 4*(int)AesKeyType.Aes192) return false;
                     _nRounds = 12;
                     break;
                 case AesKeyType.Aes256:
-                    if (key.Length < (int)AesKeyType.Aes256) return false;
+                    if (key.Length < 4*(int)AesKeyType.Aes256) return false;
                     _nRounds = 14;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(keyType), keyType, null);
             }
+
+            _key?.ZeroMemory();      // Zero memory with previous key
+
             _key = KeyExpantion(tmp);
 
             tmp.ZeroMemory();

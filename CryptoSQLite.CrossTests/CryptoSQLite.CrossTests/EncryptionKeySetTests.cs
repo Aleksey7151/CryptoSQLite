@@ -32,7 +32,7 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetSmallKeyToGost()
+        public void SetWrongKeyToGost()
         {
             using (var db = GetGostConnection())
             {
@@ -44,7 +44,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 256 bit key and GOST must be 32 bytes.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception)
@@ -57,33 +57,9 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetBigKeyToGost()
+        public void SetWrongKeyToAes256()
         {
-            using (var db = GetGostConnection())
-            {
-                var bigKey = new byte[33];
-
-                try
-                {
-                    db.SetEncryptionKey(bigKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
-            }
-        }
-
-        [Test]
-        public void SetSmallKeyToAes()
-        {
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 var smallKey = new byte[31];
 
@@ -93,7 +69,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 256 bit key and GOST must be 32 bytes.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception)
@@ -106,11 +82,11 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetBigKeyToAes()
+        public void SetWrongKeyToAes192()
         {
-            using (var db = GetAesConnection())
+            using (var db = GetAes192Connection())
             {
-                var bigKey = new byte[33];
+                var bigKey = new byte[23];
 
                 try
                 {
@@ -118,7 +94,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES and GOST must be 32 bytes", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 192 bit key must be 24 bytes.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception)
@@ -130,7 +106,31 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetSmallKeyToDes()
+        public void SetWrongKeyToAes128()
+        {
+            using (var db = GetAes128Connection())
+            {
+                var bigKey = new byte[15];
+
+                try
+                {
+                    db.SetEncryptionKey(bigKey);
+                }
+                catch (ArgumentException ex)
+                {
+                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 128 bit key must be 16 bytes.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception)
+                {
+                    Assert.Fail();
+                }
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void SetWrongKeyToDes()
         {
             using (var db = GetDesConnection())
             {
@@ -155,7 +155,7 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public void SetSmallKeyToTripleDes()
+        public void SetWrongKeyToTripleDes()
         {
             using (var db = GetTripleDesConnection())
             {
@@ -192,7 +192,7 @@ namespace CryptoSQLite.CrossTests
                     db.CreateTable<SecretTask>();
                     db.InsertItem(tasks[0]);
                 }
-                catch (NullReferenceException ae)
+                catch (CryptoSQLiteException ae)
                 {
                     Assert.IsTrue(ae.Message.IndexOf("Encryption key has not been installed.", StringComparison.Ordinal) >= 0);
                 }
@@ -242,9 +242,9 @@ namespace CryptoSQLite.CrossTests
             {
                 try
                 {
-                    db.GetItem<SecretTask>(1);
+                    db.Find<SecretTask>(st => st.Id == 1);
                 }
-                catch (NullReferenceException ae)
+                catch (CryptoSQLiteException ae)
                 {
                     Assert.IsTrue(ae.Message.IndexOf("Encryption key has not been installed.", StringComparison.Ordinal) >= 0);
                 }
@@ -262,7 +262,7 @@ namespace CryptoSQLite.CrossTests
         [Test]
         public void DeleteItemFunctionIs_Allowed_WhenEncryptionKeyIsNotSetted()
         {
-            var tasks = GetTasks();
+            var task = new SecretTask { Description = "Some descriptionen 1", Price = 99.45, IsDone = false, SecretToDo = "Some Secret Info" };
             foreach (var db in GetConnections())
             {
                 try
@@ -270,8 +270,7 @@ namespace CryptoSQLite.CrossTests
                     db.DeleteTable<SecretTask>();
                     db.CreateTable<SecretTask>();
 
-                    foreach (var task in tasks)
-                        db.InsertItem(task);
+                    db.InsertItem(task);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -291,7 +290,7 @@ namespace CryptoSQLite.CrossTests
             {
                 try
                 {
-                    db.DeleteItem<SecretTask>(1);       // delete function is allowed
+                    db.Delete<SecretTask>(st => st.Id == 1);       // delete function is allowed
                 }
                 catch (CryptoSQLiteException cex)
                 {

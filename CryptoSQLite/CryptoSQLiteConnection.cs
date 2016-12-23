@@ -51,6 +51,18 @@ namespace CryptoSQLite
         AesWith256BitsKey,
 
         /// <summary>
+        /// USA encryption algorithm. It uses the 192 bit encryption key. 
+        /// <para/>This algorithm is reliable.
+        /// </summary>
+        AesWith192BitsKey,
+
+        /// <summary>
+        /// USA encryption algorithm. It uses the 128 bit encryption key. 
+        /// <para/>This algorithm is reliable.
+        /// </summary>
+        AesWith128BitsKey,
+
+        /// <summary>
         /// USA encryption algorithm. It uses the 56 bit encryption key.
         /// <para/>This algorithm is Very Fast, but not reliable.
         /// </summary>
@@ -69,17 +81,37 @@ namespace CryptoSQLite
     public interface ICryptoSQLiteConnection
     {
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
-        /// <para/>AES key length must be 32 bytes.
-        /// <para/>DES key length must be 8 bytes.
-        /// <para/>3DES key length must be 24 bytes.
-        /// <para/>GOST key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
-        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
         /// </summary>
-        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <param name="key">Buffer, that contains encryption key.</param>
         /// <exception cref="NullReferenceException"></exception>
         void SetEncryptionKey(byte[] key);
+
+        /// <summary>
+        /// Sets the specific encryption key for specific table. This key will be used for encryption data only for specified table: <typeparamref name="TTable"></typeparamref>.
+        /// That allows you to set up different encryption keys for different tables.
+        /// This feature significantly increases data security.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
+        /// </summary>
+        /// <param name="key">Buffer, that contains encryption key.</param>
+        /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
+        /// <exception cref="NullReferenceException"></exception>
+        void SetEncryptionKey<TTable>(byte[] key);
 
         /// <summary>
         /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
@@ -250,17 +282,37 @@ namespace CryptoSQLite
     public interface ICryptoSQLiteAsyncConnection
     {
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
-        /// <para/>AES key length must be 32 bytes.
-        /// <para/>DES key length must be 8 bytes.
-        /// <para/>3DES key length must be 24 bytes.
-        /// <para/>GOST key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
-        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
         /// </summary>
-        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <param name="key">Buffer, that contains encryption key.</param>
         /// <exception cref="NullReferenceException"></exception>
         void SetEncryptionKey(byte[] key);
+
+        /// <summary>
+        /// Sets the specific encryption key for specific table. This key will be used for encryption data only for specified table: <typeparamref name="TTable"></typeparamref>.
+        /// That allows you to set up different encryption keys for different tables.
+        /// This feature significantly increases data security.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
+        /// </summary>
+        /// <param name="key">Buffer, that contains encryption key.</param>
+        /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
+        /// <exception cref="NullReferenceException"></exception>
+        void SetEncryptionKey<TTable>(byte[] key);
 
         /// <summary>
         /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
@@ -454,19 +506,42 @@ namespace CryptoSQLite
             _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
         }
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
-        /// <para/>AES key length must be 32 bytes.
-        /// <para/>DES key length must be 8 bytes.
-        /// <para/>3DES key length must be 24 bytes.
-        /// <para/>GOST key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
-        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
         /// </summary>
-        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <param name="key">Buffer, that contains encryption key.</param>
         /// <exception cref="NullReferenceException"></exception>
         public void SetEncryptionKey(byte[] key)
         {
             _connection.SetEncryptionKey(key);
+        }
+
+        /// <summary>
+        /// Sets the specific encryption key for specific table. This key will be used for encryption data only for specified table: <typeparamref name="TTable"></typeparamref>.
+        /// That allows you to set up different encryption keys for different tables.
+        /// This feature significantly increases data security.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
+        /// </summary>
+        /// <param name="key">Buffer, that contains encryption key.</param>
+        /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
+        /// <exception cref="NullReferenceException"></exception>
+        public void SetEncryptionKey<TTable>(byte[] key)
+        {
+            _connection.SetEncryptionKey<TTable>(key);
         }
 
         /// <summary>
@@ -695,7 +770,7 @@ namespace CryptoSQLite
         public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new()
         {
-            var elements = await Task.Run(() => _connection.Select<TTable>(predicate, selectedProperties));
+            var elements = await Task.Run(() => _connection.Select(predicate, selectedProperties));
             return elements;
         }
 
@@ -728,7 +803,16 @@ namespace CryptoSQLite
 
         private readonly CryptoAlgoritms _algorithm;
 
-        private readonly IDictionary<string, IList<ForeignKey>> _checkedTables;
+        /// <summary>
+        /// Dictionary with checked tables
+        /// </summary>
+        private readonly IDictionary<string, IList<ForeignKey>> _checkedTables;     
+
+        
+
+        private readonly IDictionary<Type, byte[]> _keys;   // dictionary with encryption keys for tables
+
+        private byte[] _defaultKey;     // encryption key for all tables, which don't have specific key
 
         private readonly PredicateToSql _predicateTranslator;
 
@@ -747,11 +831,12 @@ namespace CryptoSQLite
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
             
-            _cryptor = new AesCryptoProvider();
+            _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
             _algorithm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
             _checkedTables = new Dictionary<string, IList<ForeignKey>>();
             _predicateTranslator = new PredicateToSql();
+            _keys = new Dictionary<Type, byte[]>();
         }
 
         /// <summary>
@@ -766,7 +851,15 @@ namespace CryptoSQLite
             switch (cryptoAlgorithm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
-                    _cryptor = new AesCryptoProvider();
+                    _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
+                    break;
+
+                case CryptoAlgoritms.AesWith192BitsKey:
+                    _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes192);
+                    break;
+
+                case CryptoAlgoritms.AesWith128BitsKey:
+                    _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes128);
                     break;
 
                 case CryptoAlgoritms.Gost28147With256BitsKey:
@@ -782,13 +875,14 @@ namespace CryptoSQLite
                     break;
 
                 default:
-                    _cryptor = new AesCryptoProvider();
+                    _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
                     break;
             }
             _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
             _checkedTables = new Dictionary<string, IList<ForeignKey>>();
             _predicateTranslator = new PredicateToSql();
+            _keys = new Dictionary<Type, byte[]>();
         }
 
         #endregion
@@ -814,32 +908,49 @@ namespace CryptoSQLite
         #region Implementation of ICryptoSQLite
 
         /// <summary>
-        /// Sets the encryption key, that will be use in encryption algorithms for data encryption.
-        /// <para/>AES key length must be 32 bytes.
-        /// <para/>DES key length must be 8 bytes.
-        /// <para/>3DES key length must be 24 bytes.
-        /// <para/>GOST key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean content 
-        /// of <paramref name="key"/> immediately after you finish work with it.
+        /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
         /// </summary>
-        /// <param name="key">Buffer, that contains encryption key. Length must be 32 bytes.</param>
+        /// <param name="key">Buffer, that contains encryption key.</param>
         /// <exception cref="NullReferenceException"></exception>
         public void SetEncryptionKey(byte[] key)
         {
-            if(key == null)
-                throw new ArgumentNullException();
-
-            if((_algorithm == CryptoAlgoritms.AesWith256BitsKey || _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length != 32)
-                throw new ArgumentException("Key length for AES and GOST must be 32 bytes.");
-
-            if(_algorithm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
-                throw new ArgumentException("Key length for DES must be at least 8 bytes.");
-
-            if(_algorithm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
-                throw new ArgumentException("Key length for 3DES must be at least 24 bytes.");
-
-            _cryptor?.SetKey(key);
+            CheckKey(key);
+            
+            _defaultKey = key;
         }
+
+        /// <summary>
+        /// Sets the specific encryption key for specific table. This key will be used for encryption data only for specified table: <typeparamref name="TTable"/>.
+        /// That allows you to set up different encryption keys for different tables.
+        /// This feature significantly increases data security.
+        /// <para/>AesWith256BitsKey key length must be 32 bytes.
+        /// <para/>AesWith192BitsKey key length must be 24 bytes.
+        /// <para/>AesWith128BitsKey key length must be 16 bytes.
+        /// <para/>DesWith56BitsKey key length must be 8 bytes.
+        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
+        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
+        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
+        /// immediately after you finish your work with database.
+        /// </summary>
+        /// <param name="key">Buffer, that contains encryption key.</param>
+        /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
+        /// <exception cref="NullReferenceException"></exception>
+        public void SetEncryptionKey<TTable>(byte[] key)
+        {
+            CheckKey(key);
+
+            _keys.AddOrUpdate(typeof(TTable), key);
+        }
+
+        
 
         /// <summary>
         /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
@@ -864,7 +975,7 @@ namespace CryptoSQLite
             {
                 _connection.Execute(cmd);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new CryptoSQLiteException("Apparently table name or names of columns contain forbidden symbols");
             }
@@ -1243,6 +1354,31 @@ namespace CryptoSQLite
             }
         }
 
+        /// <summary>
+        /// Checks key
+        /// </summary>
+        /// <param name="key">key buffer</param>
+        private void CheckKey(byte[] key)
+        {
+            if (key == null)
+                throw new ArgumentNullException();
+
+            if ((_algorithm == CryptoAlgoritms.AesWith256BitsKey || _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length < 32)
+                throw new ArgumentException("Key length for AES with 256 bit key and GOST must be 32 bytes.");
+
+            if ((_algorithm == CryptoAlgoritms.AesWith192BitsKey) && key.Length < 24)
+                throw new ArgumentException("Key length for AES with 192 bit key must be 24 bytes.");
+
+            if ((_algorithm == CryptoAlgoritms.AesWith128BitsKey) && key.Length < 16)
+                throw new ArgumentException("Key length for AES with 128 bit key must be 16 bytes.");
+
+            if (_algorithm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
+                throw new ArgumentException("Key length for DES must be at least 8 bytes.");
+
+            if (_algorithm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
+                throw new ArgumentException("Key length for 3DES must be at least 24 bytes.");
+        }
+
         //TODO think about this function. This function takes time and reads data from database file
         /// <summary>
         /// Checks if table with corresponds columns exists in database
@@ -1344,7 +1480,7 @@ namespace CryptoSQLite
             if (columnsToAdd.Find(p => p.IsEncrypted()) != null)
             {
                 solt = GetSolt();
-                encryptor = GetEncryptor(solt);
+                encryptor = GetEncryptor(typeof(TTable), solt);
             }
 
             foreach (var col in columnsToAdd)
@@ -1488,12 +1624,10 @@ namespace CryptoSQLite
             if(!_checkedTables.ContainsKey(typeof(TTable).ToString()))
                 return;
 
-            IList<ForeignKey> referencedTablesInfos;
+           var referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
 
             if (selectedProperties != null)
-                referencedTablesInfos = _checkedTables[typeof(TTable).ToString()].Where(fk => selectedProperties.Contains(fk.ForeignKeyPropertyName)).ToList();
-            else
-                referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
+                referencedTablesInfos = referencedTablesInfos.Where(fk => selectedProperties.Contains(fk.ForeignKeyPropertyName)).ToList();
             
             if(referencedTablesInfos == null)
                 return;
@@ -1512,12 +1646,11 @@ namespace CryptoSQLite
 
                 navigationProperty.SetValue(table, refTable);                                           // pass reference to referenced table to navigation property
 
-                if (refTable != null)
-                {
-                    var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
+                if (refTable == null) continue;
 
-                    genericFindReferencedTables.Invoke(this, new[] { refTable, null });     // Recursive call
-                }
+                var genericFindReferencedTables = _methodFindReferencedTables.MakeGenericMethod(refTable.GetType());
+
+                genericFindReferencedTables.Invoke(this, new[] { refTable, null });     // Recursive call
             }
         }
 
@@ -1659,7 +1792,7 @@ namespace CryptoSQLite
             if (soltColumn != null)
             {
                 var solt = (byte[])soltColumn.SqlValue;
-                encryptor = GetEncryptor(solt); // this solt we were using in encryption of columns
+                encryptor = GetEncryptor(typeof(TTable), solt); // this solt we were using in encryption of columns
             }
 
             foreach (var property in properties)
@@ -1856,8 +1989,17 @@ namespace CryptoSQLite
             }
         }
 
-        private ICryptoProvider GetEncryptor(byte[] solt = null)
+        private ICryptoProvider GetEncryptor(Type tableType, byte[] solt = null)
         {
+            if (_keys.ContainsKey(tableType))
+                _cryptor.SetKey(_keys[tableType]);
+            else
+            {
+                if(_defaultKey == null)
+                    throw new CryptoSQLiteException("Encryption key has not been installed.");
+
+                _cryptor.SetKey(_defaultKey);
+            }
             if(solt != null)
                 _cryptor.SetSolt(solt);
 

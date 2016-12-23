@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CryptoSQLite
 {
@@ -65,6 +66,13 @@ namespace CryptoSQLite
 
             for (var i = 0; i < len; i++)
                 destination[i] ^= source[i];
+        }
+
+        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (dictionary.ContainsKey(key))
+                dictionary[key] = value;
+            else dictionary.Add(key, value);
         }
     }
 }

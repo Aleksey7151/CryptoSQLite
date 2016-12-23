@@ -20,7 +20,7 @@ namespace Tests
                 IntMinVal = -6245234
             };
 
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
@@ -57,7 +57,7 @@ namespace Tests
                 IntMinVal = -6245234
             };
 
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {

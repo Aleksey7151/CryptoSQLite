@@ -16,13 +16,29 @@ namespace Tests
         }
 
         public const string GostDbFile = "TestGost.db3";
-        public const string AesDbFile = "TestAes.db3";
+        public const string Aes256DbFile = "TestAes256.db3";
+        public const string Aes192DbFile = "TestAes192.db3";
+        public const string Aes128DbFile = "TestAes128.db3";
         public const string DesDbFile = "TestDes.db3";
         public const string TripleDesDbFile = "TestTripleDes.db3";
 
-        public CryptoSQLiteConnection GetAesConnection()
+        public CryptoSQLiteConnection GetAes256Connection()
         {
-            var conn = new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
+            var conn = new CryptoSQLiteConnection(Aes256DbFile, CryptoAlgoritms.AesWith256BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteConnection GetAes192Connection()
+        {
+            var conn = new CryptoSQLiteConnection(Aes192DbFile, CryptoAlgoritms.AesWith192BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteConnection GetAes128Connection()
+        {
+            var conn = new CryptoSQLiteConnection(Aes128DbFile, CryptoAlgoritms.AesWith128BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
@@ -51,14 +67,16 @@ namespace Tests
 
         public CryptoSQLiteConnection[] GetConnections()
         {
-            return new[] {GetGostConnection(), GetAesConnection(), GetDesConnection(), GetTripleDesConnection()};
+            return new[] {GetGostConnection(), GetAes256Connection(), GetAes192Connection(), GetAes128Connection(), GetDesConnection(), GetTripleDesConnection()};
         }
 
         public CryptoSQLiteConnection[] GetOnlyConnections()
         {
             return new[]
             {
-                new CryptoSQLiteConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey),
+                new CryptoSQLiteConnection(Aes256DbFile, CryptoAlgoritms.AesWith256BitsKey),
+                new CryptoSQLiteConnection(Aes192DbFile, CryptoAlgoritms.AesWith192BitsKey),
+                new CryptoSQLiteConnection(Aes128DbFile, CryptoAlgoritms.AesWith128BitsKey),
                 new CryptoSQLiteConnection(GostDbFile, CryptoAlgoritms.Gost28147With256BitsKey),
                 new CryptoSQLiteConnection(DesDbFile, CryptoAlgoritms.DesWith56BitsKey),
                 new CryptoSQLiteConnection(TripleDesDbFile, CryptoAlgoritms.TripleDesWith168BitsKey)
@@ -72,12 +90,27 @@ namespace Tests
             return conn;
         }
 
-        public CryptoSQLiteAsyncConnection GetAesAsyncConnection()
+        public CryptoSQLiteAsyncConnection GetAes256AsyncConnection()
         {
-            var conn = new CryptoSQLiteAsyncConnection(AesDbFile, CryptoAlgoritms.AesWith256BitsKey);
+            var conn = new CryptoSQLiteAsyncConnection(Aes256DbFile, CryptoAlgoritms.AesWith256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
+
+        public CryptoSQLiteAsyncConnection GetAes192AsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(Aes192DbFile, CryptoAlgoritms.AesWith192BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
+        public CryptoSQLiteAsyncConnection GetAes128AsyncConnection()
+        {
+            var conn = new CryptoSQLiteAsyncConnection(Aes128DbFile, CryptoAlgoritms.AesWith128BitsKey);
+            conn.SetEncryptionKey(_key);
+            return conn;
+        }
+
 
         public CryptoSQLiteAsyncConnection GetDesAsyncConnection()
         {
@@ -97,7 +130,9 @@ namespace Tests
         {
             return new[]
             {
-                GetAesAsyncConnection(),
+                GetAes256AsyncConnection(),
+                GetAes192AsyncConnection(),
+                GetAes128AsyncConnection(),
                 GetGostAsyncConnection(),
                 GetDesAsyncConnection(),
                 GetTripleDesAsyncConnection()

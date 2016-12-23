@@ -47,7 +47,7 @@ namespace CryptoSQLite.CrossTests
         public void Predicate_Can_Not_Be_Null()
         {
             var item = ULongNumbers.GetDefault();
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
@@ -77,7 +77,7 @@ namespace CryptoSQLite.CrossTests
         {
             var accounts = GetAccounts();
 
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
@@ -106,7 +106,7 @@ namespace CryptoSQLite.CrossTests
         public void ULong_Forbidden_In_Predicate()
         {
             var item = ULongNumbers.GetDefault();
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
@@ -135,7 +135,7 @@ namespace CryptoSQLite.CrossTests
         public void Long_Forbidden_In_Predicate()
         {
             var item = LongNumbers.GetDefault();
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
@@ -166,7 +166,7 @@ namespace CryptoSQLite.CrossTests
             var now = DateTime.Now;
             var item = new DateTimeTable { Date = now, NullAbleDate = DateTime.MinValue };
 
-            using (var db = GetAesConnection())
+            using (var db = GetAes256Connection())
             {
                 try
                 {
