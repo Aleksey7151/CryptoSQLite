@@ -25,6 +25,24 @@ namespace CryptoSQLiteSample.iOS
         public bool IsDone { get; set; }
     }
 
+	[CryptoTable("Infos")]
+    internal class Info
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SomeInfo { get; set; }
+
+        [Encrypted]
+        public double SomeValue { get; set; }
+
+        public bool Equal(Info i)
+        {
+            return SomeInfo == i.SomeInfo && Math.Abs(SomeValue - i.SomeValue) < 0.000001;
+        }
+    }
+
     public partial class ViewController : UIViewController
     {
         private string fileName = "MySqlDb.db3";
@@ -53,12 +71,23 @@ namespace CryptoSQLiteSample.iOS
 
                 db = new CryptoSQLiteConnection(pathToDatabaseFile, CryptoAlgoritms.AesWith256BitsKey);
 
-                db.SetEncryptionKey(new byte[32]);	// Here you must set your secret encryption key
+                // SETTING ENCRYPTION KEY FOR ALL TABLES IN DATABASE FILE
+                var keyForDatabase = new byte[32];
+                db.SetEncryptionKey(keyForDatabase);
+
+                var specificKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2};
+                // SITTING SPECIFIC ENCRYPTION KEY ONLY FOR TABLE 'Infos'. THIS KEY WILL BE USED ONLY IN TABLE 'Infos' FOR ENCRYPTION DATA.
+                db.SetEncryptionKey<Info>(specificKey);
 
                 db.CreateTable<Tasks>();
+                db.CreateTable<Info>();
 
-				// All Properties that have [Encrypted] attribute properties will be automatically encrypted or decrypted
-				  
+                // All Properties that have [Encrypted] attribute properties will be automatically encrypted or decrypted
+                
+				// Here all data in table 'Infos' will be encrypted using 'specificKey'
+				db.InsertItem(new Info {SomeInfo = "Some Info 1", SomeValue = 12343.11212});    
+
+				// In table 'Tasks' for encryption data will be used 'keyForDatabase' key, because we don't specify for table 'Tasks' cpecific encryption key
                 db.InsertItem(new Tasks { Task = "Task1", Description = "Description_1", Price = 1234.41, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task2", Description = "Description_2", Price = 1307.69, IsDone = true });
                 db.InsertItem(new Tasks { Task = "Task3", Description = "Description_1", Price = null, IsDone = true });
