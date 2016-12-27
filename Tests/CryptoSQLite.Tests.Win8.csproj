@@ -81,6 +81,7 @@
     <Compile Include="CheckTableStructureTests.cs" />
     <Compile Include="DeleteLinqTests.cs" />
     <Compile Include="DifferentKeysForDifferentTables.cs" />
+    <Compile Include="FullTextSearchTests.cs" />
     <Compile Include="NotNullAndDefaultValueTests.cs" />
     <Compile Include="DeleteItemTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />

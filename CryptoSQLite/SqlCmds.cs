@@ -7,11 +7,18 @@ namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(Type table)
+        public static string CmdCreateTable(Type table, FullTextSearchFlags fullTextSearchFlags = FullTextSearchFlags.None)
         {
+            var fts3 = (fullTextSearchFlags & FullTextSearchFlags.FTS3) != 0;
+            var fts4 = (fullTextSearchFlags & FullTextSearchFlags.FTS4) != 0;
+
+            var virtualTable = (fts3 || fts4) ? "VIRTUAL " : "";
+
+            var usingFts = fts4 ? " USING FTS4" : fts3 ? " USING FTS3" : ""; 
+
             var columns = table.GetColumns().ToArray();
 
-            var cmd = $"CREATE TABLE IF NOT EXISTS {table.TableName()}\n(\n";
+            var cmd = $"CREATE {virtualTable}TABLE IF NOT EXISTS {table.TableName()}{usingFts}\n(\n";
 
             var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 

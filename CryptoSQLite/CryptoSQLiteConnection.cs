@@ -76,6 +76,32 @@ namespace CryptoSQLite
     }
 
     /// <summary>
+    /// FTS3 and FTS4 are SQLite virtual table modules that allows users to perform full-text searches.
+    /// <para/>The FTS3 and FTS4 extension modules allows users to create special tables with a built-in full-text index (hereafter "FTS tables").
+    /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), 
+    /// even if the table contains many large documents.
+    /// </summary>
+    [Flags]
+    public enum FullTextSearchFlags
+    {
+        /// <summary>
+        /// Create ordinary table
+        /// </summary>
+        None = 0x0000,
+        /// <summary>
+        /// Create virtual table using FTS3.
+        /// <para/>Attention, for newer applications, FTS4 is recommended.
+        /// </summary>
+        FTS3 = 0x0001,
+        /// <summary>
+        /// Create virtual table using FTS4.
+        /// <para/>For newer applications, FTS4 is recommended.
+        /// <para/>FTS4 contains query performance optimizations that may significantly improve the performance of full-text queries that contain terms that are very common (present in a large percentage of table rows).
+        /// </summary>
+        FTS4 = 0x0002
+    }
+
+    /// <summary>
     /// Interface of SQLite connection to database file with data encryption
     /// </summary>
     public interface ICryptoSQLiteConnection
@@ -114,7 +140,7 @@ namespace CryptoSQLite
         void SetEncryptionKey<TTable>(byte[] key);
 
         /// <summary>
-        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
         /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing automatically generated column with name: "SoltColumn". 
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
@@ -125,6 +151,21 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
         void CreateTable<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Creates a new special table with a built-in full-text index.
+        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
+        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing automatically generated column with name: "SoltColumn". 
+        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
+        /// </summary>
+        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        void CreateTable<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class;
 
         /// <summary>
         /// Deletes the table from database.
@@ -315,7 +356,7 @@ namespace CryptoSQLite
         void SetEncryptionKey<TTable>(byte[] key);
 
         /// <summary>
-        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
         /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing automatically generated column with name: "SoltColumn". 
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
@@ -326,6 +367,21 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table to create in database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
         Task CreateTableAsync<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Creates a new special table with a built-in full-text index.
+        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
+        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing automatically generated column with name: "SoltColumn". 
+        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
+        /// </summary>
+        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        Task CreateTableAsync<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class;
 
         /// <summary>
         /// Deletes the table from database.
@@ -545,7 +601,7 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
         /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing automatically generated column with name: "SoltColumn". 
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
@@ -558,6 +614,24 @@ namespace CryptoSQLite
         public async Task CreateTableAsync<TTable>() where TTable : class
         {
             await Task.Run(() => _connection.CreateTable<TTable>());
+        }
+
+        /// <summary>
+        /// Creates a new special table with a built-in full-text index.
+        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
+        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing automatically generated column with name: "SoltColumn". 
+        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
+        /// </summary>
+        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        public async Task CreateTableAsync<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class
+        {
+            await Task.Run(() => _connection.CreateTable<TTable>(fullTextSearchFlags));
         }
 
         /// <summary>
@@ -584,7 +658,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
-        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
+        /// <para/>If you insert element with specified PrimaryKey value this element will replace element in database, that has the same value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -953,7 +1027,7 @@ namespace CryptoSQLite
         
 
         /// <summary>
-        /// Creates a new table (if it not already exists) in database, that can contain encrypted columns.
+        /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
         /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
         /// this table will be containing automatically generated column with name: "SoltColumn". 
         /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
@@ -969,7 +1043,38 @@ namespace CryptoSQLite
 
             CheckTable(table, false);   // here we don't check if table exists in database file
             
-            var cmd = SqlCmds.CmdCreateTable(table);
+            var cmd = SqlCmds.CmdCreateTable(table, FullTextSearchFlags.FTS3);
+
+            try
+            {
+                _connection.Execute(cmd);
+            }
+            catch (Exception)
+            {
+                throw new CryptoSQLiteException("Apparently table name or names of columns contain forbidden symbols");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new special table with a built-in full-text index.
+        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
+        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
+        /// this table will be containing automatically generated column with name: "SoltColumn". 
+        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
+        /// won't be able to decrypt data.
+        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
+        /// you won't be able to decrypt elements. Properties order in table is important thing.
+        /// </summary>
+        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
+        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
+        /// <exception cref="CryptoSQLiteException"></exception>
+        public void CreateTable<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class
+        {
+            var table = typeof(TTable);
+
+            CheckTable(table, false);   // here we don't check if table exists in database file
+
+            var cmd = SqlCmds.CmdCreateTable(table, fullTextSearchFlags);
 
             try
             {
@@ -1023,7 +1128,7 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Inserts or replaces the element if it exists in database.
-        /// <para/>If you insert element with setted PrimaryKey value this element will replace element in database, that has same PrimaryKey value.
+        /// <para/>If you insert element with specified PrimaryKey value this element will replace element in database, that has the same value.
         /// </summary>
         /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
         /// <param name="item">Instance of element to insert.</param>
@@ -1223,7 +1328,7 @@ namespace CryptoSQLite
 
             var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, columns, out values);
 
-            var table = ReadRowsFromTable(cmd, values);
+            var table = ReadRowsFromTable(cmd, values, columns);
 
             var items = new List<TTable>();
 
@@ -1302,7 +1407,7 @@ namespace CryptoSQLite
 
             var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values, selectedProperties);
 
-            var table = ReadRowsFromTable(cmd, values);
+            var table = ReadRowsFromTable(cmd, values, columns);
 
             var items = new List<TTable>();
 
@@ -1568,7 +1673,7 @@ namespace CryptoSQLite
                 cmd = SqlCmds.CmdSelect(tableName, columnName);
             else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
 
-            var table = ReadRowsFromTable(cmd, columnValue);
+            var table = ReadRowsFromTable(cmd, new []{columnValue}, properties);
 
             var items = new List<TTable>();
 
@@ -1603,7 +1708,7 @@ namespace CryptoSQLite
                 cmd = SqlCmds.CmdSelect(tableName, columnName);
             else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
 
-            var table = ReadRowsFromTable(cmd, columnValue);
+            var table = ReadRowsFromTable(cmd, new[]{columnValue}, properties);
 
             if (table.Count > 0)
             {
@@ -1709,7 +1814,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdFindInTable(tableName, columnName, lowerValue, upperValue);
 
-            var table = ReadRowsFromTable(cmd, lowerValue, upperValue);
+            var table = ReadRowsFromTable(cmd, new[]{lowerValue, upperValue}, properties);
 
             var items = new List<TTable>();
 
@@ -1723,7 +1828,7 @@ namespace CryptoSQLite
             return items;
         }
 
-        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, params object[] values)
+        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, object[] values, PropertyInfo[] properties = null)
         {
             var table = new List<List<SqlColumnInfo>>();
             try
@@ -1741,35 +1846,88 @@ namespace CryptoSQLite
 
                         if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
                         {
-                            switch (column.ColumnInfo.DeclaredType)
+                            // we always get here NULL if we use FTS3 and FTS4
+                            if (column.ColumnInfo.DeclaredType != null)
                             {
-                                case "BLOB":
+                                switch (column.ColumnInfo.DeclaredType)
+                                {
+                                    case "BLOB":
+                                        tmp.SqlValue = column.ToBlob();
+                                        break;
+                                    case "REAL":
+                                        if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                        {
+                                            var str = column.ToString();
+                                            double val;
+                                            tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                        }
+                                        else
+                                            tmp.SqlValue = column.ToDouble();
+                                        break;
+                                    case "INTEGER":
+                                        tmp.SqlValue = column.ToInt64();
+                                        break;
+                                    case "TEXT":
+                                        tmp.SqlValue = column.ToString();
+                                        break;
+                                    case "NULL":
+                                        tmp.SqlValue = null;
+                                        break;
+                                    default:
+                                        throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                                }
+                            }
+                            else
+                            {
+                                // SPECIAL FOR FTS3 and FTS4
+                                if (column.ColumnInfo.Name == SoltColumnName)
+                                {
                                     tmp.SqlValue = column.ToBlob();
-                                    break;
-                                case "REAL":
-                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                }
+                                else
+                                {
+                                    var prop = properties.FirstOrDefault(p => p.ColumnName() == column.ColumnInfo.Name);
+                                    if (prop == null)
+                                        throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+
+                                    if (prop.IsEncrypted())
                                     {
-                                        var str = column.ToString();
-                                        double val;
-                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                        tmp.SqlValue = column.ToBlob();
                                     }
                                     else
-                                        tmp.SqlValue = column.ToDouble();
-                                    break;
-                                case "INTEGER":
-                                    tmp.SqlValue = column.ToInt64();
-                                    break;
-                                case "TEXT":
-                                    tmp.SqlValue = column.ToString();
-                                    break;
-                                case "NULL":
-                                    tmp.SqlValue = null;
-                                    break;
-                                default:
-                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                                    {
+                                        // here we come only if not encrypted and not SoltColumn
+                                        switch (column.SQLiteType)
+                                        {
+                                            case SQLiteType.Integer:
+                                                tmp.SqlValue = column.ToInt64();
+                                                break;
+                                            case SQLiteType.Float:
+                                                if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                                {
+                                                    var str = column.ToString();
+                                                    double val;
+                                                    tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                                }
+                                                else
+                                                    tmp.SqlValue = column.ToDouble();
+                                                break;
+                                            case SQLiteType.Text:
+                                                tmp.SqlValue = column.ToString();
+                                                break;
+                                            case SQLiteType.Blob:
+                                                tmp.SqlValue = column.ToBlob();
+                                                break;
+                                            case SQLiteType.Null:
+                                                tmp.SqlValue = null;
+                                                break;
+                                            default:
+                                                throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                                        }
+                                    }
+                                }
                             }
                         }
-
                         columnsFromFile.Add(tmp);   // NULL will be NULL.
                     }
                     table.Add(columnsFromFile);
