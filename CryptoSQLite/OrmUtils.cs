@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
@@ -15,20 +17,20 @@ namespace CryptoSQLite
 
     internal static class OrmUtils
     {
-        public static Type[] ClrTextTypes = { typeof(string) };
+        public static Type[] CompatibleTextTypes = { typeof(string) };
 
-        public static Type[] ClrRealTypes =
+        public static Type[] CompatibleRealTypes =
         {
             typeof(double), typeof(float), typeof(double?), typeof(float?)
         };
 
-        public static Type[] ClrIntegerTypes =
+        public static Type[] CompatibleIntegerTypes =
         {
             typeof(int), typeof(short), typeof(byte), typeof(uint), typeof(ushort), typeof(bool), typeof(int?),
             typeof(short?), typeof(byte?), typeof(uint?), typeof(ushort?), typeof(bool?)
         };
         
-        public static Type[] ClrBlobTypes =
+        public static Type[] CompatibleBlobTypes =
         {
             typeof(long), typeof(ulong), typeof(DateTime), typeof(byte[]),
             typeof(long?), typeof(ulong?), typeof(DateTime?)
@@ -46,148 +48,7 @@ namespace CryptoSQLite
             typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[])
         };
 
-        public static bool IsTypeCompatible(this Type type)
-        {
-            return ClrIntegerTypes.Contains(type) || ClrTextTypes.Contains(type) || ClrBlobTypes.Contains(type) ||
-                   ClrRealTypes.Contains(type);
-        }
-
-        public static bool IsEncrypted(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<EncryptedAttribute>();
-            return attributes.Any();
-        }
-
-        public static bool IsColumn(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<ColumnAttribute>();
-            return attributes.Any();
-        }
-
-        public static bool IsPrimaryKey(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<PrimaryKeyAttribute>();
-            return attributes.Any();
-        }
-
-        public static bool IsAutoIncremental(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<AutoIncrementalAttribute>();
-            return attributes.Any();
-        }
-
-        public static bool IsIgnorable(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<IgnoredAttribute>();
-            return attributes.Any();
-        }
-
-        public static bool IsNotNull(this PropertyInfo property)
-        {
-            var attributes = property.GetCustomAttributes<NotNullAttribute>();
-            return attributes.Any();
-        }
-
-        public static object DefaultValue(this PropertyInfo property)
-        {
-            var attribute = property.GetCustomAttribute<NotNullAttribute>();
-            return attribute?.DefaultValue;
-        }
-
-        public static string ColumnName(this PropertyInfo property)
-        {
-            var attrs = property.GetCustomAttributes<ColumnAttribute>().ToArray();
-            return attrs.Length == 0 ? property.Name : attrs[0].ColumnName;
-        }
-
-        public static ForeignKeyAttribute ForeignKey(this PropertyInfo property)
-        {
-            var attribute = property.GetCustomAttribute<ForeignKeyAttribute>();
-            return attribute;
-        }
-
-        public static bool IsForeignKey(this PropertyInfo property)
-        {
-            var attribute = property.GetCustomAttributes<ForeignKeyAttribute>();
-            return attribute.Any();
-        }
-
-        public static CryptoTableAttribute GetCryptoTableAttribute(this Type type)
-        {
-            var attribute = type.GetTypeInfo().GetCustomAttribute<CryptoTableAttribute>();
-            return attribute;
-        }
-
-        public static string TableName(this Type table)
-        {
-            var tableAttribute = table.GetCryptoTableAttribute();
-
-            if (tableAttribute == null)
-                throw new CryptoSQLiteException($"Table {table} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}.");
-
-            if (string.IsNullOrEmpty(tableAttribute.TableName))
-                throw new CryptoSQLiteException("Table name can't be null or empty.");
-
-            return tableAttribute.TableName;
-        }
-
-
-        public static string GetSqlType(this PropertyInfo property)
-        {
-            if (property.IsEncrypted())
-                return "BLOB"; // all encrypted types has BLOB QSL type
-
-            var type = property.PropertyType;
-
-            if (ClrIntegerTypes.Contains(type))
-                return "INTEGER";
-
-            if (ClrTextTypes.Contains(type))
-                return "TEXT";
-
-            if (ClrRealTypes.Contains(type))
-                return "REAL";
-
-            if (ClrBlobTypes.Contains(type))
-                return "BLOB";
-
-            throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
-        }
-
-       
-
-
-        public static IEnumerable<PropertyInfo> GetColumns(this Type tableType)
-        {
-            // Point of this method is to find those properties, that can be used as columns in table.
-            // Only properties, that have public getter and public setter can be used as column in table.
-
-            var compatibleProperties = tableType.GetRuntimeProperties().Where(pr => 
-                                                                               pr.PropertyType.IsTypeCompatible() &&
-                                                                               pr.CanRead             &&
-                                                                               pr.CanWrite            &&
-                                                                               pr.GetMethod != null   &&
-                                                                               pr.SetMethod != null   &&
-                                                                               !pr.GetMethod.IsStatic &&
-                                                                               !pr.SetMethod.IsStatic &&
-                                                                               !pr.IsIgnorable()      );     
-
-            return compatibleProperties;
-        }
-
-        public static PropertyInfo NavigationProperty(this Type tableType, string propertyName)
-        {
-            var navigationTableProperty = tableType.GetRuntimeProperties().FirstOrDefault(pr =>
-                                                                               pr.Name == propertyName &&
-                                                                               pr.CanRead &&
-                                                                               pr.CanWrite &&
-                                                                               pr.GetMethod != null &&
-                                                                               pr.SetMethod != null &&
-                                                                               !pr.GetMethod.IsStatic &&
-                                                                               !pr.SetMethod.IsStatic );
-
-            return navigationTableProperty;
-        }
+        
 
         public static bool IsDefaultValue(this PropertyInfo property, object value)
         {
@@ -216,7 +77,7 @@ namespace CryptoSQLite
             var i = 0;
             foreach (var property in properties)
             {
-                columnsMapping[i] = new SqlColumnInfo {Name = property.ColumnName(), SqlType = property.GetSqlType()};
+                columnsMapping[i] = new SqlColumnInfo {Name = property.ColumnName(), SqlType = property.SqlType()};
                 i++;
             }
             return columnsMapping;
@@ -362,7 +223,6 @@ namespace CryptoSQLite
             }
             return list;
         }
-
     }
 
 

@@ -82,7 +82,7 @@ namespace CryptoSQLite
     /// even if the table contains many large documents.
     /// </summary>
     [Flags]
-    public enum FullTextSearchFlags
+    internal enum FullTextSearchFlags
     {
         /// <summary>
         /// Create ordinary table
@@ -153,21 +153,6 @@ namespace CryptoSQLite
         void CreateTable<TTable>() where TTable : class;
 
         /// <summary>
-        /// Creates a new special table with a built-in full-text index.
-        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
-        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
-        /// this table will be containing automatically generated column with name: "SoltColumn". 
-        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
-        /// won't be able to decrypt data.
-        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table is important thing.
-        /// </summary>
-        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
-        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        void CreateTable<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class;
-
-        /// <summary>
         /// Deletes the table from database.
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
@@ -200,7 +185,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -211,7 +196,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         TTable GetItem<TTable>(int id) where TTable : class, new();
 
         /// <summary>
@@ -222,7 +207,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         TTable GetItem<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -250,7 +235,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         void DeleteItem<TTable>(int id) where TTable: class;
 
         /// <summary>
@@ -260,7 +245,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         void DeleteItem<TTable>(TTable item) where TTable : class;
 
         /// <summary>
@@ -290,7 +275,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
@@ -369,21 +354,6 @@ namespace CryptoSQLite
         Task CreateTableAsync<TTable>() where TTable : class;
 
         /// <summary>
-        /// Creates a new special table with a built-in full-text index.
-        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
-        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
-        /// this table will be containing automatically generated column with name: "SoltColumn". 
-        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
-        /// won't be able to decrypt data.
-        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table is important thing.
-        /// </summary>
-        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
-        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        Task CreateTableAsync<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class;
-
-        /// <summary>
         /// Deletes the table from database.
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
@@ -417,7 +387,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -429,7 +399,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new();
 
         /// <summary>
@@ -441,7 +411,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new();
 
         /// <summary>
@@ -460,7 +430,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task DeleteItemAsync<TTable>(TTable item) where TTable : class;
 
         /// <summary>
@@ -479,7 +449,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task DeleteItemAsync<TTable>(int id) where TTable : class;
 
         /// <summary>
@@ -509,7 +479,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
@@ -617,24 +587,6 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Creates a new special table with a built-in full-text index.
-        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
-        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
-        /// this table will be containing automatically generated column with name: "SoltColumn". 
-        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
-        /// won't be able to decrypt data.
-        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table is important thing.
-        /// </summary>
-        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
-        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task CreateTableAsync<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class
-        {
-            await Task.Run(() => _connection.CreateTable<TTable>(fullTextSearchFlags));
-        }
-
-        /// <summary>
         /// Deletes the table from database.
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
@@ -679,7 +631,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
         public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
@@ -695,7 +647,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
         public async Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem<TTable>(id));
@@ -711,7 +663,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
         public async Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new()
         {
             var table = Task.Run(() => _connection.GetItem(item));
@@ -737,7 +689,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
         public async Task DeleteItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem(item));
@@ -762,7 +714,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
         public async Task DeleteItemAsync<TTable>(int id) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem<TTable>(id));
@@ -808,7 +760,7 @@ namespace CryptoSQLite
         /// <returns>All elements from table that are satisfying conditions.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
@@ -1043,38 +995,7 @@ namespace CryptoSQLite
 
             CheckTable(table, false);   // here we don't check if table exists in database file
             
-            var cmd = SqlCmds.CmdCreateTable(table, FullTextSearchFlags.FTS3);
-
-            try
-            {
-                _connection.Execute(cmd);
-            }
-            catch (Exception)
-            {
-                throw new CryptoSQLiteException("Apparently table name or names of columns contain forbidden symbols");
-            }
-        }
-
-        /// <summary>
-        /// Creates a new special table with a built-in full-text index.
-        /// <para/>The full-text index allows the user to efficiently query the database for all rows that contain one or more words (hereafter "tokens"), even if the table contains many large documents.
-        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
-        /// this table will be containing automatically generated column with name: "SoltColumn". 
-        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
-        /// won't be able to decrypt data.
-        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table is important thing.
-        /// </summary>
-        /// <paramref name="fullTextSearchFlags"/>Type of Full-Text Search module: FTS3 or FTS4
-        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public void CreateTable<TTable>(FullTextSearchFlags fullTextSearchFlags) where TTable : class
-        {
-            var table = typeof(TTable);
-
-            CheckTable(table, false);   // here we don't check if table exists in database file
-
-            var cmd = SqlCmds.CmdCreateTable(table, fullTextSearchFlags);
+            var cmd = SqlCmds.CmdCreateTable(table);
 
             try
             {
@@ -1151,7 +1072,7 @@ namespace CryptoSQLite
         /// <param name="columnValue">column value.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead", true)]
         public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -1168,7 +1089,7 @@ namespace CryptoSQLite
         /// <param name="id">Identifacation number of element in table.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         public TTable GetItem<TTable>(int id) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -1192,7 +1113,7 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         public TTable GetItem<TTable>(TTable item) where TTable : class, new()
         {
             CheckTable(typeof(TTable));
@@ -1255,7 +1176,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="id">Identifacation number of element in table.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         public void DeleteItem<TTable>(int id) where TTable : class
         {
             CheckTable(typeof(TTable));
@@ -1277,7 +1198,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
         /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
         public void DeleteItem<TTable>(TTable item) where TTable : class
         {
             CheckTable(typeof(TTable));
@@ -1328,7 +1249,7 @@ namespace CryptoSQLite
 
             var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, columns, out values);
 
-            var table = ReadRowsFromTable(cmd, values, columns);
+            var table = ReadRowsFromTable(cmd, values);
 
             var items = new List<TTable>();
 
@@ -1358,7 +1279,7 @@ namespace CryptoSQLite
         /// <param name="lowerValue">Lower value (inclusive).</param>
         /// <param name="upperValue">Upper value (inclusive).</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", false)]
+        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
         public IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null)
             where TTable : class, new()
         {
@@ -1407,7 +1328,7 @@ namespace CryptoSQLite
 
             var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values, selectedProperties);
 
-            var table = ReadRowsFromTable(cmd, values, columns);
+            var table = ReadRowsFromTable(cmd, values);
 
             var items = new List<TTable>();
 
@@ -1673,7 +1594,7 @@ namespace CryptoSQLite
                 cmd = SqlCmds.CmdSelect(tableName, columnName);
             else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
 
-            var table = ReadRowsFromTable(cmd, new []{columnValue}, properties);
+            var table = ReadRowsFromTable(cmd, new []{columnValue});
 
             var items = new List<TTable>();
 
@@ -1708,7 +1629,7 @@ namespace CryptoSQLite
                 cmd = SqlCmds.CmdSelect(tableName, columnName);
             else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
 
-            var table = ReadRowsFromTable(cmd, new[]{columnValue}, properties);
+            var table = ReadRowsFromTable(cmd, new[]{columnValue});
 
             if (table.Count > 0)
             {
@@ -1814,7 +1735,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdFindInTable(tableName, columnName, lowerValue, upperValue);
 
-            var table = ReadRowsFromTable(cmd, new[]{lowerValue, upperValue}, properties);
+            var table = ReadRowsFromTable(cmd, new[]{lowerValue, upperValue});
 
             var items = new List<TTable>();
 
@@ -1828,7 +1749,7 @@ namespace CryptoSQLite
             return items;
         }
 
-        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, object[] values, PropertyInfo[] properties = null)
+        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, object[] values)
         {
             var table = new List<List<SqlColumnInfo>>();
             try
@@ -1846,86 +1767,32 @@ namespace CryptoSQLite
 
                         if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
                         {
-                            // we always get here NULL if we use FTS3 and FTS4
-                            if (column.ColumnInfo.DeclaredType != null)
+                            switch (column.ColumnInfo.DeclaredType)
                             {
-                                switch (column.ColumnInfo.DeclaredType)
-                                {
-                                    case "BLOB":
-                                        tmp.SqlValue = column.ToBlob();
-                                        break;
-                                    case "REAL":
-                                        if (column.SQLiteType == SQLiteType.Text)   // for default double values
-                                        {
-                                            var str = column.ToString();
-                                            double val;
-                                            tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
-                                        }
-                                        else
-                                            tmp.SqlValue = column.ToDouble();
-                                        break;
-                                    case "INTEGER":
-                                        tmp.SqlValue = column.ToInt64();
-                                        break;
-                                    case "TEXT":
-                                        tmp.SqlValue = column.ToString();
-                                        break;
-                                    case "NULL":
-                                        tmp.SqlValue = null;
-                                        break;
-                                    default:
-                                        throw new CryptoSQLiteException("Type is not compatible with SQLite database");
-                                }
-                            }
-                            else
-                            {
-                                // SPECIAL FOR FTS3 and FTS4
-                                if (column.ColumnInfo.Name == SoltColumnName)
-                                {
+                                case "BLOB":
                                     tmp.SqlValue = column.ToBlob();
-                                }
-                                else
-                                {
-                                    var prop = properties.FirstOrDefault(p => p.ColumnName() == column.ColumnInfo.Name);
-                                    if (prop == null)
-                                        throw new CryptoSQLiteException("Type is not compatible with SQLite database");
-
-                                    if (prop.IsEncrypted())
+                                    break;
+                                case "REAL":
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
                                     {
-                                        tmp.SqlValue = column.ToBlob();
+                                        var str = column.ToString();
+                                        double val;
+                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
                                     }
                                     else
-                                    {
-                                        // here we come only if not encrypted and not SoltColumn
-                                        switch (column.SQLiteType)
-                                        {
-                                            case SQLiteType.Integer:
-                                                tmp.SqlValue = column.ToInt64();
-                                                break;
-                                            case SQLiteType.Float:
-                                                if (column.SQLiteType == SQLiteType.Text)   // for default double values
-                                                {
-                                                    var str = column.ToString();
-                                                    double val;
-                                                    tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
-                                                }
-                                                else
-                                                    tmp.SqlValue = column.ToDouble();
-                                                break;
-                                            case SQLiteType.Text:
-                                                tmp.SqlValue = column.ToString();
-                                                break;
-                                            case SQLiteType.Blob:
-                                                tmp.SqlValue = column.ToBlob();
-                                                break;
-                                            case SQLiteType.Null:
-                                                tmp.SqlValue = null;
-                                                break;
-                                            default:
-                                                throw new CryptoSQLiteException("Type is not compatible with SQLite database");
-                                        }
-                                    }
-                                }
+                                        tmp.SqlValue = column.ToDouble();
+                                    break;
+                                case "INTEGER":
+                                    tmp.SqlValue = column.ToInt64();
+                                    break;
+                                case "TEXT":
+                                    tmp.SqlValue = column.ToString();
+                                    break;
+                                case "NULL":
+                                    tmp.SqlValue = null;
+                                    break;
+                                default:
+                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
                             }
                         }
                         columnsFromFile.Add(tmp);   // NULL will be NULL.

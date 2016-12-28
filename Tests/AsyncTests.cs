@@ -35,7 +35,7 @@ namespace Tests
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>(1);
+                    await db.DeleteItemAsync<AccountsData>("Id", 1);
 
                     result = await db.TableAsync<AccountsData>();
 
@@ -46,7 +46,7 @@ namespace Tests
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>(3);
+                    await db.DeleteItemAsync<AccountsData>("Id", 3);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
@@ -56,7 +56,7 @@ namespace Tests
                     Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>(2);
+                    await db.DeleteItemAsync<AccountsData>("Id", 2);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
@@ -66,7 +66,7 @@ namespace Tests
                     Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>(4);
+                    await db.DeleteItemAsync<AccountsData>("Id", 4);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();

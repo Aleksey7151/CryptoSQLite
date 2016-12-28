@@ -114,7 +114,7 @@ namespace CryptoSQLite
         /// <returns>string with column map</returns>
         public static string MapPropertyToColumn(this PropertyInfo column)
         {
-            string clmnMap = $"{column.ColumnName()} {column.GetSqlType()}";
+            string clmnMap = $"{column.ColumnName()} {column.SqlType()}";
 
             //TODO you need think here a lot
 
