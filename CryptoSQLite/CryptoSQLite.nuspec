@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>2.1.4</version>
+    <version>2.1.5</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -20,8 +20,9 @@
       2. Generate your own personal encryption key, and pass it to CryptoSQLite library.
       3. CryptoSQLite will encrypt all properties that have '[Encrypted]' attribute automatically when you are adding (updating) elements to your Table and decrypt all [Encrypted] properties when you are getting elements from a Table in the database file.
       Last updates:
-      In 2.1.3 version the 'Delete' function has been implemented, that uses Predicate expressions to define conditions for elements that must be removed.
       In 2.1.4 version the 'SetEncryptionKey' function has been implemented, that allows you to specify different encryption keys for different tables in one database file. Two encyrption algorithms added: AES with 128 and 192 bit keys.
+      In 2.1.5 version a perfomance of library has been inproved by using compiled expressions, instead of reflection.
+      Obsolete functions have been removed from iterface.
     </description>
     <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid winphone monotouch key encrypt aes des gost linq2sql linqtosql linq win8</tags>
     <dependencies>
