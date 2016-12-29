@@ -33,14 +33,14 @@ namespace CryptoSQLite.CrossTests
 
         public CryptoSQLiteConnection GetAes192Connection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgoritms.AesWith256BitsKey);
+            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgoritms.AesWith192BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public CryptoSQLiteConnection GetAes128Connection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgoritms.AesWith256BitsKey);
+            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgoritms.AesWith128BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
