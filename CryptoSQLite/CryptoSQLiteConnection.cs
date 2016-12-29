@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoSQLite.CryptoProviders;
+using CryptoSQLite.Extensions;
 using CryptoSQLite.Mapping;
 using SQLitePCL.pretty;
 
@@ -88,11 +89,13 @@ namespace CryptoSQLite
         /// Create ordinary table
         /// </summary>
         None = 0x0000,
+
         /// <summary>
         /// Create virtual table using FTS3.
         /// <para/>Attention, for newer applications, FTS4 is recommended.
         /// </summary>
         FTS3 = 0x0001,
+
         /// <summary>
         /// Create virtual table using FTS4.
         /// <para/>For newer applications, FTS4 is recommended.
@@ -137,7 +140,7 @@ namespace CryptoSQLite
         /// <param name="key">Buffer, that contains encryption key.</param>
         /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
         /// <exception cref="NullReferenceException"></exception>
-        void SetEncryptionKey<TTable>(byte[] key);
+        void SetEncryptionKey<TTable>(byte[] key) where TTable : class;
 
         /// <summary>
         /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
@@ -178,39 +181,6 @@ namespace CryptoSQLite
         void InsertOrReplaceItem<TTable>(TTable item) where TTable : class;
 
         /// <summary>
-        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="columnName">column name.</param>
-        /// <param name="columnValue">column value.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new();
-
-        /// <summary>
-        /// Gets element from database using element <paramref name="id"/>.
-        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        TTable GetItem<TTable>(int id) where TTable : class, new();
-
-        /// <summary>
-        /// Gets element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        TTable GetItem<TTable>(TTable item) where TTable : class, new();
-
-        /// <summary>
         /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
@@ -226,27 +196,19 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name.</param>
         /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class;
-
-        /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database using
-        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        void DeleteItem<TTable>(int id) where TTable: class;
+        void Delete<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        void DeleteItem<TTable>(TTable item) where TTable : class;
+        [Obsolete(
+             "This method is deprecated and soon will be removed. Prealse use 'Delete(string columnName, object columnValue)' method instead.",
+             false)]
+        void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
@@ -265,18 +227,6 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
-
-        /// <summary>
-        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
-        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
-        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
-        /// <param name="lowerValue">Lower value (inclusive).</param>
-        /// <param name="upperValue">Upper value (inclusive).</param>
-        /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
@@ -299,7 +249,8 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new();
+        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties)
+            where TTable : class, new();
     }
 
     /// <summary>
@@ -338,7 +289,7 @@ namespace CryptoSQLite
         /// <param name="key">Buffer, that contains encryption key.</param>
         /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
         /// <exception cref="NullReferenceException"></exception>
-        void SetEncryptionKey<TTable>(byte[] key);
+        void SetEncryptionKey<TTable>(byte[] key) where TTable : class;
 
         /// <summary>
         /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
@@ -358,7 +309,7 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
-        Task DeleteTableAsync<TTable>() where TTable: class;
+        Task DeleteTableAsync<TTable>() where TTable : class;
 
         /// <summary>
         /// Inserts new element (row) in table.
@@ -379,42 +330,6 @@ namespace CryptoSQLite
         Task InsertOrReplaceItemAsync<TTable>(TTable item) where TTable : class;
 
         /// <summary>
-        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="columnName">column name.</param>
-        /// <param name="columnValue">column value.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
-
-        /// <summary>
-        /// Gets element from database using element <paramref name="id"/>.
-        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new();
-
-        /// <summary>
-        /// Gets element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new();
-
-        /// <summary>
         /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
@@ -425,13 +340,12 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task DeleteItemAsync<TTable>(TTable item) where TTable : class;
+        Task DeleteAsync<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database.
@@ -440,17 +354,12 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name.</param>
         /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
+        [Obsolete(
+             "This method is deprecated and soon will be removed. Prealse use 'DeleteAsync(string columnName, object columnValue)' method instead.",
+             false)]
         Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class;
 
-        /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database using
-        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task DeleteItemAsync<TTable>(int id) where TTable : class;
+
 
         /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
@@ -471,18 +380,6 @@ namespace CryptoSQLite
         Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
 
         /// <summary>
-        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
-        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
-        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
-        /// <param name="lowerValue">Lower value (inclusive).</param>
-        /// <param name="upperValue">Upper value (inclusive).</param>
-        /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : class, new();
-
-        /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
         /// <para/>If <paramref name="columnValue"/> == null, it will find all rows which <paramref name="columnName"/> value is null.
         /// </summary>
@@ -490,7 +387,8 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new();
+        Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
+            where TTable : class, new();
 
         /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
@@ -502,7 +400,8 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new();
+        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            params string[] selectedProperties) where TTable : class, new();
 
     }
 
@@ -531,6 +430,7 @@ namespace CryptoSQLite
         {
             _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
         }
+
         /// <summary>
         /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
         /// <para/>AesWith256BitsKey key length must be 32 bytes.
@@ -565,7 +465,7 @@ namespace CryptoSQLite
         /// <param name="key">Buffer, that contains encryption key.</param>
         /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
         /// <exception cref="NullReferenceException"></exception>
-        public void SetEncryptionKey<TTable>(byte[] key)
+        public void SetEncryptionKey<TTable>(byte[] key) where TTable : class
         {
             _connection.SetEncryptionKey<TTable>(key);
         }
@@ -591,7 +491,7 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task DeleteTableAsync<TTable>() where TTable : class 
+        public async Task DeleteTableAsync<TTable>() where TTable : class
         {
             await Task.Run(() => _connection.DeleteTable<TTable>());
         }
@@ -621,56 +521,6 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
-        /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
-        /// In this case use find function.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="columnName">column name.</param>
-        /// <param name="columnValue">column value.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
-        public async Task<TTable> GetItemAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
-        {
-            var table = Task.Run(() => _connection.GetItem<TTable>(columnName, columnValue));
-            return await table;
-        }
-
-        /// <summary>
-        /// Gets element from database using element <paramref name="id"/>.
-        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
-        public async Task<TTable> GetItemAsync<TTable>(int id) where TTable : class, new()
-        {
-            var table = Task.Run(() => _connection.GetItem<TTable>(id));
-            return await table;
-        }
-
-        /// <summary>
-        /// Gets element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable> method instead.", true)]
-        public async Task<TTable> GetItemAsync<TTable>(TTable item) where TTable : class, new()
-        {
-            var table = Task.Run(() => _connection.GetItem(item));
-            return await table;
-        }
-
-        /// <summary>
         /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
@@ -684,15 +534,14 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public async Task DeleteItemAsync<TTable>(TTable item) where TTable : class
+        public async Task DeleteAsync<TTable>(string columnName, object columnValue) where TTable : class
         {
-            await Task.Run(() => _connection.DeleteItem(item));
+            await Task.Run(() => _connection.Delete<TTable>(columnName, columnValue));
         }
 
         /// <summary>
@@ -705,19 +554,6 @@ namespace CryptoSQLite
         public async Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class
         {
             await Task.Run(() => _connection.DeleteItem<TTable>(columnName, columnValue));
-        }
-
-        /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database using
-        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use DeleteAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public async Task DeleteItemAsync<TTable>(int id) where TTable : class
-        {
-            await Task.Run(() => _connection.DeleteItem<TTable>(id));
         }
 
         /// <summary>
@@ -747,27 +583,6 @@ namespace CryptoSQLite
             return elements;
         }
 
-        /// <summary>
-        /// Finds all the elements whose <paramref name="columnName"/>-values lie between
-        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// <para/>If <paramref name="lowerValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are less or equal <paramref name="upperValue"/>
-        /// <para/>If <paramref name="upperValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are greater or equal <paramref name="lowerValue"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
-        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
-        /// <param name="lowerValue">Lower value (inclusive).</param>
-        /// <param name="upperValue">Upper value (inclusive).</param>
-        /// <returns>All elements from table that are satisfying conditions.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use FindAsync<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(string columnName, object lowerValue = null, object upperValue = null)
-            where TTable : class, new()
-        {
-            var elements = await Task.Run(() => _connection.Find<TTable>(columnName, lowerValue, upperValue));
-            return elements;
-        }
-        
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> value equal to<paramref name="columnValue"/>
         /// <para/>If <paramref name="columnValue"/> == null, it will find all elements which <paramref name="columnName"/> value is null.
@@ -821,28 +636,45 @@ namespace CryptoSQLite
     {
         #region Private fields
 
+        /// <summary>
+        /// Represents connection to database file
+        /// </summary>
         private readonly SQLiteDatabaseConnection _connection;
 
+        /// <summary>
+        /// Encrypts/Decrypts data
+        /// </summary>
         private readonly ICryptoProvider _cryptor;
 
+        /// <summary>
+        /// Generates pseudo random data
+        /// </summary>
         private readonly ISoltGenerator _solter;
 
+        /// <summary>
+        /// Translates predicate expression to SQL request
+        /// </summary>
+        private readonly PredicateTranslator _predicateTranslator;
+
+        /// <summary>
+        /// Encryption algorithm that is used for data protection
+        /// </summary>
         private readonly CryptoAlgoritms _algorithm;
 
         /// <summary>
-        /// Dictionary with checked tables
+        /// Default encryption key, this key is used for all tables which don't have specific encryption key
         /// </summary>
-        private readonly IDictionary<string, IList<ForeignKey>> _checkedTables;     
+        private byte[] _defaultKey;
 
-        
-
-        private readonly IDictionary<Type, byte[]> _keys;   // dictionary with encryption keys for tables
-
-        private byte[] _defaultKey;     // encryption key for all tables, which don't have specific key
-
-        private readonly PredicateToSql _predicateTranslator;
-
+        /// <summary>
+        /// Solt column name. This column contains sychronization data for encryption algorithm.
+        /// </summary>
         internal const string SoltColumnName = "SoltColumn";
+
+        /// <summary>
+        /// Contains information about all checked and registered tables
+        /// </summary>
+        private readonly Dictionary<Type, TableMap> _tables;
 
         #endregion
 
@@ -856,13 +688,12 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-            
+
             _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
             _algorithm = CryptoAlgoritms.AesWith256BitsKey;
             _solter = new SoltGenerator();
-            _checkedTables = new Dictionary<string, IList<ForeignKey>>();
-            _predicateTranslator = new PredicateToSql();
-            _keys = new Dictionary<Type, byte[]>();
+            _predicateTranslator = new PredicateTranslator();
+            _tables = new Dictionary<Type, TableMap>();
         }
 
         /// <summary>
@@ -873,7 +704,7 @@ namespace CryptoSQLite
         public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgorithm)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-            
+
             switch (cryptoAlgorithm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
@@ -906,9 +737,8 @@ namespace CryptoSQLite
             }
             _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
-            _checkedTables = new Dictionary<string, IList<ForeignKey>>();
-            _predicateTranslator = new PredicateToSql();
-            _keys = new Dictionary<Type, byte[]>();
+            _predicateTranslator = new PredicateTranslator();
+            _tables = new Dictionary<Type, TableMap>();
         }
 
         #endregion
@@ -923,10 +753,26 @@ namespace CryptoSQLite
         /// </summary>
         public void Dispose()
         {
-            _cryptor.Dispose();     // clear encryption key!
-            _checkedTables.Clear();
+            _cryptor.Dispose(); // clear encryption key!
+            _tables.Clear();
             _connection.Dispose();
         }
+
+        #endregion
+
+
+        #region OPEN-GENERIC METHODS
+
+        private readonly MethodInfo _methodFindFirstByValue =
+            typeof(CryptoSQLiteConnection).GetRuntimeMethods()
+                .FirstOrDefault(mi => mi.Name == nameof(FindFirstUsingColumnValue)); // FindFirstByValue Method
+
+        private readonly MethodInfo _methodFindReferencedTables =
+            typeof(CryptoSQLiteConnection).GetRuntimeMethods()
+                .FirstOrDefault(mi => mi.Name == nameof(FindReferencedTables)); // FindReferencedTables Method
+
+        private readonly MethodInfo _methodCheckTable =
+            typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(CheckTable));
 
         #endregion
 
@@ -949,7 +795,7 @@ namespace CryptoSQLite
         public void SetEncryptionKey(byte[] key)
         {
             CheckKey(key);
-            
+
             _defaultKey = key;
         }
 
@@ -969,14 +815,16 @@ namespace CryptoSQLite
         /// <param name="key">Buffer, that contains encryption key.</param>
         /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
         /// <exception cref="NullReferenceException"></exception>
-        public void SetEncryptionKey<TTable>(byte[] key)
+        public void SetEncryptionKey<TTable>(byte[] key) where TTable : class
         {
+            var tableMap = CheckTable<TTable>();
+
             CheckKey(key);
 
-            _keys.AddOrUpdate(typeof(TTable), key);
+            tableMap.Key = key;
         }
 
-        
+
 
         /// <summary>
         /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
@@ -991,11 +839,9 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public void CreateTable<TTable>() where TTable : class
         {
-            var table = typeof(TTable);
+            var tableMap = CheckTable<TTable>(false); // here we don't check if table exists in database file
 
-            CheckTable(table, false);   // here we don't check if table exists in database file
-            
-            var cmd = SqlCmds.CmdCreateTable(table);
+            var cmd = SqlCmds.CmdCreateTable(tableMap);
 
             try
             {
@@ -1020,18 +866,20 @@ namespace CryptoSQLite
 
             try
             {
-                _connection.Execute(SqlCmds.CmdDeleteTable(tableName));     // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
+                _connection.Execute(SqlCmds.CmdDeleteTable(tableName));
+                    // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
-            catch (SQLitePCL.pretty.SQLiteException ex)
+            catch (SQLiteException ex)
             {
-                if(ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
-                    throw new CryptoSQLiteException($"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.");
+                if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
+                    throw new CryptoSQLiteException(
+                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.");
                 throw new CryptoSQLiteException(ex.Message, "Unknown");
             }
 
 
-            if (_checkedTables.ContainsKey(table.ToString()))
-                _checkedTables.Remove(tableName);
+            if (_tables.ContainsKey(table))
+                _tables.Remove(table);
         }
 
         /// <summary>
@@ -1043,8 +891,9 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public void InsertItem<TTable>(TTable item) where TTable : class
         {
-            CheckTable(typeof(TTable));
-            InsertRowInTable(item, false);
+            var tableMap = CheckTable<TTable>();
+
+            InsertRowInTable(tableMap, item, false);
         }
 
         /// <summary>
@@ -1056,73 +905,9 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public void InsertOrReplaceItem<TTable>(TTable item) where TTable : class
         {
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            InsertRowInTable(item, true);
-        }
-
-        /// <summary>
-        /// Gets element from table in database that has column: <paramref name="columnName"/> with value: <paramref name="columnValue"/>.
-        /// If table contain two or more elements with value <paramref name="columnValue"/> only first element will be returned.
-        /// In this case use find function.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        ///  </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="columnName">column name.</param>
-        /// <param name="columnValue">column value.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead", true)]
-        public TTable GetItem<TTable>(string columnName, object columnValue) where TTable : class, new()
-        {
-            CheckTable(typeof(TTable));
-
-            return FindUsingColumnValue<TTable>(columnName, columnValue).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Gets element from database using element <paramref name="id"/>.
-        /// Type <typeparamref name="TTable"/> must contain the column (read/write Property) with any name: "id", "Id", "iD", "ID".
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which element will be getted.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public TTable GetItem<TTable>(int id) where TTable : class, new()
-        {
-            CheckTable(typeof(TTable));
-
-            var properties = typeof(TTable).GetColumns().ToArray();
-
-            var idProperty = properties.First(p => p.ColumnName().ToLower() == "id");
-            if (idProperty == null)
-                throw new CryptoSQLiteException(
-                    $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
-
-            return FindUsingColumnValue<TTable>(idProperty.ColumnName(), id).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Gets element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
-        /// <para/>This method is deprecated. Please use Find[<typeparamref name="TTable"/>](Predicate predicate) method.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table from which the element will be taken.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
-        /// <returns>Instance of element with type <typeparamref name="TTable"/> that will be created using data from table <typeparamref name="TTable"/> in database.</returns>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public TTable GetItem<TTable>(TTable item) where TTable : class, new()
-        {
-            CheckTable(typeof(TTable));
-
-            var properties = typeof(TTable).GetColumns().ToArray();
-
-            var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));              
-
-            return FindUsingColumnValue<TTable>(notDefaultValue.ColumnName(), notDefaultValue.GetValue(item)).FirstOrDefault();
+            InsertRowInTable(tableMap, item, true);
         }
 
         /// <summary>
@@ -1137,13 +922,13 @@ namespace CryptoSQLite
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
 
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            var tableName = typeof(TTable).TableName();
+            var tableName = tableMap.Name;
 
             object[] values;
 
-            var cmd = _predicateTranslator.DeleteToSqlCmd(predicate, tableName, typeof(TTable).GetColumns().ToArray(), out values);
+            var cmd = _predicateTranslator.DeleteToSqlCmd(predicate, tableName, tableMap.Columns.Values, out values);
 
             try
             {
@@ -1162,53 +947,82 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name.</param>
         /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        public void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class
+        public void Delete<TTable>(string columnName, object columnValue) where TTable : class
         {
-            CheckTable(typeof(TTable), false);
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
 
-            DeleteRowUsingColumnName<TTable>(columnName, columnValue);
-        }
+            var tableMap = CheckTable<TTable>(false);
 
-        /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database using
-        /// identification number of element. Type <typeparamref name="TTable"/> must contain the column (read and write Properties) with any name: "id", "Id", "iD", "ID".
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="id">Identifacation number of element in table.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public void DeleteItem<TTable>(int id) where TTable : class
-        {
-            CheckTable(typeof(TTable));
+            var tableName = tableMap.Name;
 
-            var properties = typeof(TTable).GetColumns().ToArray();
+            var mappedColumns = tableMap.Columns.Values;
 
-            var idProperty = properties.First(p => p.ColumnName().ToLower() == "id");
-            if (idProperty == null)
+            if (mappedColumns.All(col => col.Name != columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            if (mappedColumns.Any(col => col.Name == columnName && col.IsEncrypted))
                 throw new CryptoSQLiteException(
-                    $"Type {typeof(TTable)} of item doesn't contain property with name \"id\" (\"Id\", \"ID\", \"iD\")");
+                    "You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
 
-            DeleteRowUsingColumnName<TTable>(idProperty.ColumnName(), id);
+            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName, columnValue);
+
+            try
+            {
+                if (columnValue == null)
+                    _connection.Execute(cmd);
+                else _connection.Execute(cmd, columnValue);
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message,
+                    $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
+            }
         }
 
         /// <summary>
         /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// In instance of type <typeparamref name="TTable"/> at least one Property from all (read and write) Properties must be initialized.
         /// </summary>
         /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="item">Instance of element <typeparamref name="TTable"/> that contains at least one initialized Property.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <param name="columnValue">Column value.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete("This method is deprecated and soon will be removed. Use Delete<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public void DeleteItem<TTable>(TTable item) where TTable : class
+        [Obsolete(
+             "This method is deprecated and soon will be removed. Prealse use 'Delete(string columnName, object columnValue)' method instead.",
+             false)]
+        public void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class
         {
-            CheckTable(typeof(TTable));
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
 
-            var properties = typeof(TTable).GetColumns().ToArray();
+            var tableMap = CheckTable<TTable>(false);
 
-            var notDefaultValue = properties.First(p => !p.IsDefaultValue(p.GetValue(item)));
+            var tableName = tableMap.Name;
 
-            DeleteRowUsingColumnName<TTable>(notDefaultValue.ColumnName(), notDefaultValue.GetValue(item));
+            var mappedColumns = tableMap.Columns.Values;
+
+            if (mappedColumns.All(col => col.Name != columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            if (mappedColumns.Any(col => col.Name == columnName && col.IsEncrypted))
+                throw new CryptoSQLiteException(
+                    "You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
+
+            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName, columnValue);
+
+            try
+            {
+                if (columnValue == null)
+                    _connection.Execute(cmd);
+                else _connection.Execute(cmd, columnValue);
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message,
+                    $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
+            }
         }
+
 
         /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
@@ -1217,9 +1031,27 @@ namespace CryptoSQLite
         /// <returns>All elements from table <typeparamref name="TTable"/></returns>
         public IEnumerable<TTable> Table<TTable>() where TTable : class, new()
         {
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            return FindInTable<TTable>("");     // all table
+            var tableName = tableMap.Name;
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            var cmd = SqlCmds.CmdSelectAllTable(tableName);
+
+            //TODO change signature of a call
+            var table = ReadRowsFromDatabase(cmd, new object[] {});
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+                ProcessRow(mappedColumns, row, item);
+                items.Add(item);
+            }
+
+            return items;
         }
 
         /// <summary>
@@ -1239,17 +1071,17 @@ namespace CryptoSQLite
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
 
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            var tableName = typeof(TTable).TableName();
+            var tableName = tableMap.Name;
 
-            PropertyInfo[] columns = typeof(TTable).GetColumns().ToArray();
+            var mappedColumns = tableMap.Columns.Values;
 
             object[] values;
 
-            var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, columns, out values);
+            var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, mappedColumns, out values);
 
-            var table = ReadRowsFromTable(cmd, values);
+            var table = ReadRowsFromDatabase(cmd, values);
 
             var items = new List<TTable>();
 
@@ -1257,35 +1089,14 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(columns, row, item);
+                ProcessRow(mappedColumns, row, item);
 
-                FindReferencedTables(item);     // here we get all referenced tables if they exist
+                FindReferencedTables(item); // here we get all referenced tables if they exist
 
                 items.Add(item);
             }
 
             return items;
-        }
-
-
-        /// <summary>
-        /// Finds all the elements whose <paramref name="columnName"/>-values are lying between
-        /// <paramref name="lowerValue"/> and <paramref name="upperValue"/>.
-        /// <para/>If <paramref name="lowerValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are less or equal <paramref name="upperValue"/>
-        /// <para/>If <paramref name="upperValue"/>==null, it will find all elements, which <paramref name="columnName"/> values are greater or equal <paramref name="lowerValue"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
-        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
-        /// <param name="lowerValue">Lower value (inclusive).</param>
-        /// <param name="upperValue">Upper value (inclusive).</param>
-        /// <returns>All elements from table that are satisfying conditions.</returns>
-        [Obsolete("This method is deprecated and soon will be removed. Use Find<TTable>(Predicate<TTable> expr) method instead.", true)]
-        public IEnumerable<TTable> Find<TTable>(string columnName, object lowerValue = null, object upperValue = null)
-            where TTable : class, new()
-        {
-            CheckTable(typeof(TTable));
-
-            return FindInTable<TTable>(columnName, lowerValue, upperValue);
         }
 
         /// <summary>
@@ -1296,11 +1107,12 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        public IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        public IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue)
+            where TTable : class, new()
         {
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            return FindUsingColumnValue<TTable>(columnName, columnValue);
+            return FindUsingColumnValue<TTable>(tableMap, columnName, columnValue);
         }
 
         /// <summary>
@@ -1316,19 +1128,18 @@ namespace CryptoSQLite
         public IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new()
         {
-            CheckTable(typeof(TTable));
+            var tableMap = CheckTable<TTable>();
 
-            var tableName = typeof(TTable).TableName();
+            var tableName = tableMap.Name;
 
-            PropertyInfo[] columns = typeof(TTable).GetColumns().ToArray();
-
-            var predicateTraslator = new PredicateToSql();
+            var mappedColumns = tableMap.Columns.Values;
 
             object[] values;
 
-            var cmd = predicateTraslator.WhereToSqlCmd(predicate, tableName, columns, out values, selectedProperties);
+            var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, mappedColumns, out values,
+                selectedProperties);
 
-            var table = ReadRowsFromTable(cmd, values);
+            var table = ReadRowsFromDatabase(cmd, values);
 
             var items = new List<TTable>();
 
@@ -1336,9 +1147,9 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(columns, row, item);
+                ProcessRow(mappedColumns, row, item);
 
-                FindReferencedTables(item, selectedProperties);     // here we get all referenced tables if they exist
+                FindReferencedTables(item, selectedProperties); // here we get all referenced tables if they exist
 
                 items.Add(item);
             }
@@ -1354,31 +1165,79 @@ namespace CryptoSQLite
 
         /// <summary>
         /// Checks if table has correct columns structure.
-        /// And adds type of <paramref name="tableType"/> to list of registered tables.
+        /// And adds type of <typeparamref name="TTable"/> to list of registered tables.
         /// </summary>
-        private void CheckTable(Type tableType, bool checkExistanceInDatabase = true)
+        private TableMap CheckTable<TTable>(bool checkExistanceInDatabase = true) where TTable : class
         {
+            var tableType = typeof(TTable);
+
+            if (_tables.ContainsKey(typeof(TTable))) return _tables[tableType];
+
             var tableName = tableType.TableName();
 
-            if (_checkedTables.ContainsKey(tableType.ToString())) return;
+            var compatibleProperties = tableType.CompatibleProperties().ToList();
 
-            var columns = tableType.GetColumns().ToList();
+            CheckAttributes(tableName, compatibleProperties); // just checks correctness of columns attributes
 
-            CheckAttributes(tableName, columns);
+            if (checkExistanceInDatabase)
+                CheckIfTableExistsInDatabase(tableName, compatibleProperties);
 
-            if(checkExistanceInDatabase)
-                CheckIfTableExistsInDatabase(tableName, columns);
+            var hasEncryptedColumns = false;
 
-            var referencedTables = columns.ForeignKeys(tableType);  // Find all referenced tables
+            var columnMaps = new Dictionary<string, ColumnMap>();
+            var foreignKeys = new List<ForeignKey>();
+                // list of all ForeignKey Constraits, so we can Check structure of all referenced tables
 
-            _checkedTables.Add(tableType.ToString(), referencedTables);
-
-            foreach (var fk in referencedTables)     // Check all referenced tables that this table contains
+            foreach (var prop in compatibleProperties)
             {
-                if(!_checkedTables.ContainsKey(fk.TypeOfReferencedTable.ToString()))
-                    CheckTable(fk.TypeOfReferencedTable);
+                var columnName = prop.ColumnName();
+
+                var isEncrypted = prop.IsEncrypted();
+                if (!hasEncryptedColumns && isEncrypted)
+                    hasEncryptedColumns = true;
+
+                ForeignKey foreignKey = null;
+
+                var isForeignKey = prop.ForeignKey() != null;
+                if (isForeignKey)
+                {
+                    foreignKey = prop.ForeignKeyInfo<TTable>();
+                    foreignKeys.Add(foreignKey);
+                }
+
+                var colMap = new ColumnMap<TTable>(columnName, prop.Name, prop.PropertyType, prop.SqlType(),
+                    prop.IsPrimaryKey(),
+                    prop.IsAutoIncremental(), isEncrypted, prop.IsNotNull(), prop.DefaultValue(), isForeignKey,
+                    foreignKey,
+                    prop.ValueSetter<TTable>(), prop.ValueGetter<TTable>());
+
+                columnMaps.Add(columnName, colMap);
             }
+
+            var tableMap = new TableMap(tableName, hasEncryptedColumns, columnMaps);
+
+            _tables.Add(tableType, tableMap);
+
+            foreach (var fk in foreignKeys) // Check all referenced tables that this table contains
+            {
+                if (_tables.ContainsKey(fk.TypeOfReferencedTable)) continue;
+
+                var genericCheckTable = _methodCheckTable.MakeGenericMethod(fk.TypeOfReferencedTable);
+                try
+                {
+                    genericCheckTable.Invoke(this, new object[] { true });
+                }
+                catch (Exception ex)
+                {
+                    throw new CryptoSQLiteException(ex.InnerException.Message);
+                }
+                
+            }
+
+            return tableMap;
         }
+
+        
 
         /// <summary>
         /// Checks key
@@ -1433,7 +1292,7 @@ namespace CryptoSQLite
             if (tableFromFile.Count == 0)
                 throw new CryptoSQLiteException($"Database doesn't contain table with name: {tableName}.");
 
-            var tableFromOrmMapping = OrmUtils.GetColumnsMappingWithSqlTypes(properties.ToList());
+            var tableFromOrmMapping = properties.ToList().GetColumnsMappingWithSqlTypes();
 
             if (!OrmUtils.IsTablesEqual(tableFromFile, tableFromOrmMapping)) // if database doesn't contain TTable
                 throw new CryptoSQLiteException(
@@ -1466,16 +1325,16 @@ namespace CryptoSQLite
             if(properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Encrypted columns can't have default value, but they can be Not Null.");
 
-            if (properties.Any(p => p.IsPrimaryKey() && p.IsForeignKey()))
+            if (properties.Any(p => p.IsPrimaryKey() && p.ForeignKey() != null))
                 throw new CryptoSQLiteException("Property can't have ForeignKey and PrimaryKey attributes simultaneously.");
 
-            if (properties.Any(p => p.IsEncrypted() && p.IsForeignKey()))
+            if (properties.Any(p => p.IsEncrypted() && p.ForeignKey() != null))
                 throw new CryptoSQLiteException("Property can't have ForeignKey and Encrypted attributes simultaneously.");
 
-            if (properties.Any(p => p.IsAutoIncremental() && p.IsForeignKey()))
+            if (properties.Any(p => p.IsAutoIncremental() && p.ForeignKey() != null))
                 throw new CryptoSQLiteException("Property can't have ForeignKey and AutoIncrement attributes simultaneously.");
 
-            if (properties.Any(p => p.IsForeignKey() && p.DefaultValue() != null))
+            if (properties.Any(p => p.ForeignKey() != null && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Property with ForeignKey attribute can't have Default Value.");
 
             // find columns with equal names
@@ -1492,168 +1351,142 @@ namespace CryptoSQLite
         /// Inserts row in table
         /// </summary>
         /// <typeparam name="TTable">Type of table</typeparam>
+        /// <param name="tableMap">Map of table</param>
         /// <param name="row">row for insert</param>
         /// <param name="replaceRowIfExisits">flag if need replace existing row</param>
-        private void InsertRowInTable<TTable>(TTable row, bool replaceRowIfExisits)
+        private void InsertRowInTable<TTable>(TableMap tableMap, TTable row, bool replaceRowIfExisits)
         {
-            var columns = new List<string>();
-            var values = new List<object>();
+            var columnNames = new List<string>();
+
+            var columnValues = new List<object>();    
+
             byte[] solt = null;
+
             ICryptoProvider encryptor = null;
 
-            var columnsToAdd = typeof(TTable).GetColumns().ToList();
+            var tableName = tableMap.Name;
 
-            if (columnsToAdd.Find(p => p.IsEncrypted()) != null)
+            if (tableMap.HasEncryptedColumns)
             {
                 solt = GetSolt();
                 encryptor = GetEncryptor(typeof(TTable), solt);
             }
 
-            foreach (var col in columnsToAdd)
+            var columns = tableMap.Columns;
+
+            foreach (var column in columns)
             {
-                if (col.IsAutoIncremental() && !replaceRowIfExisits)
-                    continue;       // if column is AutoIncremental and we don't want to replace this row
+                if(column.Value.IsAutoIncremental && !replaceRowIfExisits)
+                    continue;   // if column is AutoIncremental and we don't want to replace this row
 
-                var value = col.GetValue(row);  // column value
+                var value = ((IValues<TTable>)column.Value).ValueGetter(row);      // Here we get value without reflection!!! We use here Expressions
 
-                if (value == null && col.DefaultValue() != null)    // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
-                    continue;
+                if(value == null && column.Value.DefaultValue != null)
+                    continue;   // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
 
-                if(value == null && col.IsNotNull() && col.DefaultValue() == null)
-                    throw new CryptoSQLiteException($"You are trying to pass NULL-value for Column '{col.ColumnName()}', but this column has NotNull atribute and Default Value is not defined.");
+                if (value == null && column.Value.IsNotNull && column.Value.DefaultValue == null)
+                    throw new CryptoSQLiteException($"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
 
-                columns.Add(col.ColumnName());
-                
-                var type = col.PropertyType;
+                columnNames.Add(column.Key);
+
+                var clrType = column.Value.ClrType;
 
                 object sqlValue = null;
 
                 if (value != null)
                 {
-                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (col.IsEncrypted())
-                        sqlValue = GetEncryptedValue(type, value, encryptor);
-                    else
-                        sqlValue = OrmUtils.GetSqlViewFromClr(type, value);
+                    sqlValue = column.Value.IsEncrypted ? GetEncryptedValueForSql(clrType, value, encryptor) : GetOpenValueForSql(clrType, value);
                 }
 
-                values.Add(sqlValue);   // NULL will be NULL
+                columnValues.Add(sqlValue);   // NULL will be NULL
             }
 
             if (solt != null)
             {
-                columns.Add(SoltColumnName);
-                values.Add(solt);
+                columnNames.Add(SoltColumnName);
+                columnValues.Add(solt);
             }
 
-            var name = typeof(TTable).TableName();
-            if (replaceRowIfExisits)
+            var cmd = replaceRowIfExisits ? SqlCmds.CmdInsertOrReplace(tableName, columnNames) : SqlCmds.CmdInsert(tableName, columnNames);
+            try
             {
-                var cmd = SqlCmds.CmdInsertOrReplace(name, columns);
-                try
-                {
-                    _connection.Execute(cmd, values.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
-                }
-                catch (Exception ex)
-                {
-                    throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
-                }
+                _connection.Execute(cmd, columnValues.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
             }
-            else
+            catch (Exception ex)
             {
-                var cmd = SqlCmds.CmdInsert(name, columns);
-                try
-                {
-                    _connection.Execute(cmd, values.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
-                }
-                catch (Exception ex)
-                {
-                    throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
-                }
+                throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
             }
         }
 
-        private IList<TTable> FindUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        private IList<TTable> FindUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue) where TTable : class, new()
         {
             if(string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
 
-            var properties = typeof(TTable).GetColumns().ToArray();
+            var mappedColumns = tableMap.Columns.Values;
 
-            var tableName = typeof(TTable).TableName();
+            var tableName = tableMap.Name;
 
-            if (properties.All(p => p.ColumnName() != columnName))
+            if (mappedColumns.All(mc => mc.Name != columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            if(properties.Any(p=>p.ColumnName()==columnName && p.IsEncrypted()))
+            if(mappedColumns.Any(mc => mc.Name == columnName && mc.IsEncrypted))
                 throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            string cmd;
+            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            if (columnValue != null)
-                cmd = SqlCmds.CmdSelect(tableName, columnName);
-            else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
-
-            var table = ReadRowsFromTable(cmd, new []{columnValue});
+            var table = ReadRowsFromDatabase(cmd, new []{columnValue});
 
             var items = new List<TTable>();
 
             foreach (var row in table)
             {
                 var item = new TTable();
-                ProcessRow(properties, row, item);
+                ProcessRow(mappedColumns, row, item);
                 items.Add(item);
             }
 
             return items;
         }
 
-        private TTable FindFirstUsingColumnValue<TTable>(string columnName, object columnValue) where TTable : class, new()
+        private TTable FindFirstUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue) where TTable : class, new()
         {
             if (string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
+            
+            var mappedColumns = tableMap.Columns.Values.ToList();
 
-            var properties = typeof(TTable).GetColumns().ToArray();
+            var tableName = tableMap.Name;
 
-            var tableName = typeof(TTable).TableName();
-
-            if (properties.All(p => p.ColumnName() != columnName))
+            if (mappedColumns.All(p => p.Name != columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            if (properties.Any(p => p.ColumnName() == columnName && p.IsEncrypted()))
+            if (mappedColumns.Any(p => p.Name == columnName && p.IsEncrypted))
                 throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            string cmd;
+            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            if (columnValue != null)
-                cmd = SqlCmds.CmdSelect(tableName, columnName);
-            else cmd = SqlCmds.CmdFindNullInTable(tableName, columnName);
+            var table = ReadRowsFromDatabase(cmd, new[]{columnValue});
 
-            var table = ReadRowsFromTable(cmd, new[]{columnValue});
+            if (table.Count <= 0) return null;
 
-            if (table.Count > 0)
-            {
-                var item = new TTable();
-                ProcessRow(properties, table[0], item);
-                return item;
-            }
-
-            return null;
+            var item = new TTable();
+            ProcessRow(mappedColumns, table[0], item);
+            return item;
         }
 
-        private readonly MethodInfo _methodFindFirstByValue = typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindFirstUsingColumnValue));     // FindFirstByValue Method
-        
-        private readonly MethodInfo _methodFindReferencedTables = typeof(CryptoSQLiteConnection).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindReferencedTables));   // FindReferencedTables Method
 
-        private void FindReferencedTables<TTable>(TTable table, string[] selectedProperties = null) where TTable : class, new()
+
+        private void FindReferencedTables<TTable>(TTable table, string[] selectedColumns = null) where TTable : class, new()
         {
-            if(!_checkedTables.ContainsKey(typeof(TTable).ToString()))
+            var tableType = typeof(TTable);
+            if(!_tables.ContainsKey(tableType))
                 return;
 
-           var referencedTablesInfos = _checkedTables[typeof(TTable).ToString()];
+            var referencedTablesInfos = _tables[tableType].Columns.ForeignKeys();
 
-            if (selectedProperties != null)
-                referencedTablesInfos = referencedTablesInfos.Where(fk => selectedProperties.Contains(fk.ForeignKeyPropertyName)).ToList();
+            if (selectedColumns != null)
+                referencedTablesInfos = referencedTablesInfos.Where(fk => selectedColumns.Contains(fk.ForeignKeyPropertyName)).ToList();
             
             if(referencedTablesInfos == null)
                 return;
@@ -1666,7 +1499,8 @@ namespace CryptoSQLite
 
                 var genericFindFirstByValue = _methodFindFirstByValue.MakeGenericMethod(refTableInfo.TypeOfReferencedTable);         // create genetic method to get referenced table instance using foreign key column name and value
 
-                var refTable = genericFindFirstByValue.Invoke(this, new[] { refTableInfo.ReferencedColumnName, primaryKeyValue });   // invoking generic method and getting instance of referenced table
+                // FindFirstByValue has three arguments: refTableMap, refColumnName, refColumnValue
+                var refTable = genericFindFirstByValue.Invoke(this, new[] { _tables[refTableInfo.TypeOfReferencedTable], refTableInfo.ReferencedColumnName, primaryKeyValue });   // invoking generic method and getting instance of referenced table
 
                 var navigationProperty = table.GetType().GetRuntimeProperty(refTableInfo.NavigationPropertyName);   // get property in current table that must navigate to referenced table
 
@@ -1680,76 +1514,7 @@ namespace CryptoSQLite
             }
         }
 
-        private void DeleteRowUsingColumnName<TTable>(string columnName, object columnValue)
-        {
-            if (string.IsNullOrEmpty(columnName))
-                throw new CryptoSQLiteException("Column name can't be null or empty.");
-
-            if (columnValue == null)
-                throw new CryptoSQLiteException("Column value can't be null.");
-
-            var tableName = typeof(TTable).TableName();
-
-            var properties = typeof(TTable).GetColumns().ToArray();
-
-            if (properties.All(p => p.ColumnName() != columnName))
-                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
-
-            if (properties.Any(p => p.ColumnName() == columnName && p.IsEncrypted()))
-                throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
-
-            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName);
-
-            try
-            {
-                _connection.Execute(cmd, columnValue);
-            }
-            catch (Exception ex)
-            {
-                throw new CryptoSQLiteException(ex.Message,
-                    $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
-            }
-        }
-        
-        private IEnumerable<TTable> FindInTable<TTable>(string columnName, object lowerValue = null, object upperValue = null) where TTable : new()
-        {
-            var tableName = typeof(TTable).TableName();
-
-            var properties = typeof(TTable).GetColumns().ToArray();
-
-            if (columnName == null)
-                throw new CryptoSQLiteException("Column name can't be null.");
-
-            if (!string.IsNullOrEmpty(columnName))  
-            {
-                // we come here only if we in Find function
-                if (properties.All(p => p.ColumnName() != columnName))
-                    throw new CryptoSQLiteException($"Table {tableName} doesn't contain column {columnName}");
-
-                var col = properties.First(p => p.ColumnName() == columnName);
-
-                if (col.IsEncrypted())
-                    throw new CryptoSQLiteException($"Column {columnName} has [Encrypted] attribute, so this column is encrypted. Find function can't work with encrypted columns.");
-
-            }
-
-            var cmd = SqlCmds.CmdFindInTable(tableName, columnName, lowerValue, upperValue);
-
-            var table = ReadRowsFromTable(cmd, new[]{lowerValue, upperValue});
-
-            var items = new List<TTable>();
-
-            foreach (var row in table)
-            {
-                var item = new TTable();
-                ProcessRow(properties, row, item);
-                items.Add(item);
-            }
-
-            return items;
-        }
-
-        private List<List<SqlColumnInfo>> ReadRowsFromTable(string cmd, object[] values)
+        private List<List<SqlColumnInfo>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values)
         {
             var table = new List<List<SqlColumnInfo>>();
             try
@@ -1807,34 +1572,38 @@ namespace CryptoSQLite
             return table;
         }
 
-        private void ProcessRow<TTable>(IEnumerable<PropertyInfo> propertieInfos, IEnumerable<SqlColumnInfo> columnInfos, TTable item)
+        private void ProcessRow<TTable>(IEnumerable<ColumnMap> mappedColumns, IList<SqlColumnInfo> databaseColumns, TTable item) where TTable : class 
         {
-            var properties = propertieInfos.ToList();
-            var columns = columnInfos.ToList();
-
             ICryptoProvider encryptor = null;
-            var soltColumn = columns.Find(c => c.Name == SoltColumnName);
+            var soltColumn = databaseColumns.FirstOrDefault(c => c.Name == SoltColumnName);
             if (soltColumn != null)
             {
                 var solt = (byte[])soltColumn.SqlValue;
                 encryptor = GetEncryptor(typeof(TTable), solt); // this solt we were using in encryption of columns
             }
 
-            foreach (var property in properties)
+            foreach (var columnMap in mappedColumns)
             {
-                var column = columns.Find(c => c.Name == property.ColumnName());
+                var column = databaseColumns.FirstOrDefault(c => c.Name == columnMap.Name);
 
                 if (column?.SqlValue == null)   // NULL value will stay NULL value
                     continue;
 
-                if (property.IsEncrypted())
-                    GetDecryptedValue(property, item, column.SqlValue, encryptor);
+                if (columnMap.IsEncrypted)
+                    SetDecryptedValueForClr(columnMap, item, column.SqlValue, encryptor);
                 else
-                    OrmUtils.GetClrViewFromSql(property, item, column.SqlValue);
+                    SetOpenValueForClr(columnMap, item, column.SqlValue);
             }
         }
 
-        private static object GetEncryptedValue(Type type, object value, ICryptoProvider encryptor)
+        /// <summary>
+        /// Returns encrypted value that must be stored in database
+        /// </summary>
+        /// <param name="type">Initial type of value</param>
+        /// <param name="value">value</param>
+        /// <param name="encryptor">ecryptor</param>
+        /// <returns></returns>
+        private static object GetEncryptedValueForSql(Type type, object value, ICryptoProvider encryptor)
         {
             if (encryptor == null)
                 throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
@@ -1924,19 +1693,21 @@ namespace CryptoSQLite
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite");
         }
      
-        private static void GetDecryptedValue(PropertyInfo property, object item, object sqlValue, ICryptoProvider encryptor)
+        private static void SetDecryptedValueForClr<TTable>(ColumnMap columnMap, TTable item, object sqlValue, ICryptoProvider encryptor) where TTable : class 
         {
             if (encryptor == null)
                 throw new CryptoSQLiteException("Internal error. Encryptor should be enitialized.");
 
-            var type = property.PropertyType;
+            var type = columnMap.ClrType;
+
+            var setter = ((ColumnMap<TTable>) columnMap).ValueSetter;
 
             if (type == typeof(string))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
                 var openString = Encoding.Unicode.GetString(bytes, 0, bytes.Length);
-                property.SetValue(item, openString);
+                setter(item, openString);       // Here is no Reflection now! we use Expressions
             }
             else if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
@@ -1944,80 +1715,158 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes);
                 var ticks = BitConverter.ToInt64(bytes, 0);
                 var dateTime = DateTime.FromBinary(ticks);
-                property.SetValue(item, dateTime);
+                setter(item, dateTime);
             }
             else if (type == typeof(short) || type == typeof(short?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToInt16(bytes, 0));
+                setter(item, BitConverter.ToInt16(bytes, 0));
             }
             else if (type == typeof(ushort) || type == typeof(ushort?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToUInt16(bytes, 0));
+                setter(item, BitConverter.ToUInt16(bytes, 0));
             }
             else if (type == typeof(int) || type == typeof(int?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToInt32(bytes, 0));
+                setter(item, BitConverter.ToInt32(bytes, 0));
             }
             else if (type == typeof(uint) || type == typeof(uint?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToUInt32(bytes, 0));
+                setter(item, BitConverter.ToUInt32(bytes, 0));
             }
             else if (type == typeof(long) || type == typeof(long?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToInt64(bytes, 0));
+                setter(item, BitConverter.ToInt64(bytes, 0));
             }
             else if (type == typeof(ulong) || type == typeof(ulong?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToUInt64(bytes, 0));
+                setter(item, BitConverter.ToUInt64(bytes, 0));
             }
             else if (type == typeof(float) || type == typeof(float?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToSingle(bytes, 0));
+                setter(item, BitConverter.ToSingle(bytes, 0));
             }
             else if (type == typeof(double) || type == typeof(double?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToDouble(bytes, 0));
+                setter(item, BitConverter.ToDouble(bytes, 0));
             }
             else if (type == typeof(byte[]))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, bytes);
+                setter(item, bytes);
             }
             else if (type == typeof(bool) || type == typeof(bool?))
             {
                 var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, BitConverter.ToBoolean(bytes, 0));
+                setter(item, BitConverter.ToBoolean(bytes, 0));
             }
             else if(type == typeof(byte) || type == typeof(byte?))
             {
                 var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes);
-                property.SetValue(item, bytes[0]);
+                setter(item, bytes[0]);
             }
         }
 
+        private static void SetOpenValueForClr<TTable>(ColumnMap columnMap, TTable item, object sqlValue)
+        {
+            var type = columnMap.ClrType;
+
+            var setter = ((ColumnMap<TTable>) columnMap).ValueSetter;
+
+            if (type == typeof(string))
+                setter(item, sqlValue);     // There is no reflection here! Only compiled expressions
+            else if (type == typeof(DateTime) || type == typeof(DateTime?))
+            {
+                var bytes = (byte[])sqlValue;
+                var ticks = BitConverter.ToInt64(bytes, 0);
+                var date = DateTime.FromBinary(ticks);
+                setter(item, date);
+            }
+            else if (type == typeof(short) || type == typeof(short?))
+                setter(item, Convert.ToInt16(sqlValue));
+            else if (type == typeof(ushort) || type == typeof(ushort?))
+                setter(item, Convert.ToUInt16(sqlValue));
+            else if (type == typeof(int) || type == typeof(int?))
+                setter(item, Convert.ToInt32(sqlValue));
+            else if (type == typeof(uint) || type == typeof(uint?))
+                setter(item, Convert.ToUInt32(sqlValue));
+            else if (type == typeof(long) || type == typeof(long?))
+            {
+                var value = BitConverter.ToInt64((byte[])sqlValue, 0);
+                setter(item, value);
+            }
+            else if (type == typeof(ulong) || type == typeof(ulong?))
+            {
+                var value = BitConverter.ToUInt64((byte[])sqlValue, 0);
+                setter(item, value);
+            }
+            else if (type == typeof(byte) || type == typeof(byte?))
+                setter(item, Convert.ToByte(sqlValue));
+            else if (type == typeof(bool) || type == typeof(bool?))
+                setter(item, Convert.ToBoolean(sqlValue));
+            else if (type == typeof(double) || type == typeof(double?))
+                setter(item, Convert.ToDouble(sqlValue));
+            else if (type == typeof(float) || type == typeof(float?))
+                setter(item, Convert.ToSingle(sqlValue));
+            else if (type == typeof(byte[]))
+                setter(item, (byte[])sqlValue);
+        }
+
+        private static object GetOpenValueForSql(Type type, object value)
+        {
+            if (type == typeof(int) || type == typeof(short) || type == typeof(double) || type == typeof(byte) ||
+                type == typeof(uint) || type == typeof(ushort) || type == typeof(float))
+                return value;
+
+            if (type == typeof(int?) || type == typeof(short?) || type == typeof(double?) || type == typeof(byte?) ||
+                type == typeof(uint?) || type == typeof(ushort?) || type == typeof(float?))
+                return value;
+
+            if (type == typeof(string) || type == typeof(byte[]))       // reference types
+                return value;
+
+            if (type == typeof(long) || type == typeof(long?))
+                return BitConverter.GetBytes((long)value);
+
+            if (type == typeof(ulong) || type == typeof(ulong?))
+                return BitConverter.GetBytes((ulong)value);
+
+            if (type == typeof(DateTime) || type == typeof(DateTime?))
+            {
+                var date = (DateTime)value;
+                var ticks = date.ToBinary();
+                return BitConverter.GetBytes(ticks);
+            }
+
+            if (type == typeof(bool) || type == typeof(bool?))
+                return Convert.ToInt32(value);
+
+            throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite.");
+        }
+
+
         private ICryptoProvider GetEncryptor(Type tableType, byte[] solt = null)
         {
-            if (_keys.ContainsKey(tableType))
-                _cryptor.SetKey(_keys[tableType]);
+            if (_tables.ContainsKey(tableType) && _tables[tableType].Key != null)
+                _cryptor.SetKey(_tables[tableType].Key);
             else
             {
                 if(_defaultKey == null)

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using CryptoSQLite.Mapping;
 
-namespace CryptoSQLite
+namespace CryptoSQLite.Extensions
 {
     internal static class ReflectionExtensions
     {
@@ -61,13 +62,13 @@ namespace CryptoSQLite
             var attribute = property.GetCustomAttribute<ForeignKeyAttribute>();
             return attribute;
         }
-
+        /*
         public static bool IsForeignKey(this PropertyInfo property)
         {
             var attribute = property.GetCustomAttributes<ForeignKeyAttribute>();
             return attribute.Any();
         }
-
+        */
         /// <summary>
         /// Gets table name using CryptoTable Attribute
         /// </summary>
@@ -113,7 +114,12 @@ namespace CryptoSQLite
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
 
-        public static IEnumerable<PropertyInfo> GetColumns(this Type tableType)
+        /// <summary>
+        /// Returns all compatible properties that can be used as a columns in SQL database file
+        /// </summary>
+        /// <param name="tableType"></param>
+        /// <returns></returns>
+        public static IEnumerable<PropertyInfo> CompatibleProperties(this Type tableType)
         {
             // Point of this method is to find those properties, that can be used as columns in table.
             // Only properties, that have public getter and public setter can be used as column in table.
@@ -151,7 +157,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table for which value getter will be created</typeparam>
         /// <param name="property">property for which value getter will be created</param>
         /// <returns>Value getter</returns>
-        public static Func<TTable, object> ValueGetter<TTable>(this PropertyInfo property)
+        public static Func<TTable, object> ValueGetter<TTable>(this PropertyInfo property) where TTable : class 
         {
             if (typeof(TTable) != property.DeclaringType)
                 throw new ArgumentException(nameof(property));
@@ -169,7 +175,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table for which value setter will be created</typeparam>
         /// <param name="property">property for which value setter will be created</param>
         /// <returns>Value setter</returns>
-        public static Action<TTable, object> ValueSetter<TTable>(this PropertyInfo property)
+        public static Action<TTable, object> ValueSetter<TTable>(this PropertyInfo property) where TTable : class 
         {
             if (typeof(TTable) != property.DeclaringType)
                 throw new ArgumentException(nameof(property));
@@ -184,6 +190,41 @@ namespace CryptoSQLite
             var lambda = Expression.Lambda<Action<TTable, object>>(assignExpr, instanceParameter, valueParameter);
 
             return lambda.Compile();
+        }
+
+        /// <summary>
+        /// Returns all information about foreign key constraint
+        /// </summary>
+        /// <typeparam name="TTable">Type of table</typeparam>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public static ForeignKey ForeignKeyInfo<TTable>(this PropertyInfo property)
+        {
+            if (property.PropertyType != typeof(int) && property.PropertyType != typeof(uint) &&
+                property.PropertyType != typeof(short) && property.PropertyType != typeof(ushort))
+                throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTable attribute.");
+
+            var table = typeof(TTable);
+            var navigationPropertyNameToReferencedTable = property.ForeignKey().NavigationPropertyName;
+
+            if (string.IsNullOrEmpty(navigationPropertyNameToReferencedTable))
+                throw new CryptoSQLiteException($"Foreign Key Attribute in property '{property.Name}' can't have empty name.");
+
+            var navigationProperty = table.NavigationProperty(navigationPropertyNameToReferencedTable);
+            if (navigationProperty == null)
+                throw new CryptoSQLiteException($"Can't find Navigation Property for '{property.Name}'. Check if ForeignKey Attribute has correct Name.");
+
+            var referencedTable = navigationProperty.PropertyType;
+
+            var referencedTableName = referencedTable.TableName();
+
+            var primaryKeyInReferencedTable = referencedTable.GetRuntimeProperties().FirstOrDefault(p => p.IsPrimaryKey());  // check if table has PrimaryKey Attribute
+            if (primaryKeyInReferencedTable == null)
+                throw new CryptoSQLiteException($"Table {referencedTableName} doesn't contain property with PrimaryKey Attribute.");
+
+            var primaryKeyColumnNameInReferencedTable = primaryKeyInReferencedTable.ColumnName();
+
+            return new ForeignKey(referencedTableName, primaryKeyColumnNameInReferencedTable, property.Name, property.ColumnName(), navigationProperty.Name, referencedTable);
         }
     }
 }

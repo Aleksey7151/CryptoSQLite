@@ -1,34 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
 {
     internal static class SqlCmds
     {
-        public static string CmdCreateTable(Type table, FullTextSearchFlags fullTextSearchFlags = FullTextSearchFlags.None)
+        public static string CmdCreateTable(TableMap table, FullTextSearchFlags fullTextSearchFlags = FullTextSearchFlags.None)
         {
             var fts3 = (fullTextSearchFlags & FullTextSearchFlags.FTS3) != 0;
             var fts4 = (fullTextSearchFlags & FullTextSearchFlags.FTS4) != 0;
 
             var virtualTable = (fts3 || fts4) ? "VIRTUAL " : "";
 
-            var usingFts = fts4 ? " USING FTS4" : fts3 ? " USING FTS3" : ""; 
+            var usingFts = fts4 ? " USING FTS4" : fts3 ? " USING FTS3" : "";
 
-            var columns = table.GetColumns().ToArray();
+            var columns = table.Columns.Values.ToList();
 
-            var cmd = $"CREATE {virtualTable}TABLE IF NOT EXISTS {table.TableName()}{usingFts}\n(\n";
+            var cmd = $"CREATE {virtualTable}TABLE IF NOT EXISTS {table.Name}{usingFts}\n(\n";
 
             var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 
-            if (columns.Any(p => p.IsEncrypted()))
+            if (table.HasEncryptedColumns)
                 mappedColumns.Add($"{CryptoSQLiteConnection.SoltColumnName} BLOB");
 
             var joinedColumns = string.Join(",\n", mappedColumns);
 
+            var foreignKeys = table.Columns.ForeignKeys();
             
-            var mappedForeignKeys = string.Join(",\n", columns.ForeignKeys(table).Select(fk => $"FOREIGN KEY({fk.ForeignKeyColumnName}) REFERENCES {fk.ReferencedTableName}({fk.ReferencedColumnName})"));
+            var mappedForeignKeys = string.Join(",\n", foreignKeys.Select(fk => $"FOREIGN KEY({fk.ForeignKeyColumnName}) REFERENCES {fk.ReferencedTableName}({fk.ReferencedColumnName})"));
 
             if (mappedForeignKeys.Length > 0)
                 joinedColumns += ",\n" + mappedForeignKeys;
@@ -66,9 +66,11 @@ namespace CryptoSQLite
             return cmd;
         }
 
-        public static string CmdSelect(string tableName, string columnName)
+        public static string CmdSelect(string tableName, string columnName, object columnValue)
         {
-            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} = (?)";
+            var value = columnValue == null ? "IS NULL" : "= (?)";
+
+            var cmd = $"SELECT * FROM {tableName} WHERE {columnName} {value}";
 
             return cmd;
         }
@@ -78,31 +80,11 @@ namespace CryptoSQLite
             return $"SELECT * FROM {tableName}";
         }
 
-        public static string CmdFindInTable(string tableName, string columnName, object lower, object upper)
+        public static string CmdDeleteRow(string tableName, string columnName, object columnValue)
         {
-            if (lower != null && upper != null)
-            {
-                return $"SELECT * FROM {tableName} WHERE {columnName} BETWEEN (?) AND (?)";
-            }
-            if (lower != null)
-            {
-                return $"SELECT * FROM {tableName} WHERE {columnName} >= (?)";
-            }
-            if (upper != null)
-            {
-                return $"SELECT * FROM {tableName} WHERE {columnName} <= (?)";
-            }
-            return $"SELECT * FROM {tableName}";    // all table
-        }
+            var value = columnValue == null ? "IS NULL" : "= (?)";
 
-        public static string CmdFindNullInTable(string tableName, string columnName)
-        {
-            return $"SELECT * FROM {tableName} WHERE {columnName} IS NULL";
-        }
-
-        public static string CmdDeleteRow(string tableName, string columnName)
-        {
-            var cmd = $"DELETE FROM {tableName} WHERE {columnName} = (?)";
+            var cmd = $"DELETE FROM {tableName} WHERE {columnName} {value}";
 
             return cmd;
         }
@@ -112,24 +94,24 @@ namespace CryptoSQLite
         /// </summary>
         /// <param name="column">ColumnAttribute map</param>
         /// <returns>string with column map</returns>
-        public static string MapPropertyToColumn(this PropertyInfo column)
+        public static string MapPropertyToColumn(this ColumnMap column)
         {
-            string clmnMap = $"{column.ColumnName()} {column.SqlType()}";
+            string clmnMap = $"{column.Name} {column.SqlType}";
 
             //TODO you need think here a lot
 
-            if (column.IsPrimaryKey() && column.IsAutoIncremental())
+            if (column.IsPrimaryKey && column.IsAutoIncremental)
             {
                 clmnMap += " PRIMARY KEY AUTOINCREMENT";
             }
-            else if (column.IsPrimaryKey())
+            else if (column.IsPrimaryKey)
             {
                 clmnMap += " PRIMARY KEY NOT NULL";
             }
-            else if (column.IsNotNull())
+            else if (column.IsNotNull)
             {
                 clmnMap += " NOT NULL";
-                var defaultValue = column.DefaultValue();
+                var defaultValue = column.DefaultValue;
                 if (defaultValue != null)
                 {
                     clmnMap += $" DEFAULT \"{defaultValue}\"";

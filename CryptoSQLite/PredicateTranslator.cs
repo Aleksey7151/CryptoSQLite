@@ -4,23 +4,26 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using CryptoSQLite.Extensions;
+using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
 {
-    internal class PredicateToSql
+    internal class PredicateTranslator
     {
         private readonly StringBuilder _builder = new StringBuilder();
 
-        private PropertyInfo[] _compatibleProperties;
+        private ColumnMap[] _mappedColumns;
 
         private string _tableName;
 
         private readonly List<object> _values = new List<object>();
 
-        public string DeleteToSqlCmd(LambdaExpression deleteExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values)
+        public string DeleteToSqlCmd(LambdaExpression deleteExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values)
         {
             _tableName = tableName;
-            _compatibleProperties = compatibleProperties;
+
+            _mappedColumns = mappedColumns.ToArray();
 
             _values.Clear();
 
@@ -31,6 +34,7 @@ namespace CryptoSQLite
             TranslateExpression(deleteExpression);
 
             _builder.Replace("= NULL", "IS NULL");
+
             _builder.Replace("<> NULL", "IS NOT NULL");
 
             values = _values.ToArray();
@@ -38,13 +42,10 @@ namespace CryptoSQLite
             return _builder.ToString();
         }
 
-        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, PropertyInfo[] compatibleProperties, out object[] values, string[] selectedPropertyNames = null)
+        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values, string[] selectedPropertyNames = null)
         {
-            if (compatibleProperties == null)
-                throw new ArgumentNullException(nameof(compatibleProperties));
-
             _tableName = tableName;
-            _compatibleProperties = compatibleProperties;
+            _mappedColumns = mappedColumns.ToArray();
 
             _values.Clear();
 
@@ -59,15 +60,15 @@ namespace CryptoSQLite
                     if(string.IsNullOrEmpty(propertyName))
                         throw new CryptoSQLiteException("Property Name for 'Select' can't be Null or Empty.");
 
-                    var clmn = compatibleProperties.FirstOrDefault(cp => cp.Name == propertyName);
+                    var clmn = mappedColumns.FirstOrDefault(cp => cp.PropertyName == propertyName); // if wrong property name passed
 
                     if (clmn == null)
                         throw new CryptoSQLiteException($"Table '{tableName}' doesn't contain property with name: '{propertyName}'.");
 
-                    if (clmn.IsEncrypted())
+                    if (clmn.IsEncrypted)       // we must read SoltColumn from database only if onle of selected properties has Encrypted attribute
                         hasEncrypted = true;
 
-                    columnNames.Add(clmn.ColumnName());
+                    columnNames.Add(clmn.Name);
                 }
 
                 if(hasEncrypted)
@@ -130,20 +131,20 @@ namespace CryptoSQLite
             if (memberExp.Expression != null && memberExp.Expression.NodeType == ExpressionType.Parameter)
             {
                 //Get real column name:
-                var prop = _compatibleProperties.FirstOrDefault(p => p.Name == memberExp.Member.Name);
-                if(prop == null)
+                var column = _mappedColumns.FirstOrDefault(col => col.PropertyName == memberExp.Member.Name);
+                if(column == null)
                     throw new ArgumentException($"Table {_tableName} doesn't contain column with name {memberExp.Member.Name}.");
 
-                _memberAccessLastType = prop.PropertyType;
+                _memberAccessLastType = column.ClrType;
 
                 // Check forbidden types, they can't be used in Predicate to find items, because they are stored in database in BLOB view.
-                if(OrmUtils.ForbiddenTypesInFindRequests.Contains(prop.PropertyType))
+                if(column.ClrType.IsForbiddenInFindRequests())
                     throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.");
 
-                if(prop.IsEncrypted())
-                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column {prop.ColumnName()} is Encrypted.");
+                if(column.IsEncrypted)
+                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column '{column.Name}' is Encrypted.");
 
-                _builder.Append(prop.ColumnName());  // set real column name
+                _builder.Append(column.Name);  // choose real column name
 
                 return memberExp;
             }

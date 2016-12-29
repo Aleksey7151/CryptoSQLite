@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CryptoSQLite
+namespace CryptoSQLite.Extensions
 {
-    internal static class Extensions
+    internal static class MemoryExtensions
     {
         public static void ZeroMemory(this byte[] buf)
         {

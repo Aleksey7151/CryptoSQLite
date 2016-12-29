@@ -787,7 +787,7 @@ namespace Tests
                 try
                 {
                     // Dependency diagram:  
-                    //                                     / ---> Account ---> Job                     / ---> 2 ---> 1             / ---> 1 ---> 2
+                    //                                     / ---> Account ---> Job                      / ---> 2 ---> 1             / ---> 1 ---> 2
                     //
                     //                 ManyRefTables ---> |  ---> Info                          1 ---> |  ---> 1            2 ---> |  ---> 2
                     //
