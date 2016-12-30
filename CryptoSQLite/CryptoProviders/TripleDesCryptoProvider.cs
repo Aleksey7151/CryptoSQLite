@@ -49,7 +49,7 @@ namespace CryptoSQLite.CryptoProviders
             _solt = BitConverter.ToUInt64(solt, 0);
         }
 
-        public void XorGamma(byte[] data, int dataLen = 0)
+        public void XorGamma(byte[] data, int columnNumber, int dataLen = 0)
         {
             if (_key1 == 0 && _key2 == 0 && _key3 == 0)
                 throw new NullReferenceException("Encryption key has not been installed.");
@@ -58,28 +58,29 @@ namespace CryptoSQLite.CryptoProviders
 
             var len = dataLen == 0 ? data.Length : dataLen;
 
-            var gamma = GetGamma(len);
+            var gamma = GetGamma(len, columnNumber);
 
             data.Xor(gamma, len);
 
             gamma.ZeroMemory();     // clean up
         }
 
-        private byte[] GetGamma(int count)
+        private byte[] GetGamma(int gammaLength, int columnNumber)
         {
-            if (count < 1)
+            if (gammaLength < 1)
                 throw new ArgumentException();
 
-            var takts = count / 8;
-            if (count % 8 > 0)
+            var takts = gammaLength / 8;
+            if (gammaLength % 8 > 0)
                 takts += 1;
 
             var gamma = new byte[takts * 8];
+            var solt = _solt ^ (ulong)columnNumber;
 
             for (var t = 0; t < takts; t++)
             {
                 _baseDes.SetKey(_key1);     // encrypt data
-                var tmp = _baseDes.ElectronicCodeBookEncrypt(_solt);
+                var tmp = _baseDes.ElectronicCodeBookEncrypt(solt);
 
                 _baseDes.SetKey(_key2);     // decrypt data using different key
                 tmp = _baseDes.ElectronicCodeBookDecrypt(tmp);
@@ -87,7 +88,7 @@ namespace CryptoSQLite.CryptoProviders
                 _baseDes.SetKey(_key3);     // encrypt data using differend key
                 tmp = _baseDes.ElectronicCodeBookEncrypt(tmp);
 
-                _solt ^= tmp;
+                solt ^= tmp;
 
                 for (var i = 0; i < 8; i++)
                     gamma[8 * t + i] = (byte)(tmp >> 8 * i);

@@ -44,12 +44,13 @@ namespace CryptoSQLite.Mapping
 
     internal class ColumnMap
     {
-        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey)
+        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, int columnNumber, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey)
         {
             Name = name;
             PropertyName = propertyName;
             ClrType = clrType;
             SqlType = sqlType;
+            ColumnNumber = columnNumber;
             IsPrimaryKey = isPrimaryKey;
             IsAutoIncremental = isAutoIncrement;
             IsEncrypted = isEncrypted;
@@ -78,6 +79,11 @@ namespace CryptoSQLite.Mapping
         /// SQL data type of column
         /// </summary>
         public string SqlType { get; }
+
+        /// <summary>
+        /// Represents the column (property) number in table (object)
+        /// </summary>
+        public int ColumnNumber { get; }
 
         /// <summary>
         /// Determines if column has PrimaryKey constraint
@@ -134,8 +140,8 @@ namespace CryptoSQLite.Mapping
 
     internal class ColumnMap<TTable> : ColumnMap, IValues<TTable>
     {
-        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey, Action<TTable, object> valueSetter, Func<TTable, object> valueGetter) 
-            : base(name, propertyName, clrType, sqlType, isPrimaryKey, isAutoIncrement, isEncrypted, isNotNull, defaultValue, isForeignKey, foreignKey)
+        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, int columnNumber, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey, Action<TTable, object> valueSetter, Func<TTable, object> valueGetter) 
+            : base(name, propertyName, clrType, sqlType, columnNumber, isPrimaryKey, isAutoIncrement, isEncrypted, isNotNull, defaultValue, isForeignKey, foreignKey)
         {
             ValueSetter = valueSetter;
             ValueGetter = valueGetter;

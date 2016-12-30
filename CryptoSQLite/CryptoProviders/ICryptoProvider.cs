@@ -21,7 +21,8 @@ namespace CryptoSQLite.CryptoProviders
         /// <paramref name="data"/> gamma.
         /// </summary>
         /// <param name="data">Data that must be encrypted or decrypted</param>
+        /// <param name="columnNumber">Number of column that must be encrypted</param>
         /// <param name="dataLen">Count of bytes that must be encrypted</param>
-        void XorGamma(byte[] data, int dataLen = 0);
+        void XorGamma(byte[] data, int columnNumber, int dataLen = 0);
     }
 }

@@ -16,22 +16,25 @@ namespace CryptoSQLite.CryptoProviders
             _solt = new byte[16];
         }
 
-        private byte[] GetGamma(int count)
+        private byte[] GetGamma(int gammaLength, int columnNumber)
         {
-            if (count < 1)
+            if (gammaLength < 1)
                 throw new ArgumentException();
 
-            var takts = count / 16;
-            if (count % 16 > 0)
+            var takts = gammaLength / 16;
+            if (gammaLength % 16 > 0)
                 takts += 1;
 
             var gamma = new byte[takts * 16];
+            var solt = new byte[16];
+            solt.MemCpy(_solt, solt.Length);
+            solt.UpdateSolt(columnNumber);
 
             for (var t = 0; t < takts; t++)
             {
-                var tmp = _aes.ElectronicCodeBook(_solt);    // get gamma from gost
+                var tmp = _aes.ElectronicCodeBook(solt);    // get gamma from gost
 
-                _solt.Xor(tmp, 16);
+                solt.Xor(tmp, 16);
                 
                 gamma.MemCpy(tmp, 16, 16*t);
 
@@ -41,7 +44,7 @@ namespace CryptoSQLite.CryptoProviders
             return gamma;
         }
 
-        public void XorGamma(byte[] data, int dataLen = 0)
+        public void XorGamma(byte[] data, int numberOfColumn, int dataLen = 0)
         {
             if (_key == null)
                 throw new NullReferenceException("Encryption key has not been installed.");
@@ -50,7 +53,7 @@ namespace CryptoSQLite.CryptoProviders
 
             var len = dataLen == 0 ? data.Length : dataLen;
 
-            var gamma = GetGamma(len);
+            var gamma = GetGamma(len, numberOfColumn);
 
             data.Xor(gamma, len);
 

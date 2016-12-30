@@ -341,5 +341,151 @@ namespace Tests
                 }
             }
         }
+
+        /// <summary>
+        /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
+        /// column must be correctly decrypted. 
+        /// </summary>
+        [Test]
+        public void SelectOnlyOneEncryptedColumnWhenTableContainsSeveralEncryptedColumns()
+        {
+            var item = SeveralColumns.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SeveralColumns>();
+                    db.CreateTable<SeveralColumns>();
+                    
+                    db.InsertItem(item);
+
+                    var elements = db.Select<SeveralColumns>(s => s.Id == 1, "Str2").ToArray();
+                    Assert.NotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == null);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
+        /// column must be correctly decrypted. 
+        /// </summary>
+        [Test]
+        public void SelectTwoEncryptedColumnWhenTableContainsSeveralEncryptedColumns()
+        {
+            var item = SeveralColumns.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SeveralColumns>();
+                    db.CreateTable<SeveralColumns>();
+
+                    db.InsertItem(item);
+
+                    var elements = db.Select<SeveralColumns>(s => s.Id == 1, "Str2", "Str4").ToArray();
+                    Assert.NotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == item.Str4);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
+        /// column must be correctly decrypted. 
+        /// </summary>
+        [Test]
+        public void SelectThreeEncryptedColumnWhenTableContainsSeveralEncryptedColumns()
+        {
+            var item = SeveralColumns.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SeveralColumns>();
+                    db.CreateTable<SeveralColumns>();
+
+                    db.InsertItem(item);
+
+                    var elements = db.Select<SeveralColumns>(s => s.Id == 1, "Str2", "Str4", "Str3").ToArray();
+                    Assert.NotNull(elements);
+                    Assert.IsTrue(elements.Length == 1);
+                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == item.Str3 && elements[0].Str4 == item.Str4);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+    }
+
+    [CryptoTable("SeveralColumns")]
+    internal class SeveralColumns
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string Str1 { get; set; }
+
+        [Encrypted]
+        public string Str2 { get; set; }
+
+        [Encrypted]
+        public string Str3 { get; set; }
+
+        [Encrypted]
+        public string Str4 { get; set; }
+
+        public bool Equals(SeveralColumns sc)
+        {
+            return Str1 == sc.Str1 && Str2 == sc.Str2 && Str3 == sc.Str3 && Str4 == sc.Str4;
+        }
+
+        public static SeveralColumns GetDefault()
+        {
+            return new SeveralColumns
+            {
+                Str1 = "Several Columns String 1",
+                Str2 = "Several Columns String 22",
+                Str3 = "Several Columns String 333",
+                Str4 = "Several Columns String 4444",
+            };
+        }
     }
 }

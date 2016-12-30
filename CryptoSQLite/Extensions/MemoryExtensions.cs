@@ -49,7 +49,7 @@ namespace CryptoSQLite.Extensions
             for (var i = 0; i < len; i++)
                 destination[i] ^= source[i];
         }
-
+        
         public static void Xor(this uint[] destination, uint[] source, int len)
         {
             if (destination.Length < len || source.Length < len)
@@ -73,6 +73,23 @@ namespace CryptoSQLite.Extensions
             if (dictionary.ContainsKey(key))
                 dictionary[key] = value;
             else dictionary.Add(key, value);
+        }
+
+        public static void UpdateSolt(this byte[] solt, int columnNumber)
+        {
+            var numb = BitConverter.GetBytes(columnNumber);
+            for (var i = 0; i < solt.Length; i++)
+            {
+                solt[i] ^= numb[i%4];
+            }
+        }
+
+        public static void UpdateSolt(this uint[] solt, int columnNumber)
+        {
+            for (var i = 0; i < solt.Length; i++)
+            {
+                solt[i] ^= (uint)columnNumber;
+            }
         }
     }
 }

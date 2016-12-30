@@ -37,7 +37,7 @@ namespace CryptoSQLite.CryptoProviders
             _solt = BitConverter.ToUInt64(solt, 0);
         }
 
-        public void XorGamma(byte[] data, int dataLen = 0)
+        public void XorGamma(byte[] data, int columnNumber, int dataLen = 0)
         {
             if (!_keyInstalled)
                 throw new NullReferenceException("Encryption key has not been installed.");
@@ -46,30 +46,31 @@ namespace CryptoSQLite.CryptoProviders
 
             var len = dataLen == 0 ? data.Length : dataLen;
 
-            var gamma = GetGamma(len);
+            var gamma = GetGamma(len, columnNumber);
 
             data.Xor(gamma, len);
 
             gamma.ZeroMemory();     // clean up
         }
 
-        private byte[] GetGamma(int count)
+        private byte[] GetGamma(int gammaLength, int columnNumber)
         {
-            if (count < 1)
+            if (gammaLength < 1)
                 throw new ArgumentException();
 
-            var takts = count / 8;
-            if (count % 8 > 0)
+            var takts = gammaLength / 8;
+            if (gammaLength % 8 > 0)
                 takts += 1;
 
             var gamma = new byte[takts * 8];
+            ulong solt = _solt ^ (ulong)columnNumber;
 
             for (var t = 0; t < takts; t++)
             {
                 // ReSharper disable once PossibleInvalidOperationException
-                var tmp = _baseDes.ElectronicCodeBookEncrypt(_solt);
+                var tmp = _baseDes.ElectronicCodeBookEncrypt(solt);
 
-                _solt ^= tmp;
+                solt ^= tmp;
 
                 for(var i = 0; i < 8; i++)
                     gamma[8*t + i] = (byte)(tmp >> 8*i);
