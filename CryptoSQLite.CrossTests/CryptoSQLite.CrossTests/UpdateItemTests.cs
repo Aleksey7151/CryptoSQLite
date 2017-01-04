@@ -317,6 +317,50 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
+        public void UpdateDecimalNumbers()
+        {
+            var item = DecimalNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DecimalNumbers>();
+                    db.CreateTable<DecimalNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<DecimalNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.Equals(item));
+
+                    element.MaxVal = 485425757831379.23413511m;
+                    element.MinVal = -962123383783414.15145344m;
+                    element.NullAble1 = null;
+                    element.NullAble2 = -27348992.2384723m;
+
+                    db.InsertOrReplaceItem(element);
+
+                    var updated = db.Table<DecimalNumbers>().ToArray()[0];
+                    Assert.IsNotNull(updated);
+                    Assert.IsTrue(element.Equals(updated));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public void UpdateFloatNumbers()
         {
             var item = FloatNumbers.GetDefault();
@@ -749,6 +793,50 @@ namespace CryptoSQLite.CrossTests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<FloatEncryptedNumbers>().ToArray()[0];
+                    Assert.IsNotNull(updated);
+                    Assert.IsTrue(element.Equals(updated));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void UpdateDecimalEncryptedNumbers()
+        {
+            var item = DecimalEncryptedNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DecimalEncryptedNumbers>();
+                    db.CreateTable<DecimalEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.Equals(item));
+
+                    element.MaxVal = 48539333421379.23413511m;
+                    element.MinVal = -96212314.1514558555344m;
+                    element.NullAble1 = null;
+                    element.NullAble2 = -23874827.8943333334298m;
+
+                    db.InsertOrReplaceItem(element);
+
+                    var updated = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
                     Assert.IsNotNull(updated);
                     Assert.IsTrue(element.Equals(updated));
                 }

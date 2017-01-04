@@ -674,6 +674,82 @@ namespace Tests.Tables
         }
     }
 
+    [CryptoTable("DecimalNumbers")]
+    internal class DecimalNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        public decimal MaxVal { get; set; }
+
+        public decimal MinVal { get; set; }
+
+        public decimal? NullAble1 { get; set; }
+
+        public decimal? NullAble2 { get; set; }
+
+        public static DecimalNumbers GetDefault()
+        {
+            return new DecimalNumbers
+            {
+                MaxVal = decimal.MaxValue,
+                MinVal = decimal.MinValue,
+                NullAble2 = null,
+                NullAble1 = decimal.MinValue
+            };
+        }
+
+        public bool Equals(DecimalNumbers o)
+        {
+            if (o == null) return false;
+
+            return MaxVal == o.MaxVal &&
+                   MinVal == o.MinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
+        }
+    }
+
+    [CryptoTable("DecimalEncryptedNumbers")]
+    internal class DecimalEncryptedNumbers
+    {
+        [PrimaryKey, AutoIncremental]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public decimal MaxVal { get; set; }
+
+        [Encrypted]
+        public decimal MinVal { get; set; }
+
+        [Encrypted]
+        public decimal? NullAble1 { get; set; }
+
+        [Encrypted]
+        public decimal? NullAble2 { get; set; }
+
+        public static DecimalEncryptedNumbers GetDefault()
+        {
+            return new DecimalEncryptedNumbers
+            {
+                MaxVal = decimal.MaxValue,
+                MinVal = decimal.MinValue,
+                NullAble2 = null,
+                NullAble1 = decimal.MinValue
+            };
+        }
+
+        public bool Equals(DecimalEncryptedNumbers o)
+        {
+            if (o == null) return false;
+
+            return MaxVal == o.MaxVal &&
+                   MinVal == o.MinVal &&
+                   NullAble1 == o.NullAble1 &&
+                   NullAble2 == o.NullAble2;
+        }
+    }
+
     [CryptoTable("BoolEncryptedNumbers")]
     internal class BoolEncryptedNumbers
     {
@@ -875,7 +951,7 @@ namespace Tests.Tables
 
         public bool Equal(AccountsData ac)
         {
-            return IsAdministrator == ac.IsAdministrator && Name == ac.Name && Password == ac.Password && 
+            return IsAdministrator == ac.IsAdministrator && Name == ac.Name && Password == ac.Password &&
                    Age == ac.Age &&
                    SocialSecureId == ac.SocialSecureId;
         }

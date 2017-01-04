@@ -112,7 +112,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -141,7 +141,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -171,7 +171,7 @@ namespace Tests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)

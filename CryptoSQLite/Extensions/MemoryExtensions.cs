@@ -17,6 +17,12 @@ namespace CryptoSQLite.Extensions
                 buf[i] = 0;
         }
 
+        public static void ZeroMemory(this int[] buf)
+        {
+            for (var i = 0; i < buf.Length; i++)
+                buf[i] = 0;
+        }
+
         public static void ZeroMemory(this ulong[] buf)
         {
             for (var i = 0; i < buf.Length; i++)

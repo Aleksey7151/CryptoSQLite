@@ -1308,7 +1308,7 @@ namespace CryptoSQLite
         /// </summary>
         /// <param name="tableName">table name</param>
         /// <param name="properties">list of compatible properties</param>
-        private static /*TableMap*/void CheckAttributes(string tableName, IList<PropertyInfo> properties)
+        private static void CheckAttributes(string tableName, IList<PropertyInfo> properties)
         {
             if (properties.Any(p => p.ColumnName() == SoltColumnName))
                 throw new CryptoSQLiteException(
@@ -1674,6 +1674,12 @@ namespace CryptoSQLite
                 encryptor.XorGamma(bytes, columnNumber);
                 return bytes;
             }
+            if (type == typeof(decimal) || type == typeof(decimal?))
+            {
+                var bytes = ((decimal) value).GetBytes();
+                encryptor.XorGamma(bytes, columnNumber);
+                return bytes;
+            }
             if (type == typeof(byte[]))
             {
                 var bytes = (byte[])value;
@@ -1709,16 +1715,16 @@ namespace CryptoSQLite
 
             var columnNumber = columnMap.ColumnNumber;
 
+            var bytes = (byte[])sqlValue;   // all encrypted properties stored in database file as BLOB type
+
             if (type == typeof(string))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 var openString = Encoding.Unicode.GetString(bytes, 0, bytes.Length);
                 setter(item, openString);       // Here is no Reflection now! we use Expressions
             }
             else if (type == typeof(DateTime) || type == typeof(DateTime?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 var ticks = BitConverter.ToInt64(bytes, 0);
                 var dateTime = DateTime.FromBinary(ticks);
@@ -1726,67 +1732,61 @@ namespace CryptoSQLite
             }
             else if (type == typeof(short) || type == typeof(short?))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToInt16(bytes, 0));
             }
             else if (type == typeof(ushort) || type == typeof(ushort?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToUInt16(bytes, 0));
             }
             else if (type == typeof(int) || type == typeof(int?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToInt32(bytes, 0));
             }
             else if (type == typeof(uint) || type == typeof(uint?))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToUInt32(bytes, 0));
             }
             else if (type == typeof(long) || type == typeof(long?))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToInt64(bytes, 0));
             }
             else if (type == typeof(ulong) || type == typeof(ulong?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToUInt64(bytes, 0));
             }
             else if (type == typeof(float) || type == typeof(float?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToSingle(bytes, 0));
             }
             else if (type == typeof(double) || type == typeof(double?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToDouble(bytes, 0));
             }
+            else if (type == typeof(decimal) || type == typeof(decimal?))
+            {
+                encryptor.XorGamma(bytes, columnNumber);
+                setter(item, bytes.ToDecimal());
+            }
             else if (type == typeof(byte[]))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, bytes);
             }
             else if (type == typeof(bool) || type == typeof(bool?))
             {
-                var bytes = (byte[]) sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, BitConverter.ToBoolean(bytes, 0));
             }
             else if(type == typeof(byte) || type == typeof(byte?))
             {
-                var bytes = (byte[])sqlValue;
                 encryptor.XorGamma(bytes, columnNumber);
                 setter(item, bytes[0]);
             }
@@ -1825,6 +1825,10 @@ namespace CryptoSQLite
                 var value = BitConverter.ToUInt64((byte[])sqlValue, 0);
                 setter(item, value);
             }
+            else if (type == typeof(decimal) || type == typeof(decimal?))
+            {
+                setter(item, ((byte[]) sqlValue).ToDecimal());
+            }
             else if (type == typeof(byte) || type == typeof(byte?))
                 setter(item, Convert.ToByte(sqlValue));
             else if (type == typeof(bool) || type == typeof(bool?))
@@ -1855,6 +1859,9 @@ namespace CryptoSQLite
 
             if (type == typeof(ulong) || type == typeof(ulong?))
                 return BitConverter.GetBytes((ulong)value);
+
+            if (type == typeof(decimal) || type == typeof(decimal?))
+                return ((decimal) value).GetBytes();
 
             if (type == typeof(DateTime) || type == typeof(DateTime?))
             {

@@ -808,6 +808,72 @@ namespace Tests
         }
 
         [Test]
+        public void InsertDecimalNumbers()
+        {
+            var item = DecimalNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DecimalNumbers>();
+                    db.CreateTable<DecimalNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<DecimalNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.Equals(item));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void InsertDecimalEncryptedNumbers()
+        {
+            var item = DecimalEncryptedNumbers.GetDefault();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<DecimalEncryptedNumbers>();
+                    db.CreateTable<DecimalEncryptedNumbers>();
+
+                    db.InsertItem(item);
+
+                    var element = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
+
+                    Assert.IsNotNull(element);
+                    Assert.IsTrue(element.Equals(item));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public void InserdBlobData()
         {
             var item = new BlobData

@@ -117,7 +117,7 @@ namespace CryptoSQLite
             if (constExp.Value != null)
             {
                 if(OrmUtils.TypesForOnlyNullFindRequests.Contains(_memberAccessLastType))
-                    throw new CryptoSQLiteException("Properties with types 'UInt64?', 'Int64?', 'DateTime?' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements.");
+                    throw new CryptoSQLiteException("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements.");
                 
                 // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL in SQL request.
                 _values.Add(constExp.Value);
@@ -139,7 +139,7 @@ namespace CryptoSQLite
 
                 // Check forbidden types, they can't be used in Predicate to find items, because they are stored in database in BLOB view.
                 if(column.ClrType.IsForbiddenInFindRequests())
-                    throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.");
+                    throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.");
 
                 if(column.IsEncrypted)
                     throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column '{column.Name}' is Encrypted.");

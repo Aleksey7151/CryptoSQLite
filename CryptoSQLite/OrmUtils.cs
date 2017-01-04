@@ -31,12 +31,12 @@ namespace CryptoSQLite
         public static Type[] CompatibleBlobTypes =
         {
             typeof(long), typeof(ulong), typeof(DateTime), typeof(byte[]),
-            typeof(long?), typeof(ulong?), typeof(DateTime?)
+            typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(decimal), typeof(decimal?)
         };
 
         public static Type[] ForbiddenTypesInFindRequests =
         {
-            typeof(long), typeof(ulong), typeof(DateTime)
+            typeof(long), typeof(ulong), typeof(DateTime), typeof(decimal)
         };
 
         public static bool IsForbiddenInFindRequests(this Type type)
@@ -48,7 +48,7 @@ namespace CryptoSQLite
         // because this types stored in database in BLOB type.
         public static Type[] TypesForOnlyNullFindRequests =
         {
-            typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[])
+            typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[]), typeof(decimal?)
         };
 
         

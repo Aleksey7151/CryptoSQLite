@@ -120,7 +120,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -149,7 +149,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -179,7 +179,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -1329,7 +1329,7 @@ namespace CryptoSQLite.CrossTests
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal) >= 0);
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal) >= 0);
                     return;
                 }
                 catch (Exception ex)
@@ -1412,6 +1412,121 @@ namespace CryptoSQLite.CrossTests
                 {
                     db.Dispose();
                 }
+            }
+        }
+
+        [Test]
+        public async Task NullableDecimal_Equal_To_Null_Predicate()
+        {
+            var item1 = DecimalNumbers.GetDefault();
+            var item2 = DecimalNumbers.GetDefault();
+            item2.NullAble2 = 9492893892.29384928m;
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<DecimalNumbers>();
+                    await db.CreateTableAsync<DecimalNumbers>();
+
+
+                    await db.InsertItemAsync(item1);
+                    await db.InsertItemAsync(item2);
+
+                    var result = await db.FindAsync<DecimalNumbers>(a => a.NullAble2 == null);
+
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 1);
+                    Assert.IsTrue(table[0].Equals(item1));
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public async Task NullableDecimal_Not_Equal_To_Null_Predicate()
+        {
+            var item1 = DecimalNumbers.GetDefault();
+            var item2 = DecimalNumbers.GetDefault();
+            item2.NullAble2 = 9492893892.29384928m;
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<DecimalNumbers>();
+                    await db.CreateTableAsync<DecimalNumbers>();
+
+
+                    await db.InsertItemAsync(item1);
+                    await db.InsertItemAsync(item2);
+
+                    var result = await db.FindAsync<DecimalNumbers>(a => a.NullAble2 != null);
+
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 1);
+                    Assert.IsTrue(table[0].Equals(item2));
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public async Task NullableDecimal_Equal_To_Explicit_Value_Forbidden_In_Predicate()
+        {
+            var item1 = DecimalNumbers.GetDefault();
+            var item2 = DecimalNumbers.GetDefault();
+            item2.NullAble2 = 9492893892.29384928m;
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<DecimalNumbers>();
+                    await db.CreateTableAsync<DecimalNumbers>();
+
+
+                    await db.InsertItemAsync(item1);
+                    await db.InsertItemAsync(item2);
+
+                    var result = await db.FindAsync<DecimalNumbers>(a => a.NullAble2 == 1231312333m);
+
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
             }
         }
     }
