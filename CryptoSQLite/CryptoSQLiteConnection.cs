@@ -163,6 +163,12 @@ namespace CryptoSQLite
         void DeleteTable<TTable>() where TTable : class;
 
         /// <summary>
+        /// Deletes all data inside the table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        void ClearTable<TTable>() where TTable : class;
+        
+        /// <summary>
         /// Inserts new element (row) in table.
         /// The table must be already created.
         /// </summary>
@@ -310,6 +316,12 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
         /// <exception cref="CryptoSQLiteException"></exception>
         Task DeleteTableAsync<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Deletes all data inside the table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        Task ClearTableAsync<TTable>() where TTable : class;
 
         /// <summary>
         /// Inserts new element (row) in table.
@@ -494,6 +506,15 @@ namespace CryptoSQLite
         public async Task DeleteTableAsync<TTable>() where TTable : class
         {
             await Task.Run(() => _connection.DeleteTable<TTable>());
+        }
+
+        /// <summary>
+        /// Deletes all data inside the table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        public async Task ClearTableAsync<TTable>() where TTable : class
+        {
+            await Task.Run(() => _connection.CreateTable<TTable>());
         }
 
         /// <summary>
@@ -880,6 +901,30 @@ namespace CryptoSQLite
 
             if (_tables.ContainsKey(table))
                 _tables.Remove(table);
+        }
+
+        /// <summary>
+        /// Deletes all data inside the table <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        public void ClearTable<TTable>() where TTable : class
+        {
+            var table = typeof(TTable);
+
+            var tableName = table.TableName();
+
+            try
+            {
+                _connection.Execute(SqlCmds.CmdClearTable(tableName));
+                // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
+            }
+            catch (SQLiteException ex)
+            {
+                if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
+                    throw new CryptoSQLiteException(
+                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.");
+                throw new CryptoSQLiteException(ex.Message, "Unknown");
+            }
         }
 
         /// <summary>

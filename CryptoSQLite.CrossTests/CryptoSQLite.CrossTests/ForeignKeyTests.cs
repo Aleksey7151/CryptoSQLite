@@ -997,6 +997,49 @@ namespace CryptoSQLite.CrossTests
                 Assert.Fail();
             }
         }
+
+        // You can't clear table if another table referenced on this table using foreign key constraint.
+        [Test]
+        public void ClearTableWhenItIsForeignKeyDependencyForOtherTables()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SimpleReference>();
+                    db.DeleteTable<Simple>();
+
+                    db.CreateTable<Simple>();
+                    db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
+
+                    var simple1 = new Simple { SimpleString = "Some Simple String 1", SimpleValue = 283423 };
+                    db.InsertItem(simple1);
+
+                    var simpleRef1 = new SimpleReference
+                    {
+                        SomeData = "Some Data Descriptionen 1",
+                        InfoRefId = 1 /*Row Doesn't exist in Infos!!!*/
+                    };
+                    db.InsertItem(simpleRef1);
+
+                    db.ClearTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.IsTrue(cex.Message.IndexOf("because other tables referenced on her, using ForeignKey Constrait.", StringComparison.Ordinal) >= 0);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+                Assert.Fail();
+            }
+        }
     }
 }
 

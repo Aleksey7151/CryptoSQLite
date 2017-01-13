@@ -125,6 +125,11 @@ namespace CryptoSQLite
             return $"DROP TABLE IF EXISTS \"{tableName}\"";
         }
 
+        public static string CmdClearTable(string tableName)
+        {
+            return $"DELETE FROM {tableName}";  // SQLite doesn't have TRUNCATE TABLE command.
+        }
+
         public static string CmdGetTableInfo(string tableName)
         {
             return $"PRAGMA TABLE_INFO(\"{tableName}\")";
