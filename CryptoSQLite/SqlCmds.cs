@@ -75,6 +75,13 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdSelectTop(string tableName)
+        {
+            var cmd = $"SELECT * FROM {tableName} LIMIT (?)";
+
+            return cmd;
+        }
+
         public static string CmdSelectAllTable(string tableName)
         {
             return $"SELECT * FROM {tableName}";
@@ -85,6 +92,17 @@ namespace CryptoSQLite
             var value = columnValue == null ? "IS NULL" : "= (?)";
 
             var cmd = $"DELETE FROM {tableName} WHERE {columnName} {value}";
+
+            return cmd;
+        }
+
+        public static string CmdCount(string tableName, string columnName = null, bool isDistinct = false)
+        {
+            var column = columnName ?? "*";
+
+            var distinct = isDistinct ? "DISTINCT " : "";
+
+            var cmd = $"SELECT COUNT({distinct}{column}) FROM {tableName}";
 
             return cmd;
         }

@@ -19,6 +19,29 @@ namespace CryptoSQLite
 
         private readonly List<object> _values = new List<object>();
 
+        public string CountToSqlCmd(LambdaExpression whereExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values)
+        {
+            _tableName = tableName;
+
+            _mappedColumns = mappedColumns.ToArray();
+
+            _values.Clear();
+
+            _builder.Clear();
+
+            _builder.Append($"SELECT COUNT(*) FROM {tableName} WHERE ");
+
+            TranslateExpression(whereExpression);
+
+            _builder.Replace("= NULL", "IS NULL");
+
+            _builder.Replace("<> NULL", "IS NOT NULL");
+
+            values = _values.ToArray();
+
+            return _builder.ToString();
+        }
+
         public string DeleteToSqlCmd(LambdaExpression deleteExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values)
         {
             _tableName = tableName;

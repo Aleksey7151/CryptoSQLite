@@ -80,6 +80,7 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="CheckTableStructureTests.cs" />
     <Compile Include="ClearTableTests.cs" />
+    <Compile Include="CountTests.cs" />
     <Compile Include="DeleteLinqTests.cs" />
     <Compile Include="DifferentKeysForDifferentTables.cs" />
     <Compile Include="NotNullAndDefaultValueTests.cs" />

@@ -167,7 +167,38 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table.</typeparam>
         void ClearTable<TTable>() where TTable : class;
-        
+
+        /// <summary>
+        /// Returns the number of records in table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <returns></returns>
+        int Count<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Returns the number of records in table that satisfying the condition defined in <paramref name="predicate"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="predicate">Condition</param>
+        /// <returns></returns>
+        int Count<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the number of values (NULL values won't be counted) for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        int Count<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the number of distinct values for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        int CountDistinct<TTable>(string columnName) where TTable : class;
+
         /// <summary>
         /// Inserts new element (row) in table.
         /// The table must be already created.
@@ -257,6 +288,14 @@ namespace CryptoSQLite
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties)
             where TTable : class, new();
+
+        /// <summary>
+        /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="count">Count of first elements, that will be returned.</param>
+        /// <returns></returns>
+        IEnumerable<TTable> SelectTop<TTable>(int count) where TTable : class, new();
     }
 
     /// <summary>
@@ -322,6 +361,37 @@ namespace CryptoSQLite
         /// </summary>
         /// <typeparam name="TTable">Type of table.</typeparam>
         Task ClearTableAsync<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Returns the number of records in table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <returns></returns>
+        Task<int> CountAsync<TTable>() where TTable : class;
+
+        /// <summary>
+        /// Returns the number of records in table that satisfying the condition defined in <paramref name="predicate"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="predicate">Condition</param>
+        /// <returns></returns>
+        Task<int> CountAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the number of values (NULL values won't be counted) for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        Task<int> CountAsync<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the number of distinct values for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        Task<int> CountDistinctAsync<TTable>(string columnName) where TTable : class;
 
         /// <summary>
         /// Inserts new element (row) in table.
@@ -414,6 +484,14 @@ namespace CryptoSQLite
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new();
+
+        /// <summary>
+        /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="count">Count of first elements, that will be returned.</param>
+        /// <returns></returns>
+        Task<IEnumerable<TTable>> SelectTopAsync<TTable>(int count) where TTable : class, new();
 
     }
 
@@ -515,6 +593,49 @@ namespace CryptoSQLite
         public async Task ClearTableAsync<TTable>() where TTable : class
         {
             await Task.Run(() => _connection.CreateTable<TTable>());
+        }
+
+        /// <summary>
+        /// Returns the number of records in table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <returns></returns>
+        public async Task<int> CountAsync<TTable>() where TTable : class
+        {
+            return await Task.Run(() => _connection.Count<TTable>());
+        }
+
+        /// <summary>
+        /// Returns the number of records in table that satisfying the condition defined in <paramref name="predicate"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="predicate">Condition</param>
+        /// <returns></returns>
+        public async Task<int> CountAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            return await Task.Run(() => _connection.Count(predicate));
+        }
+
+        /// <summary>
+        /// Returns the number of values (NULL values won't be counted) for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        public async Task<int> CountAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.Count<TTable>(columnName));
+        }
+
+        /// <summary>
+        /// Returns the number of distinct values for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        public async Task<int> CountDistinctAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.CountDistinct<TTable>(columnName));
         }
 
         /// <summary>
@@ -634,6 +755,17 @@ namespace CryptoSQLite
         {
             var elements = await Task.Run(() => _connection.Select(predicate, selectedProperties));
             return elements;
+        }
+
+        /// <summary>
+        /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="count">Count of first elements, that will be returned.</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TTable>> SelectTopAsync<TTable>(int count) where TTable : class, new()
+        {
+            return await Task.Run(() => _connection.SelectTop<TTable>(count));
         }
 
 
@@ -888,7 +1020,7 @@ namespace CryptoSQLite
             try
             {
                 _connection.Execute(SqlCmds.CmdDeleteTable(tableName));
-                    // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
+                // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
             catch (SQLiteException ex)
             {
@@ -909,9 +1041,9 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of table.</typeparam>
         public void ClearTable<TTable>() where TTable : class
         {
-            var table = typeof(TTable);
+            var tableMap = CheckTable<TTable>();
 
-            var tableName = table.TableName();
+            var tableName = tableMap.Name;
 
             try
             {
@@ -925,6 +1057,155 @@ namespace CryptoSQLite
                         $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.");
                 throw new CryptoSQLiteException(ex.Message, "Unknown");
             }
+        }
+
+        /// <summary>
+        /// Returns the number of records in table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <returns></returns>
+        public int Count<TTable>() where TTable : class
+        {
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            var countCmd = SqlCmds.CmdCount(tableName);
+
+            try
+            {
+                var queryable = _connection.Query(countCmd);
+
+                foreach (var row in queryable)
+                {
+                    foreach (var column in row)
+                    {
+                        return column.ToInt();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                var msg = ex.Message;
+                throw;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns the number of records in table that satisfying the condition defined in <paramref name="predicate"/>
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="predicate">Condition</param>
+        /// <returns></returns>
+        public int Count<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            object[] values;
+
+            var countCmd = _predicateTranslator.CountToSqlCmd(predicate, tableName, tableMap.Columns.Values, out values);
+
+            try
+            {
+                var queryable = _connection.Query(countCmd, values);
+
+                foreach (var row in queryable)
+                {
+                    foreach (var column in row)
+                    {
+                        return column.ToInt();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                var msg = ex.Message;
+                throw;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns the number of values (NULL values won't be counted) for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        public int Count<TTable>(string columnName) where TTable : class
+        {
+            if(string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var countCmd = SqlCmds.CmdCount(tableName, columnName);
+
+            try
+            {
+                var queryable = _connection.Query(countCmd);
+
+                foreach (var row in queryable)
+                {
+                    foreach (var column in row)
+                    {
+                        return column.ToInt();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                var msg = ex.Message;
+                throw;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns the number of distinct values for the specified column
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="columnName">Name of specified column</param>
+        /// <returns></returns>
+        public int CountDistinct<TTable>(string columnName) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var countCmd = SqlCmds.CmdCount(tableName, columnName, true);
+
+            try
+            {
+                var queryable = _connection.Query(countCmd);
+
+                foreach (var row in queryable)
+                {
+                    foreach (var column in row)
+                    {
+                        return column.ToInt();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                var msg = ex.Message;
+                throw;
+            }
+            return 0;
         }
 
         /// <summary>
@@ -1195,6 +1476,40 @@ namespace CryptoSQLite
                 ProcessRow(mappedColumns, row, item);
 
                 FindReferencedTables(item, selectedProperties); // here we get all referenced tables if they exist
+
+                items.Add(item);
+            }
+
+            return items;
+        }
+
+        /// <summary>
+        /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
+        /// </summary>
+        /// <typeparam name="TTable"></typeparam>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public IEnumerable<TTable> SelectTop<TTable>(int count) where TTable : class, new()
+        {
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            var cmd = SqlCmds.CmdSelectTop(tableName);
+
+            var table = ReadRowsFromDatabase(cmd, new object[]{count});
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+
+                ProcessRow(mappedColumns, row, item);
+
+                FindReferencedTables(item); // here we get all referenced tables if they exist
 
                 items.Add(item);
             }

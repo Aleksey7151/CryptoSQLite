@@ -452,6 +452,52 @@ namespace Tests
                 }
             }
         }
+
+        [Test]
+        public void SelectTop_Items_From_Table()
+        {
+            var item1 = IntNumbers.GetDefault();
+            item1.IntMaxVal = 9;
+            var item2 = IntNumbers.GetDefault();
+            item2.IntMaxVal = 7;
+            var item3 = IntNumbers.GetDefault();
+            item3.IntMaxVal = 13;
+            var item4 = IntNumbers.GetDefault();
+            item4.IntMaxVal = 7;
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<IntNumbers>();
+                    db.CreateTable<IntNumbers>();
+
+                    db.InsertItem(item1);
+                    db.InsertItem(item2);
+                    db.InsertItem(item3);
+                    db.InsertItem(item4);
+
+                    var result = db.SelectTop<IntNumbers>(2).ToArray();
+
+                    Assert.IsTrue(result.Length == 2);
+
+                    Assert.IsTrue(result[0].Equals(item1));
+                    Assert.IsTrue(result[1].Equals(item2));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
     }
 
     [CryptoTable("SeveralColumns")]

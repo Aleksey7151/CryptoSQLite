@@ -103,13 +103,13 @@ namespace CryptoSQLite.Extensions
                 return "INTEGER";
 
             if (OrmUtils.CompatibleTextTypes.Contains(type))
-                return "TEXT";
+                return "TEXT";      // by default SQLite can store 1.000.000.000 bytes
 
             if (OrmUtils.CompatibleRealTypes.Contains(type))
                 return "REAL";
 
             if (OrmUtils.CompatibleBlobTypes.Contains(type))
-                return "BLOB";
+                return "BLOB";      // by default SQLite can store 1.000.000.000 bytes
 
             throw new Exception($"Type {type} is not compatible with CryptoSQLite.");
         }
