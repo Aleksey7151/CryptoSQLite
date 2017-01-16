@@ -124,6 +124,14 @@ namespace CryptoSQLiteSample.iOS
                 db.Delete<Tasks>(t => t.Price == null || t.IsDone);
 
                 db.Delete<Tasks>(t => t.Price < 1300 && t.Description == "Description_1");
+
+				// NOW WE CAN CALCULATE NUMBER OF ROWS, THAT SATISFYING TO SPECIFIC CONDITIONS
+				db.Count<Tasks>();							// returns count of records in table "Tasks"
+				db.Count<Tasks>(t => t.IsDone == true);		// returns count of completed tasks
+				db.Count<Tasks>("PriceForTask");			// returns count of records, that have not null value in column "PriceForTask"
+				db.CountDistinct<Tasks>("PriceForTask");	// returns count of records, that have distinct values in column "PriceForTask"
+
+				db.SelectTop<Tasks>(3);		// Returns first three elements from table Tasks
             }
             catch (Exception ex)
             {
