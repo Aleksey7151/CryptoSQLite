@@ -19,7 +19,8 @@ namespace CryptoSQLite
 
         private readonly List<object> _values = new List<object>();
 
-        public string CountToSqlCmd(LambdaExpression whereExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values)
+        public string TraslateToSqlStatement(LambdaExpression predicate, string tableName,
+            ICollection<ColumnMap> mappedColumns, out object[] values)
         {
             _tableName = tableName;
 
@@ -29,85 +30,10 @@ namespace CryptoSQLite
 
             _builder.Clear();
 
-            _builder.Append($"SELECT COUNT(*) FROM {tableName} WHERE ");
-
-            TranslateExpression(whereExpression);
+            TranslateExpression(predicate);
 
             _builder.Replace("= NULL", "IS NULL");
 
-            _builder.Replace("<> NULL", "IS NOT NULL");
-
-            values = _values.ToArray();
-
-            return _builder.ToString();
-        }
-
-        public string DeleteToSqlCmd(LambdaExpression deleteExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values)
-        {
-            _tableName = tableName;
-
-            _mappedColumns = mappedColumns.ToArray();
-
-            _values.Clear();
-
-            _builder.Clear();
-
-            _builder.Append($"DELETE FROM {tableName} WHERE ");
-
-            TranslateExpression(deleteExpression);
-
-            _builder.Replace("= NULL", "IS NULL");
-
-            _builder.Replace("<> NULL", "IS NOT NULL");
-
-            values = _values.ToArray();
-
-            return _builder.ToString();
-        }
-
-        public string WhereToSqlCmd(LambdaExpression whereExpression, string tableName, ICollection<ColumnMap> mappedColumns, out object[] values, string[] selectedPropertyNames = null)
-        {
-            _tableName = tableName;
-            _mappedColumns = mappedColumns.ToArray();
-
-            _values.Clear();
-
-            _builder.Clear();
-
-            if (selectedPropertyNames != null && selectedPropertyNames.Length > 0)      // if selected columns defined, then take only them
-            {
-                IList<string> columnNames = new List<string>();
-                var hasEncrypted = false;
-                foreach (var propertyName in selectedPropertyNames)
-                {
-                    if(string.IsNullOrEmpty(propertyName))
-                        throw new CryptoSQLiteException("Property Name for 'Select' can't be Null or Empty.");
-
-                    var clmn = mappedColumns.FirstOrDefault(cp => cp.PropertyName == propertyName); // if wrong property name passed
-
-                    if (clmn == null)
-                        throw new CryptoSQLiteException($"Table '{tableName}' doesn't contain property with name: '{propertyName}'.");
-
-                    if (clmn.IsEncrypted)       // we must read SoltColumn from database only if onle of selected properties has Encrypted attribute
-                        hasEncrypted = true;
-
-                    columnNames.Add(clmn.Name);
-                }
-
-                if(hasEncrypted)
-                    columnNames.Add(CryptoSQLiteConnection.SoltColumnName);
-
-                var joinedColumnNames = string.Join(", ", columnNames);
-
-                _builder.Append($"SELECT {joinedColumnNames} FROM {tableName} WHERE ");
-            }
-
-            else
-                _builder.Append($"SELECT * FROM {tableName} WHERE ");   // take all columns
-
-            TranslateExpression(whereExpression);
-
-            _builder.Replace("= NULL", "IS NULL");
             _builder.Replace("<> NULL", "IS NOT NULL");
 
             values = _values.ToArray();

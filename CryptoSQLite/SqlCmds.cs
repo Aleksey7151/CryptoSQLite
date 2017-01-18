@@ -75,6 +75,13 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdSelectForPredicate(string tableName)
+        {
+            var cmd = $"SELECT * FROM {tableName} WHERE ";
+
+            return cmd;
+        }
+
         public static string CmdSelectTop(string tableName)
         {
             var cmd = $"SELECT * FROM {tableName} LIMIT (?)";
@@ -103,6 +110,13 @@ namespace CryptoSQLite
             var distinct = isDistinct ? "DISTINCT " : "";
 
             var cmd = $"SELECT COUNT({distinct}{column}) FROM {tableName}";
+
+            return cmd;
+        }
+
+        public static string CmdCountForPredicate(string tableName)
+        {
+            var cmd = $"SELECT COUNT(*) FROM {tableName} WHERE ";
 
             return cmd;
         }
@@ -143,6 +157,11 @@ namespace CryptoSQLite
             return $"DROP TABLE IF EXISTS \"{tableName}\"";
         }
 
+        public static string CmdDeleteForPredicate(string tableName)
+        {
+            return $"DELETE FROM {tableName} WHERE ";
+        }
+
         public static string CmdClearTable(string tableName)
         {
             return $"DELETE FROM {tableName}";  // SQLite doesn't have TRUNCATE TABLE command.
@@ -151,6 +170,46 @@ namespace CryptoSQLite
         public static string CmdGetTableInfo(string tableName)
         {
             return $"PRAGMA TABLE_INFO(\"{tableName}\")";
+        }
+
+        public static string CmdMax(string tableName, string columnName)
+        {
+            return $"SELECT MAX({columnName}) FROM {tableName}";
+        }
+
+        public static string CmdMaxForPredicate(string tableName, string columnName)
+        {
+            return $"SELECT MAX({columnName}) FROM {tableName} WHERE ";
+        }
+
+        public static string CmdMin(string tableName, string columnName)
+        {
+            return $"SELECT MIN({columnName}) FROM {tableName}";
+        }
+
+        public static string CmdMinForPredicate(string tableName, string columnName)
+        {
+            return $"SELECT MIN({columnName}) FROM {tableName} WHERE ";
+        }
+
+        public static string CmdSum(string tableName, string columnName)
+        {
+            return $"SELECT SUM({columnName}) FROM {tableName}";
+        }
+
+        public static string CmdSumForPredicate(string tableName, string columnName)
+        {
+            return $"SELECT SUM({columnName}) FROM {tableName} WHERE ";
+        }
+
+        public static string CmdAvg(string tableName, string columnName)
+        {
+            return $"SELECT AVG({columnName}) FROM {tableName}";
+        }
+
+        public static string CmdAvgForPredicate(string tableName, string columnName)
+        {
+            return $"SELECT AVG({columnName}) FROM {tableName} WHERE ";
         }
     }
 }

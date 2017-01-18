@@ -296,6 +296,78 @@ namespace CryptoSQLite
         /// <param name="count">Count of first elements, that will be returned.</param>
         /// <returns></returns>
         IEnumerable<TTable> SelectTop<TTable>(int count) where TTable : class, new();
+
+        #region SQLiteFunctions
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        double Max<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Max value.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        double Max<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        double Min<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Min value.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        double Min<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        double Sum<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Summary value.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        double Sum<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        double Avg<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining average value.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        double Avg<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        #endregion  //SQLiteFunctions
     }
 
     /// <summary>
@@ -492,6 +564,78 @@ namespace CryptoSQLite
         /// <param name="count">Count of first elements, that will be returned.</param>
         /// <returns></returns>
         Task<IEnumerable<TTable>> SelectTopAsync<TTable>(int count) where TTable : class, new();
+
+        #region SQLiteFunctions
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        Task<double> MaxAsync<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Max value.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        Task<double> MaxAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        Task<double> MinAsync<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Min value.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        Task<double> MinAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        Task<double> SumAsync<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Summary value.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        Task<double> SumAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        Task<double> AvgAsync<TTable>(string columnName) where TTable : class;
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining average value.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        Task<double> AvgAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        #endregion  //SQLiteFunctions
 
     }
 
@@ -768,6 +912,104 @@ namespace CryptoSQLite
             return await Task.Run(() => _connection.SelectTop<TTable>(count));
         }
 
+        #region SQLiteFunctions
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> MaxAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.Max<TTable>(columnName));
+        }
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Max value.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> MaxAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
+        {
+            return await Task.Run(() => _connection.Max(columnName, predicate));
+        }
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> MinAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.Min<TTable>(columnName));
+        }
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Min value.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> MinAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
+        {
+            return await Task.Run(() => _connection.Min(columnName, predicate));
+        }
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> SumAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.Sum<TTable>(columnName));
+        }
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Summary value.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> SumAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
+        {
+            return await Task.Run(() => _connection.Sum(columnName, predicate));
+        }
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> AvgAsync<TTable>(string columnName) where TTable : class
+        {
+            return await Task.Run(() => _connection.Avg<TTable>(columnName));
+        }
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining average value.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        public async Task<double> AvgAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            return await Task.Run(() => _connection.Avg(columnName, predicate));
+        }
+
+        #endregion  //SQLiteFunctions
 
 
         /// <summary>
@@ -1072,22 +1314,14 @@ namespace CryptoSQLite
 
             var countCmd = SqlCmds.CmdCount(tableName);
 
-            try
-            {
-                var queryable = _connection.Query(countCmd);
+            var queryable = _connection.Query(countCmd);
 
-                foreach (var row in queryable)
-                {
-                    foreach (var column in row)
-                    {
-                        return column.ToInt();
-                    }
-                }
-            }
-            catch (SQLiteException ex)
+            foreach (var row in queryable)
             {
-                var msg = ex.Message;
-                throw;
+                foreach (var column in row)
+                {
+                    return column.ToInt();
+                }
             }
             return 0;
         }
@@ -1106,7 +1340,9 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var countCmd = _predicateTranslator.CountToSqlCmd(predicate, tableName, tableMap.Columns.Values, out values);
+            var countCmd = SqlCmds.CmdCountForPredicate(tableName) +
+                           _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
+                               out values);
 
             try
             {
@@ -1136,7 +1372,7 @@ namespace CryptoSQLite
         /// <returns></returns>
         public int Count<TTable>(string columnName) where TTable : class
         {
-            if(string.IsNullOrEmpty(columnName))
+            if (string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
 
             var tableMap = CheckTable<TTable>();
@@ -1254,7 +1490,9 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = _predicateTranslator.DeleteToSqlCmd(predicate, tableName, tableMap.Columns.Values, out values);
+            var cmd = SqlCmds.CmdDeleteForPredicate(tableName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
+                          out values);
 
             try
             {
@@ -1405,7 +1643,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, mappedColumns, out values);
+            var cmd = SqlCmds.CmdSelectForPredicate(tableName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             var table = ReadRowsFromDatabase(cmd, values);
 
@@ -1460,10 +1699,47 @@ namespace CryptoSQLite
 
             var mappedColumns = tableMap.Columns.Values;
 
+            string cmdForPredicate;
+
+            if (selectedProperties != null && selectedProperties.Length > 0)
+                // if selected columns defined, then take only them
+            {
+                IList<string> columnNames = new List<string>();
+                var hasEncrypted = false;
+                foreach (var propertyName in selectedProperties)
+                {
+                    if (string.IsNullOrEmpty(propertyName))
+                        throw new CryptoSQLiteException("Property Name for 'Select' can't be Null or Empty.");
+
+                    var clmn = mappedColumns.FirstOrDefault(cp => cp.PropertyName == propertyName);
+                    // if wrong property name passed
+
+                    if (clmn == null)
+                        throw new CryptoSQLiteException(
+                            $"Table '{tableName}' doesn't contain property with name: '{propertyName}'.");
+
+                    if (clmn.IsEncrypted)
+                        // we must read SoltColumn from database only if onle of selected properties has Encrypted attribute
+                        hasEncrypted = true;
+
+                    columnNames.Add(clmn.Name);
+                }
+
+                if (hasEncrypted)
+                    columnNames.Add(SoltColumnName);
+
+                var joinedColumnNames = string.Join(", ", columnNames);
+
+                cmdForPredicate = $"SELECT {joinedColumnNames} FROM {tableName} WHERE ";
+            }
+
+            else
+                cmdForPredicate = SqlCmds.CmdSelectForPredicate(tableName); // takes all columns
+
             object[] values;
 
-            var cmd = _predicateTranslator.WhereToSqlCmd(predicate, tableName, mappedColumns, out values,
-                selectedProperties);
+            var cmd = cmdForPredicate +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             var table = ReadRowsFromDatabase(cmd, values);
 
@@ -1499,7 +1775,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelectTop(tableName);
 
-            var table = ReadRowsFromDatabase(cmd, new object[]{count});
+            var table = ReadRowsFromDatabase(cmd, new object[] {count});
 
             var items = new List<TTable>();
 
@@ -1517,8 +1793,233 @@ namespace CryptoSQLite
             return items;
         }
 
+        #region SQLiteFunctions
 
-        #endregion
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        public double Max<TTable>(string columnName) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var cmd = SqlCmds.CmdMax(tableName, columnName);
+
+            return SQLiteMathFunction(cmd, null);
+        }
+
+        /// <summary>
+        /// Returns the largest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Max value.</param>
+        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
+        public double Max<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if (predicate == null)
+                throw new CryptoSQLiteException("Predicate can't be null.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            object[] values;
+
+            var cmd = SqlCmds.CmdMaxForPredicate(tableName, columnName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            return SQLiteMathFunction(cmd, values);
+        }
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        public double Min<TTable>(string columnName) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var cmd = SqlCmds.CmdMin(tableName, columnName);
+
+            return SQLiteMathFunction(cmd, null);
+        }
+
+        /// <summary>
+        /// Returns the smallest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Min value.</param>
+        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
+        public double Min<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if (predicate == null)
+                throw new CryptoSQLiteException("Predicate can't be null.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            object[] values;
+
+            var cmd = SqlCmds.CmdMinForPredicate(tableName, columnName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            return SQLiteMathFunction(cmd, values);
+        }
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        public double Sum<TTable>(string columnName) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var cmd = SqlCmds.CmdSum(tableName, columnName);
+
+            return SQLiteMathFunction(cmd, null);
+        }
+
+        /// <summary>
+        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Summary value.</param>
+        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
+        public double Sum<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if (predicate == null)
+                throw new CryptoSQLiteException("Predicate can't be null.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            object[] values;
+
+            var cmd = SqlCmds.CmdSumForPredicate(tableName, columnName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            return SQLiteMathFunction(cmd, values);
+        }
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        public double Avg<TTable>(string columnName) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var cmd = SqlCmds.CmdAvg(tableName, columnName);
+
+            return SQLiteMathFunction(cmd, null);
+        }
+
+        /// <summary>
+        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table.</typeparam>
+        /// <param name="columnName">Selected column name.</param>
+        /// <param name="predicate">Addition condition for determining Average value.</param>
+        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
+        public double Avg<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            if (string.IsNullOrEmpty(columnName))
+                throw new CryptoSQLiteException("Column name can't be null or empty.");
+
+            if (predicate == null)
+                throw new CryptoSQLiteException("Predicate can't be null.");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            if (!tableMap.Columns.Keys.Contains(columnName))
+                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            object[] values;
+
+            var cmd = SqlCmds.CmdAvgForPredicate(tableName, columnName) +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            return SQLiteMathFunction(cmd, values);
+        }
+
+        #endregion  //SQLiteFunctions
+
+        #endregion//CryptoSQLite interface
 
 
         #region Private Functions
@@ -1567,7 +2068,8 @@ namespace CryptoSQLite
                     foreignKeys.Add(foreignKey);
                 }
 
-                var colMap = new ColumnMap<TTable>(columnName, prop.Name, prop.PropertyType, prop.SqlType(), columnNumber,
+                var colMap = new ColumnMap<TTable>(columnName, prop.Name, prop.PropertyType, prop.SqlType(),
+                    columnNumber,
                     prop.IsPrimaryKey(),
                     prop.IsAutoIncremental(), isEncrypted, prop.IsNotNull(), prop.DefaultValue(), isForeignKey,
                     foreignKey,
@@ -1589,19 +2091,19 @@ namespace CryptoSQLite
                 var genericCheckTable = _methodCheckTable.MakeGenericMethod(fk.TypeOfReferencedTable);
                 try
                 {
-                    genericCheckTable.Invoke(this, new object[] { true });
+                    genericCheckTable.Invoke(this, new object[] {true});
                 }
                 catch (Exception ex)
                 {
                     throw new CryptoSQLiteException(ex.InnerException.Message);
                 }
-                
+
             }
 
             return tableMap;
         }
 
-        
+
 
         /// <summary>
         /// Checks key
@@ -1612,7 +2114,8 @@ namespace CryptoSQLite
             if (key == null)
                 throw new ArgumentNullException();
 
-            if ((_algorithm == CryptoAlgoritms.AesWith256BitsKey || _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length < 32)
+            if ((_algorithm == CryptoAlgoritms.AesWith256BitsKey ||
+                 _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length < 32)
                 throw new ArgumentException("Key length for AES with 256 bit key and GOST must be 32 bytes.");
 
             if ((_algorithm == CryptoAlgoritms.AesWith192BitsKey) && key.Length < 24)
@@ -1662,7 +2165,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     $"SQL Database doesn't contain table with column structure that specified in {tableName}.");
         }
-        
+
         /// <summary>
         /// Checks the structure of attributes for columns (properties) in table
         /// </summary>
@@ -1686,17 +2189,20 @@ namespace CryptoSQLite
             if (properties.Any(p => p.IsAutoIncremental() && p.IsEncrypted()))
                 throw new CryptoSQLiteException("Column with AutoIncremental Attribute can't be Encrypted.");
 
-            if(properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
+            if (properties.Any(p => p.IsEncrypted() && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Encrypted columns can't have default value, but they can be Not Null.");
 
             if (properties.Any(p => p.IsPrimaryKey() && p.ForeignKey() != null))
-                throw new CryptoSQLiteException("Property can't have ForeignKey and PrimaryKey attributes simultaneously.");
+                throw new CryptoSQLiteException(
+                    "Property can't have ForeignKey and PrimaryKey attributes simultaneously.");
 
             if (properties.Any(p => p.IsEncrypted() && p.ForeignKey() != null))
-                throw new CryptoSQLiteException("Property can't have ForeignKey and Encrypted attributes simultaneously.");
+                throw new CryptoSQLiteException(
+                    "Property can't have ForeignKey and Encrypted attributes simultaneously.");
 
             if (properties.Any(p => p.IsAutoIncremental() && p.ForeignKey() != null))
-                throw new CryptoSQLiteException("Property can't have ForeignKey and AutoIncrement attributes simultaneously.");
+                throw new CryptoSQLiteException(
+                    "Property can't have ForeignKey and AutoIncrement attributes simultaneously.");
 
             if (properties.Any(p => p.ForeignKey() != null && p.DefaultValue() != null))
                 throw new CryptoSQLiteException("Property with ForeignKey attribute can't have Default Value.");
@@ -1722,7 +2228,7 @@ namespace CryptoSQLite
         {
             var columnNames = new List<string>();
 
-            var columnValues = new List<object>();    
+            var columnValues = new List<object>();
 
             byte[] solt = null;
 
@@ -1740,16 +2246,19 @@ namespace CryptoSQLite
 
             foreach (var column in columns)
             {
-                if(column.Value.IsAutoIncremental && !replaceRowIfExisits)
-                    continue;   // if column is AutoIncremental and we don't want to replace this row
+                if (column.Value.IsAutoIncremental && !replaceRowIfExisits)
+                    continue; // if column is AutoIncremental and we don't want to replace this row
 
-                var value = ((IValues<TTable>)column.Value).ValueGetter(row);      // Here we get value without reflection!!! We use here Expressions
+                var value = ((IValues<TTable>) column.Value).ValueGetter(row);
+                // Here we get value without reflection!!! We use here Expressions
 
-                if(value == null && column.Value.DefaultValue != null)
-                    continue;   // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
+                if (value == null && column.Value.DefaultValue != null)
+                    continue;
+                // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
 
                 if (value == null && column.Value.IsNotNull && column.Value.DefaultValue == null)
-                    throw new CryptoSQLiteException($"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
+                    throw new CryptoSQLiteException(
+                        $"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
 
                 columnNames.Add(column.Key);
 
@@ -1759,10 +2268,12 @@ namespace CryptoSQLite
 
                 if (value != null)
                 {
-                    sqlValue = column.Value.IsEncrypted ? GetEncryptedValueForSql(clrType, value, column.Value.ColumnNumber, encryptor) : GetOpenValueForSql(clrType, value);
+                    sqlValue = column.Value.IsEncrypted
+                        ? GetEncryptedValueForSql(clrType, value, column.Value.ColumnNumber, encryptor)
+                        : GetOpenValueForSql(clrType, value);
                 }
 
-                columnValues.Add(sqlValue);   // NULL will be NULL
+                columnValues.Add(sqlValue); // NULL will be NULL
             }
 
             if (solt != null)
@@ -1771,20 +2282,24 @@ namespace CryptoSQLite
                 columnValues.Add(solt);
             }
 
-            var cmd = replaceRowIfExisits ? SqlCmds.CmdInsertOrReplace(tableName, columnNames) : SqlCmds.CmdInsert(tableName, columnNames);
+            var cmd = replaceRowIfExisits
+                ? SqlCmds.CmdInsertOrReplace(tableName, columnNames)
+                : SqlCmds.CmdInsert(tableName, columnNames);
             try
             {
-                _connection.Execute(cmd, columnValues.ToArray());     // Do not remove '.ToArray()' or you'll get a error 
+                _connection.Execute(cmd, columnValues.ToArray()); // Do not remove '.ToArray()' or you'll get a error 
             }
             catch (Exception ex)
             {
-                throw new CryptoSQLiteException(ex.Message, "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
+                throw new CryptoSQLiteException(ex.Message,
+                    "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
             }
         }
 
-        private IList<TTable> FindUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue) where TTable : class, new()
+        private IList<TTable> FindUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue)
+            where TTable : class, new()
         {
-            if(string.IsNullOrEmpty(columnName))
+            if (string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
 
             var mappedColumns = tableMap.Columns.Values;
@@ -1794,12 +2309,13 @@ namespace CryptoSQLite
             if (mappedColumns.All(mc => mc.Name != columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            if(mappedColumns.Any(mc => mc.Name == columnName && mc.IsEncrypted))
-                throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
+            if (mappedColumns.Any(mc => mc.Name == columnName && mc.IsEncrypted))
+                throw new CryptoSQLiteException(
+                    "You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new []{columnValue});
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue});
 
             var items = new List<TTable>();
 
@@ -1813,11 +2329,12 @@ namespace CryptoSQLite
             return items;
         }
 
-        private TTable FindFirstUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue) where TTable : class, new()
+        private TTable FindFirstUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue)
+            where TTable : class, new()
         {
             if (string.IsNullOrEmpty(columnName))
                 throw new CryptoSQLiteException("Column name can't be null or empty.");
-            
+
             var mappedColumns = tableMap.Columns.Values.ToList();
 
             var tableName = tableMap.Name;
@@ -1826,11 +2343,12 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
             if (mappedColumns.Any(p => p.Name == columnName && p.IsEncrypted))
-                throw new CryptoSQLiteException("You can't use [Encrypted] column as a column in which the columnValue should be found.");
+                throw new CryptoSQLiteException(
+                    "You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new[]{columnValue});
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue});
 
             if (table.Count <= 0) return null;
 
@@ -1839,7 +2357,25 @@ namespace CryptoSQLite
             return item;
         }
 
-
+        private double SQLiteMathFunction(string command, object[] values)
+        {
+            try
+            {
+                var queryable = values != null ? _connection.Query(command, values) : _connection.Query(command);
+                foreach (var row in queryable)
+                {
+                    foreach (var column in row)
+                    {
+                        return column.ToDouble();
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                throw new CryptoSQLiteException(ex.Message, "");
+            }
+            return 0;
+        }
 
         private void FindReferencedTables<TTable>(TTable table, string[] selectedColumns = null) where TTable : class, new()
         {
@@ -2259,6 +2795,8 @@ namespace CryptoSQLite
             var solt = _solter.GetSolt();
             return solt;
         }
+
+
 
         #endregion
     }

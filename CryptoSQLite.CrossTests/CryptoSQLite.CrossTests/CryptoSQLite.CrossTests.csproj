@@ -53,6 +53,7 @@
     <Compile Include="FindLinqTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectTests.cs" />
+    <Compile Include="SQLiteFunctionTests.cs" />
     <Compile Include="Tables\CorrectTables.cs" />
     <Compile Include="Tables\IncorrectTables.cs" />
     <Compile Include="UpdateItemTests.cs" />

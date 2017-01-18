@@ -91,6 +91,7 @@
     <Compile Include="GetItemTests.cs" />
     <Compile Include="FindLinqTests.cs" />
     <Compile Include="SelectTests.cs" />
+    <Compile Include="SQLiteFunctionsTests.cs" />
     <Compile Include="Tables\CorrectTables.cs" />
     <Compile Include="InsertItemTests.cs" />
     <Compile Include="Tables\IncorrectTables.cs" />
