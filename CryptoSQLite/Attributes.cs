@@ -91,12 +91,19 @@ namespace CryptoSQLite
         public string NavigationPropertyName { get; }
 
         /// <summary>
+        /// Determines if referenced table must be automatically obtained from database, when you are getting this table.
+        /// </summary>
+        public bool IsAutoResolved { get; }
+
+        /// <summary>
         /// Ctor.
         /// </summary>
         /// <param name="navigationPropertyName">Name of property (Navigation Property). This property will be containing reference to a instance of foreign Table</param>
-        public ForeignKeyAttribute(string navigationPropertyName)
+        /// <param name="autoResolveReference">Determines if referenced table must be automatically obtained from database, when you are getting this table.</param>
+        public ForeignKeyAttribute(string navigationPropertyName, bool autoResolveReference = true)
         {
             NavigationPropertyName = navigationPropertyName;
+            IsAutoResolved = autoResolveReference;
         }
     }
 

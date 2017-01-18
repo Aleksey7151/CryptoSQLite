@@ -157,6 +157,21 @@ namespace CryptoSQLite.CrossTests
         public Simple Simple { get; set; }
     }
 
+    [CryptoTable("SimpleReferenceWithoutAutoResolve")]
+    internal class SimpleReferenceWithoutAutoResolve
+    {
+        [PrimaryKey]
+        public int Id { get; set; }
+
+        [Encrypted]
+        public string SomeData { get; set; }
+
+        [ForeignKey("Simple", false)]
+        public int InfoRefId { get; set; }
+
+        public Simple Simple { get; set; }
+    }
+
     [CryptoTable("Simple")]
     internal class Simple
     {
@@ -1038,6 +1053,50 @@ namespace CryptoSQLite.CrossTests
                     db.Dispose();
                 }
                 Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void AutoResolveReferenceEqualsToFalse()
+        {
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<SimpleReferenceWithoutAutoResolve>();
+
+                    db.CreateTable<Simple>();
+                    db.CreateTable<SimpleReferenceWithoutAutoResolve>();  // SimpleReference has ForeignKey constrait, referenced to Simple
+
+                    var simple1 = new Simple { SimpleString = "Some Simple String 1", SimpleValue = 283423 };
+                    db.InsertItem(simple1);
+
+                    var table = db.Table<Simple>().ToArray();
+
+                    var simpleRef1 = new SimpleReferenceWithoutAutoResolve
+                    {
+                        SomeData = "Some Data Descriptionen 1",
+                        InfoRefId = 1
+                    };
+                    db.InsertItem(simpleRef1);
+
+                    var item = db.Table<SimpleReferenceWithoutAutoResolve>().ToArray();
+                    Assert.IsTrue(item.Length == 1);
+                    Assert.IsNull(item[0].Simple);
+                    db.DeleteTable<SimpleReferenceWithoutAutoResolve>();
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
             }
         }
     }

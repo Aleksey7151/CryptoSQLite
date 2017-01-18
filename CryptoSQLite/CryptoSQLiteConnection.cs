@@ -2393,6 +2393,9 @@ namespace CryptoSQLite
 
             foreach (var refTableInfo in referencedTablesInfos)
             {
+                if(!refTableInfo.IsAutoResolve)     // we obtain only those tables, that have autoResolveReference setted to TRUE 
+                    continue;   
+
                 var foreignProperty = table.GetType().GetRuntimeProperty(refTableInfo.ForeignKeyPropertyName);      // get property that contain value of foreign key, that referenced to another table
 
                 var primaryKeyValue = foreignProperty.GetValue(table);                                              // get value of foreign key
@@ -2771,8 +2774,6 @@ namespace CryptoSQLite
 
             throw new CryptoSQLiteException($"Type {type} is not compatible with CryptoSQLite.");
         }
-
-
         private ICryptoProvider GetEncryptor(Type tableType, byte[] solt = null)
         {
             if (_tables.ContainsKey(tableType) && _tables[tableType].Key != null)
@@ -2795,9 +2796,6 @@ namespace CryptoSQLite
             var solt = _solter.GetSolt();
             return solt;
         }
-
-
-
         #endregion
     }
 }

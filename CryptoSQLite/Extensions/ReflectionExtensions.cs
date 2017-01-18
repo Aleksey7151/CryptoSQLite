@@ -205,7 +205,9 @@ namespace CryptoSQLite.Extensions
                 throw new CryptoSQLiteException("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTable attribute.");
 
             var table = typeof(TTable);
-            var navigationPropertyNameToReferencedTable = property.ForeignKey().NavigationPropertyName;
+            var foreignKeyAttr = property.ForeignKey();
+            var isAutoResolve = foreignKeyAttr.IsAutoResolved;
+            var navigationPropertyNameToReferencedTable = foreignKeyAttr.NavigationPropertyName;
 
             if (string.IsNullOrEmpty(navigationPropertyNameToReferencedTable))
                 throw new CryptoSQLiteException($"Foreign Key Attribute in property '{property.Name}' can't have empty name.");
@@ -224,7 +226,7 @@ namespace CryptoSQLite.Extensions
 
             var primaryKeyColumnNameInReferencedTable = primaryKeyInReferencedTable.ColumnName();
 
-            return new ForeignKey(referencedTableName, primaryKeyColumnNameInReferencedTable, property.Name, property.ColumnName(), navigationProperty.Name, referencedTable);
+            return new ForeignKey(referencedTableName, primaryKeyColumnNameInReferencedTable, property.Name, property.ColumnName(), navigationProperty.Name, referencedTable, isAutoResolve);
         }
     }
 }

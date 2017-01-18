@@ -16,6 +16,8 @@ namespace CryptoSQLite.Mapping
 
         public string NavigationPropertyName { get; }
 
+        public bool IsAutoResolve { get; }
+
         /// <summary>
         /// Creates class that contains all data for creating reference to another table using FOREIGN KEY constrait
         /// </summary>
@@ -25,7 +27,8 @@ namespace CryptoSQLite.Mapping
         /// <param name="foreignKeyColumnName">Name of column in table that is foreign key</param>
         /// <param name="navigationPropertyName">Name of navigation property that will be contain reference to referenced Table</param>
         /// <param name="referencedTable">Type of referenced Table</param>
-        public ForeignKey(string referencedTableName, string referencedColumnName, string foreignKeyPropertyName, string foreignKeyColumnName, string navigationPropertyName, Type referencedTable)
+        /// <param name="isAutoResolve">Determines if referenced table must be automatically obtained</param>
+        public ForeignKey(string referencedTableName, string referencedColumnName, string foreignKeyPropertyName, string foreignKeyColumnName, string navigationPropertyName, Type referencedTable, bool isAutoResolve)
         {
             ReferencedTableName = referencedTableName;
             ReferencedColumnName = referencedColumnName;
@@ -33,6 +36,7 @@ namespace CryptoSQLite.Mapping
             ForeignKeyColumnName = foreignKeyColumnName;
             NavigationPropertyName = navigationPropertyName;
             TypeOfReferencedTable = referencedTable;
+            IsAutoResolve = isAutoResolve;
         }
     }
 }
