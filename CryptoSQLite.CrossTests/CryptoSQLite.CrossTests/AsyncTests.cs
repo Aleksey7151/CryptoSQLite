@@ -34,7 +34,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>("Id", 1);
+                    await db.DeleteAsync<AccountsData>("Id", 1);
 
                     result = await db.TableAsync<AccountsData>();
 
@@ -45,7 +45,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>("Id", 3);
+                    await db.DeleteAsync<AccountsData>("Id", 3);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
@@ -55,7 +55,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>("Id", 2);
+                    await db.DeleteAsync<AccountsData>("Id", 2);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();
@@ -65,7 +65,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsFalse(table.Any(e => e.Equal(accounts[3])));
                     Assert.IsTrue(table.Any(e => e.Equal(accounts[4])));
 
-                    await db.DeleteItemAsync<AccountsData>("Id", 4);
+                    await db.DeleteAsync<AccountsData>("Id", 4);
                     result = await db.TableAsync<AccountsData>();
 
                     table = result.ToArray();

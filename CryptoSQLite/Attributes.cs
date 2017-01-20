@@ -144,27 +144,4 @@ namespace CryptoSQLite
             DefaultValue = defaultValue;
         }
     }
-
-    /// <summary>
-    /// This attribute used to indicate, that column has default value, that must be written to database 
-    /// <para/>This Attribute is deprecated. You should use NotNullAttribute instead.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    [Obsolete("This class is deprecated. You should use NotNull Attribute instead.", false)]
-    public class HasDefaultValueAttribute : Attribute
-    {
-        /// <summary>
-        /// Default value
-        /// </summary>
-        public object DefaultValue { get; }
-
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        /// <param name="defaultValue">Default value</param>
-        public HasDefaultValueAttribute(object defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
-    }
 }

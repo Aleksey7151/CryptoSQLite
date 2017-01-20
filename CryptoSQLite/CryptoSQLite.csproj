@@ -37,6 +37,7 @@
     <DocumentationFile>bin\Release\CryptoSQLite.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Expressions\AccessMemberTraslator.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="CryptoProviders\BaseDesAlgoritm.cs" />
     <Compile Include="CryptoProviders\DesCryptoProvider.cs" />
@@ -55,7 +56,7 @@
     <Content Include="Samples\TableDeffinitions.cs.txt" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="SqlCmds.cs" />
-    <Compile Include="PredicateTranslator.cs" />
+    <Compile Include="Expressions\PredicateTranslator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SQLitePCL.pretty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

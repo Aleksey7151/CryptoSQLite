@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
-using CryptoSQLite.Extensions;
 using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
@@ -39,6 +37,15 @@ namespace CryptoSQLite
             values = _values.ToArray();
 
             return _builder.ToString();
+        }
+
+        public string GetColumnNameFromPredicate(ICollection<ColumnMap> mappedColumns, LambdaExpression[] selectedProperties)
+        {
+            for (var i = 0; i < selectedProperties.Length; i++)
+            {
+                
+            }
+            return null;
         }
 
         private Expression TranslateUnaryExpression(UnaryExpression unaryExp)
@@ -152,7 +159,7 @@ namespace CryptoSQLite
             return binaryExp;
         }
 
-        protected virtual Expression VisitLambda(LambdaExpression lambda)
+        private Expression VisitLambda(LambdaExpression lambda)
         {
 
             Expression body = TranslateExpression(lambda.Body);

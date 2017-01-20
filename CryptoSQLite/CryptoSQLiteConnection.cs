@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoSQLite.CryptoProviders;
+using CryptoSQLite.Expressions;
 using CryptoSQLite.Extensions;
 using CryptoSQLite.Mapping;
 using SQLitePCL.pretty;
@@ -236,18 +237,6 @@ namespace CryptoSQLite
         void Delete<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="columnName">Column name.</param>
-        /// <param name="columnValue">Column value.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete(
-             "This method is deprecated and soon will be removed. Prealse use 'Delete(string columnName, object columnValue)' method instead.",
-             false)]
-        void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class;
-
-        /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
@@ -273,7 +262,6 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        //[Obsolete("This method is deprecated and soon will be removed. Use LINQ Where<T>(Predicate<T> p) method instead.", false)]
         IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
@@ -286,7 +274,21 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
         IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties)
+            where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
             where TTable : class, new();
 
         /// <summary>
@@ -502,20 +504,6 @@ namespace CryptoSQLite
         Task DeleteAsync<TTable>(string columnName, object columnValue) where TTable : class;
 
         /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="columnName">Column name.</param>
-        /// <param name="columnValue">Column value.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete(
-             "This method is deprecated and soon will be removed. Prealse use 'DeleteAsync(string columnName, object columnValue)' method instead.",
-             false)]
-        Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class;
-
-
-
-        /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
@@ -554,8 +542,22 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
         Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+            where TTable : class, new();
 
         /// <summary>
         /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
@@ -831,18 +833,6 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="columnName">Column name.</param>
-        /// <param name="columnValue">Column value.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task DeleteItemAsync<TTable>(string columnName, object columnValue) where TTable : class
-        {
-            await Task.Run(() => _connection.DeleteItem<TTable>(columnName, columnValue));
-        }
-
-        /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
@@ -862,8 +852,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate)
-            where TTable : class, new()
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Find(predicate));
             return elements;
@@ -877,8 +866,7 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
-            where TTable : class, new()
+        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.FindByValue<TTable>(columnName, columnValue));
             return elements;
@@ -894,11 +882,27 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
-            params string[] selectedProperties) where TTable : class, new()
+        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
+        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Select(predicate, selectedProperties));
             return elements;
+        }
+
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+            where TTable : class, new()
+        {
+            return await Task.Run(() => _connection.Select(predicate, selectedProperties));
         }
 
         /// <summary>
@@ -1545,50 +1549,6 @@ namespace CryptoSQLite
         }
 
         /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="columnName">Column name.</param>
-        /// <param name="columnValue">Column value.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        [Obsolete(
-             "This method is deprecated and soon will be removed. Prealse use 'Delete(string columnName, object columnValue)' method instead.",
-             false)]
-        public void DeleteItem<TTable>(string columnName, object columnValue) where TTable : class
-        {
-            if (string.IsNullOrEmpty(columnName))
-                throw new CryptoSQLiteException("Column name can't be null or empty.");
-
-            var tableMap = CheckTable<TTable>(false);
-
-            var tableName = tableMap.Name;
-
-            var mappedColumns = tableMap.Columns.Values;
-
-            if (mappedColumns.All(col => col.Name != columnName))
-                throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
-
-            if (mappedColumns.Any(col => col.Name == columnName && col.IsEncrypted))
-                throw new CryptoSQLiteException(
-                    "You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
-
-            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName, columnValue);
-
-            try
-            {
-                if (columnValue == null)
-                    _connection.Execute(cmd);
-                else _connection.Execute(cmd, columnValue);
-            }
-            catch (Exception ex)
-            {
-                throw new CryptoSQLiteException(ex.Message,
-                    $"Apparently column with name {columnName} doesn't exist in table {tableName}.");
-            }
-        }
-
-
-        /// <summary>
         /// Gets all elements from table <typeparamref name="TTable"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table with information about table</typeparam>
@@ -1690,6 +1650,7 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
         public IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new()
         {
@@ -1752,6 +1713,78 @@ namespace CryptoSQLite
                 ProcessRow(mappedColumns, row, item);
 
                 FindReferencedTables(item, selectedProperties); // here we get all referenced tables if they exist
+
+                items.Add(item);
+            }
+
+            return items;
+        }
+
+        /// <summary>
+        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+            where TTable : class, new()
+        {
+            if (selectedProperties == null || selectedProperties.Length == 0)
+                throw new CryptoSQLiteException("You must specify at least one property that will be obtained");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            var mappedColumns = tableMap.Columns.Values;
+            
+            IList<string> columnNames = new List<string>();
+            IList<string> propertyNames = new List<string>();
+            var hasEncrypted = false;
+
+            foreach (var expression in selectedProperties)
+            {
+                bool isEncrypted;
+                string propertyName;
+
+                var columnName = AccessMemberTraslator.GetColumnName(expression, tableName, mappedColumns, out isEncrypted, out propertyName);
+
+                if (isEncrypted)
+                {
+                    // we must read SoltColumn from database only if onle of selected properties has Encrypted attribute
+                    hasEncrypted = true;
+                }
+                columnNames.Add(columnName);
+                propertyNames.Add(propertyName);
+            }
+
+            if (hasEncrypted)
+                columnNames.Add(SoltColumnName);
+
+            var joinedColumnNames = string.Join(", ", columnNames);
+
+            string cmdForPredicate = $"SELECT {joinedColumnNames} FROM {tableName} WHERE ";
+            
+            object[] values;
+
+            var cmd = cmdForPredicate +
+                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            var table = ReadRowsFromDatabase(cmd, values);
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+
+                ProcessRow(mappedColumns, row, item);
+
+                FindReferencedTables(item, propertyNames.ToArray()); // here we get all referenced tables if they exist
 
                 items.Add(item);
             }
