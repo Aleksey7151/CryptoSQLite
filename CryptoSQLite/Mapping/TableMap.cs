@@ -12,6 +12,11 @@ namespace CryptoSQLite.Mapping
         public string Name { get; }
 
         /// <summary>
+        /// Type of table
+        /// </summary>
+        public Type Type { get; }
+
+        /// <summary>
         /// Determines if table contains encrypted columns
         /// </summary>
         public bool HasEncryptedColumns { get; }
@@ -26,9 +31,10 @@ namespace CryptoSQLite.Mapping
         /// </summary>
         public IDictionary<string, ColumnMap> Columns { get; }
 
-        public TableMap(string name, bool hasEncryptedColumns, IDictionary<string, ColumnMap> columns)
+        public TableMap(string name, Type tableType, bool hasEncryptedColumns, IDictionary<string, ColumnMap> columns)
         {
             Name = name;
+            Type = tableType;
             HasEncryptedColumns = hasEncryptedColumns;
             Columns = columns;
         }

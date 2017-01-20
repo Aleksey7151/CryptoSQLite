@@ -265,6 +265,64 @@ namespace CryptoSQLite
         IEnumerable<TTable> FindByValue<TTable>(string columnName, object columnValue) where TTable : class, new();
 
         /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Left table type</typeparam>
+        /// <typeparam name="TTable2">Right table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningOnCondition">The relationship between the two tables for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
+        /// <returns>Results of Jioning request</returns>
+        IEnumerable<object> Join<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition, 
+            Func<TTable1, TTable2, object> joiningResultView)
+            where TTable1 : class, new() 
+            where TTable2 : class, new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TTable1"></typeparam>
+        /// <typeparam name="TTable2"></typeparam>
+        /// <typeparam name="TTable3"></typeparam>
+        /// <param name="whereCondition"></param>
+        /// <param name="joiningOnWithTable2"></param>
+        /// <param name="joiningOnWithTable3"></param>
+        /// <param name="joiningResultView"></param>
+        /// <returns></returns>
+        IEnumerable<object> Join<TTable1, TTable2, TTable3>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningOnWithTable2, 
+            Expression<Func<TTable1, TTable3, bool>> joiningOnWithTable3,
+            Func<TTable1, TTable2, TTable3, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TTable1"></typeparam>
+        /// <typeparam name="TTable2"></typeparam>
+        /// <typeparam name="TTable3"></typeparam>
+        /// <typeparam name="TTable4"></typeparam>
+        /// <param name="whereCondition"></param>
+        /// <param name="joiningOnWithTable2"></param>
+        /// <param name="joiningOnWithTable3"></param>
+        /// <param name="joiningOnWithTable4"></param>
+        /// <param name="joiningResultView"></param>
+        /// <returns></returns>
+        IEnumerable<object> Join<TTable1, TTable2, TTable3, TTable4>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningOnWithTable2, 
+            Expression<Func<TTable1, TTable3, bool>> joiningOnWithTable3,
+            Expression<Func<TTable1, TTable4, bool>> joiningOnWithTable4,
+            Func<TTable1, TTable2, TTable3, TTable4, object> joiningResultView)
+            where TTable1 : class, new() 
+            where TTable2 : class, new() 
+            where TTable3 : class, new()
+            where TTable4 : class, new();
+        
+
+        /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
         /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
         /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
@@ -1641,6 +1699,53 @@ namespace CryptoSQLite
         }
 
         /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Left table type</typeparam>
+        /// <typeparam name="TTable2">Right table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between the two tables for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
+        /// <returns>Results of Jioning request</returns>
+        public IEnumerable<object> Join<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2, 
+            Func<TTable1, TTable2, object> joiningResultView)
+            where TTable1 : class, new() 
+            where TTable2 : class, new()
+        {
+            var tableMap1 = CheckTable<TTable1>();
+            var tableMap2 = CheckTable<TTable2>();
+
+            var onJoinTranslator = new JoinOnTranslator();
+            var onJoin = onJoinTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+            return new[] {joiningResultView(new TTable1(), new TTable2())};
+        }
+
+        public IEnumerable<object> Join<TTable1, TTable2, TTable3>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3, 
+            Func<TTable1, TTable2, TTable3, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new()
+        {
+            return new[] { joiningResultView(new TTable1(), new TTable2(), new TTable3()) };
+        }
+
+        public IEnumerable<object> Join<TTable1, TTable2, TTable3, TTable4>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Expression<Func<TTable1, TTable4, bool>> joiningConditionWithTable4,
+            Func<TTable1, TTable2, TTable3, TTable4, object> joiningResultView)
+            where TTable1 : class, new() 
+            where TTable2 : class, new() 
+            where TTable3 : class, new() 
+            where TTable4 : class, new()
+        {
+            return new[] { joiningResultView(new TTable1(), new TTable2(), new TTable3(), new TTable4()) };
+        }
+
+        /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
         /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
         /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
@@ -2113,7 +2218,7 @@ namespace CryptoSQLite
                 columnNumber += 1;
             }
 
-            var tableMap = new TableMap(tableName, hasEncryptedColumns, columnMaps);
+            var tableMap = new TableMap(tableName, tableType, hasEncryptedColumns, columnMaps);
 
             _tables.Add(tableType, tableMap);
 

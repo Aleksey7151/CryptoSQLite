@@ -112,9 +112,8 @@ namespace CryptoSQLiteSample.iOS
 
                 var exampleWithThreeRules = db.Find<Tasks>(t => t.IsDone && t.Price > 1000 && t.Price < 1300);  // SQL Request will be: SELECT * FROM MyTasks WHERE (((IsDone = 1) AND (Price > 1000)) AND (Price < 1300))
 
-
 				// NOW WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
-				var selectedItem = db.Select<Tasks>(t => t.IsDone, "Task" /*Property Name!*/, "Price" /*Property Name!*/);    // It will get values for only 'Task' and 'Price' properties
+				var selectedItem = db.Select<Tasks>(t => t.IsDone /*This is Predicate*/, t => t.Task /*First property*/, t => t.Price /*Second property*/);    // It will get values for only 'Task' and 'Price' properties. SQL Request will be: SELECT Task, Price FROM MyTasks WHERE (IsDone = TRUE) 
 
 				// DELETE USING PREDICATES
                 db.Delete<Tasks>(t => t.IsDone);    // It will removes from table all completed tasks.

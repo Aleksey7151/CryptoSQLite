@@ -83,6 +83,7 @@
     <Compile Include="CountTests.cs" />
     <Compile Include="DeleteLinqTests.cs" />
     <Compile Include="DifferentKeysForDifferentTables.cs" />
+    <Compile Include="JoinTests.cs" />
     <Compile Include="NotNullAndDefaultValueTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />
     <Compile Include="FindTests.cs" />

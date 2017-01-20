@@ -39,15 +39,6 @@ namespace CryptoSQLite
             return _builder.ToString();
         }
 
-        public string GetColumnNameFromPredicate(ICollection<ColumnMap> mappedColumns, LambdaExpression[] selectedProperties)
-        {
-            for (var i = 0; i < selectedProperties.Length; i++)
-            {
-                
-            }
-            return null;
-        }
-
         private Expression TranslateUnaryExpression(UnaryExpression unaryExp)
         {
             if (unaryExp.NodeType == ExpressionType.Convert)
@@ -107,7 +98,7 @@ namespace CryptoSQLite
             throw new NotSupportedException($"Member {memberExp.Member.Name} is not supported.");
         }
 
-        protected Expression TranslateBinaryExpression(BinaryExpression binaryExp)
+        private Expression TranslateBinaryExpression(BinaryExpression binaryExp)
         {
             _builder.Append("(");
 
