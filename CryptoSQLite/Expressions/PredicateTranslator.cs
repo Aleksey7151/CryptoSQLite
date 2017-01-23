@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using CryptoSQLite.Mapping;
 
-namespace CryptoSQLite
+namespace CryptoSQLite.Expressions
 {
     internal class PredicateTranslator
     {
@@ -15,12 +15,16 @@ namespace CryptoSQLite
 
         private string _tableName;
 
+        private bool _addTableNameToColumns;
+
         private readonly List<object> _values = new List<object>();
 
         public string TraslateToSqlStatement(LambdaExpression predicate, string tableName,
-            ICollection<ColumnMap> mappedColumns, out object[] values)
+            ICollection<ColumnMap> mappedColumns, out object[] values, bool addTableNameToColumns = false)
         {
             _tableName = tableName;
+
+            _addTableNameToColumns = addTableNameToColumns;
 
             _mappedColumns = mappedColumns.ToArray();
 
@@ -91,7 +95,7 @@ namespace CryptoSQLite
                 if(column.IsEncrypted)
                     throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column '{column.Name}' is Encrypted.");
 
-                _builder.Append(column.Name);  // choose real column name
+                _builder.Append(_addTableNameToColumns ? $"{_tableName}.{column.Name}" : column.Name);
 
                 return memberExp;
             }

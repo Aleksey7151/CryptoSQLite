@@ -274,53 +274,53 @@ namespace CryptoSQLite
         /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
         /// <returns>Results of Jioning request</returns>
         IEnumerable<object> Join<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition, 
+            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition,
             Func<TTable1, TTable2, object> joiningResultView)
-            where TTable1 : class, new() 
+            where TTable1 : class, new()
             where TTable2 : class, new();
 
         /// <summary>
-        /// 
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
         /// </summary>
-        /// <typeparam name="TTable1"></typeparam>
-        /// <typeparam name="TTable2"></typeparam>
-        /// <typeparam name="TTable3"></typeparam>
-        /// <param name="whereCondition"></param>
-        /// <param name="joiningOnWithTable2"></param>
-        /// <param name="joiningOnWithTable3"></param>
-        /// <param name="joiningResultView"></param>
-        /// <returns></returns>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the first table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the second table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
         IEnumerable<object> Join<TTable1, TTable2, TTable3>(Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningOnWithTable2, 
-            Expression<Func<TTable1, TTable3, bool>> joiningOnWithTable3,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
             Func<TTable1, TTable2, TTable3, object> joiningResultView)
             where TTable1 : class, new()
             where TTable2 : class, new()
             where TTable3 : class, new();
 
         /// <summary>
-        /// 
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
         /// </summary>
-        /// <typeparam name="TTable1"></typeparam>
-        /// <typeparam name="TTable2"></typeparam>
-        /// <typeparam name="TTable3"></typeparam>
-        /// <typeparam name="TTable4"></typeparam>
-        /// <param name="whereCondition"></param>
-        /// <param name="joiningOnWithTable2"></param>
-        /// <param name="joiningOnWithTable3"></param>
-        /// <param name="joiningOnWithTable4"></param>
-        /// <param name="joiningResultView"></param>
-        /// <returns></returns>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <typeparam name="TTable4">Third joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
+        /// <param name="joiningConditionWithTable4">The relationship between Main table and the Third table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
         IEnumerable<object> Join<TTable1, TTable2, TTable3, TTable4>(Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningOnWithTable2, 
-            Expression<Func<TTable1, TTable3, bool>> joiningOnWithTable3,
-            Expression<Func<TTable1, TTable4, bool>> joiningOnWithTable4,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Expression<Func<TTable1, TTable4, bool>> joiningConditionWithTable4,
             Func<TTable1, TTable2, TTable3, TTable4, object> joiningResultView)
-            where TTable1 : class, new() 
-            where TTable2 : class, new() 
+            where TTable1 : class, new()
+            where TTable2 : class, new()
             where TTable3 : class, new()
             where TTable4 : class, new();
-        
+
 
         /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
@@ -332,7 +332,9 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
+        [Obsolete(
+             "This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained."
+         )]
         IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties)
             where TTable : class, new();
 
@@ -346,7 +348,8 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+        IEnumerable<TTable> Select<TTable>(Expression<Predicate<TTable>> predicate,
+            params Expression<Func<TTable, object>>[] selectedProperties)
             where TTable : class, new();
 
         /// <summary>
@@ -591,6 +594,63 @@ namespace CryptoSQLite
             where TTable : class, new();
 
         /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Left table type</typeparam>
+        /// <typeparam name="TTable2">Right table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningOnCondition">The relationship between the two tables for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
+        /// <returns>Results of Jioning request</returns>
+        Task<IEnumerable<object>> JoinAsync<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition,
+            Func<TTable1, TTable2, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new();
+
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the first table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the second table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
+        Task<IEnumerable<object>> JoinAsync<TTable1, TTable2, TTable3>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Func<TTable1, TTable2, TTable3, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new();
+
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <typeparam name="TTable4">Third joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
+        /// <param name="joiningConditionWithTable4">The relationship between Main table and the Third table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
+        Task<IEnumerable<object>> JoinAsync<TTable1, TTable2, TTable3, TTable4>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Expression<Func<TTable1, TTable4, bool>> joiningConditionWithTable4,
+            Func<TTable1, TTable2, TTable3, TTable4, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new()
+            where TTable4 : class, new();
+
+        /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
         /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
         /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
@@ -600,7 +660,9 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
+        [Obsolete(
+             "This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained."
+         )]
         Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
             params string[] selectedProperties) where TTable : class, new();
 
@@ -614,7 +676,8 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+        Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            params Expression<Func<TTable, object>>[] selectedProperties)
             where TTable : class, new();
 
         /// <summary>
@@ -910,7 +973,8 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate)
+            where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Find(predicate));
             return elements;
@@ -924,10 +988,79 @@ namespace CryptoSQLite
         /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
         /// <param name="columnValue">Value for find</param>
         /// <returns>All elements from table that are satisfying conditions.</returns>
-        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue) where TTable : class, new()
+        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
+            where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.FindByValue<TTable>(columnName, columnValue));
             return elements;
+        }
+
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Left table type</typeparam>
+        /// <typeparam name="TTable2">Right table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningOnCondition">The relationship between the two tables for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
+        /// <returns>Results of Jioning request</returns>
+        public async Task<IEnumerable<object>> JoinAsync<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition,
+            Func<TTable1, TTable2, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+        {
+            return await Task.Run(() => _connection.Join(whereCondition, joiningOnCondition, joiningResultView));
+        }
+
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the first table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the second table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
+        public async Task<IEnumerable<object>> JoinAsync<TTable1, TTable2, TTable3>(
+            Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Func<TTable1, TTable2, TTable3, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new()
+        {
+            return await Task.Run(() => _connection.Join(whereCondition, joiningConditionWithTable2, joiningConditionWithTable3, joiningResultView));
+        }
+
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <typeparam name="TTable4">Third joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
+        /// <param name="joiningConditionWithTable4">The relationship between Main table and the Third table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
+        public async Task<IEnumerable<object>> JoinAsync<TTable1, TTable2, TTable3, TTable4>(
+            Expression<Predicate<TTable1>> whereCondition,
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
+            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
+            Expression<Func<TTable1, TTable4, bool>> joiningConditionWithTable4,
+            Func<TTable1, TTable2, TTable3, TTable4, object> joiningResultView)
+            where TTable1 : class, new()
+            where TTable2 : class, new()
+            where TTable3 : class, new()
+            where TTable4 : class, new()
+        {
+            return await Task.Run(() => _connection.Join(whereCondition, joiningConditionWithTable2, joiningConditionWithTable3, joiningConditionWithTable4, joiningResultView));
         }
 
         /// <summary>
@@ -940,8 +1073,11 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Property names whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        [Obsolete("This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained.")]
-        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params string[] selectedProperties) where TTable : class, new()
+        [Obsolete(
+             "This method is deprecated. Please use the same method but with Funk<TTable, object> function for determinig prorerties that must be obtained."
+         )]
+        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            params string[] selectedProperties) where TTable : class, new()
         {
             var elements = await Task.Run(() => _connection.Select(predicate, selectedProperties));
             return elements;
@@ -957,7 +1093,8 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate, params Expression<Func<TTable, object>>[] selectedProperties)
+        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            params Expression<Func<TTable, object>>[] selectedProperties)
             where TTable : class, new()
         {
             return await Task.Run(() => _connection.Select(predicate, selectedProperties));
@@ -1066,7 +1203,8 @@ namespace CryptoSQLite
         /// <param name="columnName">Selected column name.</param>
         /// <param name="predicate">Addition condition for determining average value.</param>
         /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> AvgAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate) where TTable : class
+        public async Task<double> AvgAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
+            where TTable : class
         {
             return await Task.Run(() => _connection.Avg(columnName, predicate));
         }
@@ -1114,6 +1252,11 @@ namespace CryptoSQLite
         private readonly PredicateTranslator _predicateTranslator;
 
         /// <summary>
+        /// Translates Join-ON Rule between two tables
+        /// </summary>
+        private readonly JoinOnTranslator _joinOnTranslator;
+
+        /// <summary>
         /// Encryption algorithm that is used for data protection
         /// </summary>
         private readonly CryptoAlgoritms _algorithm;
@@ -1138,31 +1281,9 @@ namespace CryptoSQLite
 
         #region Constructors
 
-        /// <summary>
-        /// Constructor. Creates connection to SQLite datebase file with data encryption.
-        /// </summary>
-        /// <param name="dbFilename">Path to SQLite database file.</param>
-        public CryptoSQLiteConnection(string dbFilename)
+        private CryptoSQLiteConnection(CryptoAlgoritms cryptoAlgoritm)
         {
-            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-
-            _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
-            _algorithm = CryptoAlgoritms.AesWith256BitsKey;
-            _solter = new SoltGenerator();
-            _predicateTranslator = new PredicateTranslator();
-            _tables = new Dictionary<Type, TableMap>();
-        }
-
-        /// <summary>
-        /// Constructor. Creates connection to SQLite datebase file with data encryption.
-        /// </summary>
-        /// <param name="dbFilename">Path to database file</param>
-        /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
-        public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgorithm)
-        {
-            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
-
-            switch (cryptoAlgorithm)
+            switch (cryptoAlgoritm)
             {
                 case CryptoAlgoritms.AesWith256BitsKey:
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
@@ -1192,10 +1313,29 @@ namespace CryptoSQLite
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
                     break;
             }
-            _algorithm = cryptoAlgorithm;
+            _algorithm = cryptoAlgoritm;
             _solter = new SoltGenerator();
             _predicateTranslator = new PredicateTranslator();
             _tables = new Dictionary<Type, TableMap>();
+            _joinOnTranslator = new JoinOnTranslator();
+        }
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFilename">Path to SQLite database file.</param>
+        public CryptoSQLiteConnection(string dbFilename) : this(CryptoAlgoritms.AesWith256BitsKey)
+        {
+            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
+        }
+
+        /// <summary>
+        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// </summary>
+        /// <param name="dbFilename">Path to database file</param>
+        /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
+        public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgorithm) : this(cryptoAlgorithm)
+        {
+            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
         }
 
         #endregion
@@ -1629,7 +1769,7 @@ namespace CryptoSQLite
             foreach (var row in table)
             {
                 var item = new TTable();
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
                 items.Add(item);
             }
 
@@ -1672,7 +1812,7 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
 
                 FindReferencedTables(item); // here we get all referenced tables if they exist
 
@@ -1698,29 +1838,76 @@ namespace CryptoSQLite
             return FindUsingColumnValue<TTable>(tableMap, columnName, columnValue);
         }
 
+       
         /// <summary>
-        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
         /// </summary>
         /// <typeparam name="TTable1">Left table type</typeparam>
         /// <typeparam name="TTable2">Right table type</typeparam>
         /// <param name="whereCondition">Where clause</param>
         /// <param name="joiningConditionWithTable2">The relationship between the two tables for joining them.</param>
-        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
-        /// <returns>Results of Jioning request</returns>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
         public IEnumerable<object> Join<TTable1, TTable2>(Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2, 
+            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
             Func<TTable1, TTable2, object> joiningResultView)
-            where TTable1 : class, new() 
+            where TTable1 : class, new()
             where TTable2 : class, new()
         {
             var tableMap1 = CheckTable<TTable1>();
             var tableMap2 = CheckTable<TTable2>();
 
-            var onJoinTranslator = new JoinOnTranslator();
-            var onJoin = onJoinTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
-            return new[] {joiningResultView(new TTable1(), new TTable2())};
+            if (tableMap1.Type == tableMap2.Type)
+                throw new CryptoSQLiteException("You can't join table with itself.");
+            
+            var onJoin = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+
+            object[] values = {};
+
+            var where = whereCondition != null
+                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                : null;
+
+            var cmd = SqlCmds.CmdJoinTwoTables(tableMap1, tableMap2, onJoin, where);
+            var toRet = new List<object>();
+            try
+            {
+                var tables = ReadRowsFromDatabase(cmd, values);
+
+                foreach (var row in tables)
+                {
+                    // First Table
+                    var cols1 = row[tableMap1.Name];
+                    var tableInst1 = new TTable1();
+                    ProcessRow(tableMap1.Columns.Values, cols1, tableInst1);
+
+                    // Second Table
+                    var cols2 = row[tableMap2.Name];
+                    var tableInst2 = new TTable2();
+                    ProcessRow(tableMap2.Columns.Values, cols2, tableInst2);
+
+                    toRet.Add(joiningResultView(tableInst1, tableInst2));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+
+            return toRet;
         }
 
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
         public IEnumerable<object> Join<TTable1, TTable2, TTable3>(Expression<Predicate<TTable1>> whereCondition,
             Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
             Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3, 
@@ -1729,9 +1916,70 @@ namespace CryptoSQLite
             where TTable2 : class, new()
             where TTable3 : class, new()
         {
-            return new[] { joiningResultView(new TTable1(), new TTable2(), new TTable3()) };
+            var tableMap1 = CheckTable<TTable1>();
+            var tableMap2 = CheckTable<TTable2>();
+            var tableMap3 = CheckTable<TTable3>();
+
+            if (tableMap1.Type == tableMap2.Type || tableMap1.Type == tableMap3.Type || tableMap2.Type == tableMap3.Type)
+                throw new CryptoSQLiteException("You can't join table with itself.");
+
+            var onJoin12 = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+
+            var onJoin13 = _joinOnTranslator.Traslate(joiningConditionWithTable3, tableMap1, tableMap3);
+
+            object[] values = { };
+
+            var where = whereCondition != null
+                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                : null;
+
+            var cmd = SqlCmds.CmdJoinThreeTables(tableMap1, tableMap2, tableMap3, onJoin12, onJoin13, where);
+            var toRet = new List<object>();
+            try
+            {
+                var tables = ReadRowsFromDatabase(cmd, values);
+
+                foreach (var row in tables)
+                {
+                    // First Table
+                    var cols1 = row[tableMap1.Name];
+                    var tableInst1 = new TTable1();
+                    ProcessRow(tableMap1.Columns.Values, cols1, tableInst1);
+
+                    // Second Table
+                    var cols2 = row[tableMap2.Name];
+                    var tableInst2 = new TTable2();
+                    ProcessRow(tableMap2.Columns.Values, cols2, tableInst2);
+
+                    // Third Table
+                    var cols3 = row[tableMap3.Name];
+                    var tableInst3 = new TTable3();
+                    ProcessRow(tableMap3.Columns.Values, cols3, tableInst3);
+
+                    toRet.Add(joiningResultView(tableInst1, tableInst2, tableInst3));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+
+            return toRet;
         }
 
+        /// <summary>
+        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
+        /// </summary>
+        /// <typeparam name="TTable1">Main table type</typeparam>
+        /// <typeparam name="TTable2">First joined table type</typeparam>
+        /// <typeparam name="TTable3">Second joined table type</typeparam>
+        /// <typeparam name="TTable4">Third joined table type</typeparam>
+        /// <param name="whereCondition">Where clause</param>
+        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
+        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
+        /// <param name="joiningConditionWithTable4">The relationship between Main table and the Third table for joining them.</param>
+        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
+        /// <returns>Joined tables</returns>
         public IEnumerable<object> Join<TTable1, TTable2, TTable3, TTable4>(Expression<Predicate<TTable1>> whereCondition,
             Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
             Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
@@ -1742,7 +1990,66 @@ namespace CryptoSQLite
             where TTable3 : class, new() 
             where TTable4 : class, new()
         {
-            return new[] { joiningResultView(new TTable1(), new TTable2(), new TTable3(), new TTable4()) };
+            var tableMap1 = CheckTable<TTable1>();
+            var tableMap2 = CheckTable<TTable2>();
+            var tableMap3 = CheckTable<TTable3>();
+            var tableMap4 = CheckTable<TTable4>();
+
+            if (tableMap1.Type == tableMap2.Type || tableMap1.Type == tableMap3.Type || tableMap2.Type == tableMap3.Type ||
+                tableMap1.Type == tableMap4.Type || tableMap2.Type == tableMap4.Type || tableMap3.Type == tableMap4.Type)
+                throw new CryptoSQLiteException("You can't join table with itself.");
+
+            var onJoin12 = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+
+            var onJoin13 = _joinOnTranslator.Traslate(joiningConditionWithTable3, tableMap1, tableMap3);
+
+            var onJoin14 = _joinOnTranslator.Traslate(joiningConditionWithTable4, tableMap1, tableMap4);
+
+
+
+            object[] values = { };
+
+            var where = whereCondition != null
+                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                : null;
+
+            var cmd = SqlCmds.CmdJoinFourTables(tableMap1, tableMap2, tableMap3, tableMap4, onJoin12, onJoin13, onJoin14, where);
+            var toRet = new List<object>();
+            try
+            {
+                var tables = ReadRowsFromDatabase(cmd, values);
+
+                foreach (var row in tables)
+                {
+                    // First Table
+                    var cols1 = row[tableMap1.Name];
+                    var tableInst1 = new TTable1();
+                    ProcessRow(tableMap1.Columns.Values, cols1, tableInst1);
+
+                    // Second Table
+                    var cols2 = row[tableMap2.Name];
+                    var tableInst2 = new TTable2();
+                    ProcessRow(tableMap2.Columns.Values, cols2, tableInst2);
+
+                    // Third Table
+                    var cols3 = row[tableMap3.Name];
+                    var tableInst3 = new TTable3();
+                    ProcessRow(tableMap3.Columns.Values, cols3, tableInst3);
+
+                    // Fourth Table
+                    var cols4 = row[tableMap4.Name];
+                    var tableInst4 = new TTable4();
+                    ProcessRow(tableMap4.Columns.Values, cols4, tableInst4);
+
+                    toRet.Add(joiningResultView(tableInst1, tableInst2, tableInst3, tableInst4));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+
+            return toRet;
         }
 
         /// <summary>
@@ -1815,7 +2122,7 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
 
                 FindReferencedTables(item, selectedProperties); // here we get all referenced tables if they exist
 
@@ -1887,7 +2194,7 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
 
                 FindReferencedTables(item, propertyNames.ToArray()); // here we get all referenced tables if they exist
 
@@ -1921,7 +2228,7 @@ namespace CryptoSQLite
             {
                 var item = new TTable();
 
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
 
                 FindReferencedTables(item); // here we get all referenced tables if they exist
 
@@ -2460,7 +2767,7 @@ namespace CryptoSQLite
             foreach (var row in table)
             {
                 var item = new TTable();
-                ProcessRow(mappedColumns, row, item);
+                ProcessRow(mappedColumns, row[tableName], item);
                 items.Add(item);
             }
 
@@ -2491,7 +2798,7 @@ namespace CryptoSQLite
             if (table.Count <= 0) return null;
 
             var item = new TTable();
-            ProcessRow(mappedColumns, table[0], item);
+            ProcessRow(mappedColumns, table[0][tableName], item);
             return item;
         }
 
@@ -2555,9 +2862,9 @@ namespace CryptoSQLite
             }
         }
 
-        private List<List<SqlColumnInfo>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values)
+        private List<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values)
         {
-            var table = new List<List<SqlColumnInfo>>();
+            var table = new List<Dictionary<string,List<SqlColumnInfo>>>();
             try
             {
                 var notNullValues = values.Where(v => v != null).ToArray();
@@ -2566,9 +2873,13 @@ namespace CryptoSQLite
 
                 foreach (var row in queryable)
                 {
-                    var columnsFromFile = new List<SqlColumnInfo>();
+                    var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
                     foreach (var column in row)
                     {
+                        if (!columnsFromFile.ContainsKey(column.ColumnInfo.TableName))
+                        {
+                            columnsFromFile.Add(column.ColumnInfo.TableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
+                        }
                         var tmp = new SqlColumnInfo {Name = column.ColumnInfo.Name};
 
                         if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
@@ -2601,7 +2912,7 @@ namespace CryptoSQLite
                                     throw new CryptoSQLiteException("Type is not compatible with SQLite database");
                             }
                         }
-                        columnsFromFile.Add(tmp);   // NULL will be NULL.
+                        columnsFromFile[column.ColumnInfo.TableName].Add(tmp);   // NULL will be NULL.
                     }
                     table.Add(columnsFromFile);
                 }

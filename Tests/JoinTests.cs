@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using CryptoSQLite;
 using NUnit.Framework;
-using Tests.Tables;
 
 namespace Tests
 {
@@ -30,6 +31,12 @@ namespace Tests
         [ForeignKey("Warehouse", false)]    // this table won't be automatically obtained from database, when we get this table, because we set 'autoResolveReference' parameter to false.
         public int WarehouseId { get; set; }
         public Warehouse Warehouse { get; set; }
+
+        public bool Equals(Product p)
+        {
+            return Serial == p.Serial && Description == p.Description && CustomerId == p.CustomerId &&
+                   ManufacturerId == p.ManufacturerId && WarehouseId == p.WarehouseId;
+        }
     }
 
     [CryptoTable("Customers")]
@@ -45,6 +52,11 @@ namespace Tests
         public string Address { get; set; }
 
         public int Rating { get; set; }
+
+        public bool Equals(Customer c)
+        {
+            return ContactName == c.ContactName && Address == c.Address && Rating == c.Rating;
+        }
     }
 
     [CryptoTable("Manufacturers")]
@@ -59,6 +71,11 @@ namespace Tests
 
         [Encrypted]
         public int Salary { get; set; }
+
+        public bool Equals(Manufacturer m)
+        {
+            return FirstName == m.FirstName && LastName == m.LastName && Salary == m.Salary;
+        }
     }
 
     [CryptoTable("Warehouses")]
@@ -74,6 +91,22 @@ namespace Tests
         public string PhoneNumber { get; set; }
 
         public string Manager { get; set; }
+
+        public bool Equals(Warehouse w)
+        {
+            return Address == w.Address && PhoneNumber == w.PhoneNumber && Manager == w.Manager;
+        }
+    }
+
+    public class JoinedTables
+    {
+        public Product Product { get; set; }
+
+        public Customer Customer { get; set; }
+
+        public Manufacturer Manufacturer { get; set; }
+
+        public Warehouse Warehouse { get; set; }
     }
 
     #endregion
@@ -81,60 +114,124 @@ namespace Tests
     public class JoinTests : BaseTest
     {
         [Test]
-        public void JoinTwoTables()
+        public async Task JoinTwoTables()
         {
-            var warehouse1 = new Warehouse{Address = "Tuchachevskogo 31-30",Manager = "Safonova Anna",PhoneNumber = "7000665"};
-            var warehouse2 = new Warehouse{Address = "Ohotskaya",Manager = "Safonov Alexei",PhoneNumber = "7979665"};
+            
+            var warehouse1 = new Warehouse{ Address = "Tuchachevskogo 31-30", Manager = "Safonova Anna",  PhoneNumber = "7000665" };
+            var warehouse2 = new Warehouse{ Address = "Ohotskaya",            Manager = "Safonov Alexei", PhoneNumber = "7979665" };
 
-            var manufacturer1 = new Manufacturer{FirstName = "Alexei",LastName = "Safonov",Salary = 1800};
-            var manufacturer2 = new Manufacturer{FirstName = "Hanna",LastName = "Safonova",Salary = 250};
-            var manufacturer3 = new Manufacturer{FirstName = "Tatiana",LastName = "Kulikova",Salary = 550};
+            var manufacturer1 = new Manufacturer{ FirstName = "Alexei",  LastName = "Safonov",  Salary = 1800 };
+            var manufacturer2 = new Manufacturer{ FirstName = "Hanna",   LastName = "Safonova", Salary = 250 };
+            var manufacturer3 = new Manufacturer{ FirstName = "Tatiana", LastName = "Kulikova", Salary = 550 };
 
-            var customer1 = new Customer {Address = "New York", ContactName = "Sidorov Evgeniy", Rating = 100};
-            var customer2 = new Customer { Address = "Moscow", ContactName = "Sidorova Evgenia", Rating = 99 };
-            var customer3 = new Customer { Address = "Minsk", ContactName = "Luka", Rating = 2 };
+            var customer1 = new Customer { Address = "New York", ContactName = "Sidorov Evgeniy",  Rating = 100 };
+            var customer2 = new Customer { Address = "Moscow",   ContactName = "Sidorova Evgenia", Rating = 99 };
+            var customer3 = new Customer { Address = "Minsk",    ContactName = "Luka",             Rating = 2 };
 
-            var product1 = new Product{Serial = 12355444,Description = "Toy Pistol",CustomerId = 2,ManufacturerId = 1,WarehouseId = 1};
-            var product2 = new Product { Serial = 483783, Description = "Book of jungle", CustomerId = null, ManufacturerId = 2, WarehouseId = 1 };
-            var product3 = new Product { Serial = 2456434, Description = "Bycycle", CustomerId = 1, ManufacturerId = 3, WarehouseId = 2 };
-            var product4 = new Product { Serial = 345333, Description = "Train", CustomerId = null, ManufacturerId = 1, WarehouseId = 1 };
-            var product5 = new Product { Serial = 6786678, Description = "MotoByke", CustomerId = 2, ManufacturerId = 3, WarehouseId = 2 };
+            var product1 = new Product { Serial = 11111, Description = "Toy Pistol",     CustomerId = 2,    ManufacturerId = 1, WarehouseId = 1 };
+            var product2 = new Product { Serial = 22222, Description = "Book of jungle", CustomerId = 4,    ManufacturerId = 2, WarehouseId = 1 };
+            var product3 = new Product { Serial = 33333, Description = "Bycycle",        CustomerId = 1,    ManufacturerId = 3, WarehouseId = 2 };
+            var product4 = new Product { Serial = 44444, Description = "Train",          CustomerId = null, ManufacturerId = 1, WarehouseId = 1 };
+            var product5 = new Product { Serial = 55555, Description = "MotoByke",       CustomerId = 3,    ManufacturerId = 3, WarehouseId = 2 };
 
-            foreach (var db in GetConnections())
+            foreach (var db in GetAsyncConnections())
             {
                 try
                 {
-                    db.DeleteTable<Product>();
-                    db.DeleteTable<Warehouse>();
-                    db.DeleteTable<Manufacturer>();
-                    db.DeleteTable<Customer>();
+                    await db.DeleteTableAsync<Product>();
+                    await db.DeleteTableAsync<Warehouse>();
+                    await db.DeleteTableAsync<Manufacturer>();
+                    await db.DeleteTableAsync<Customer>();
 
 
-                    db.CreateTable<Warehouse>();
-                    db.CreateTable<Manufacturer>();
-                    db.CreateTable<Customer>();
-                    db.CreateTable<Product>();
+                    await db.CreateTableAsync<Warehouse>();
+                    await db.CreateTableAsync<Manufacturer>();
+                    await db.CreateTableAsync<Customer>();
+                    await db.CreateTableAsync<Product>();
 
-                    db.InsertItem(warehouse1);
-                    db.InsertItem(warehouse2);
+                    await db.InsertItemAsync(warehouse1);
+                    await db.InsertItemAsync(warehouse2);
 
-                    db.InsertItem(manufacturer1);
-                    db.InsertItem(manufacturer2);
-                    db.InsertItem(manufacturer3);
+                    await db.InsertItemAsync(manufacturer1);
+                    await db.InsertItemAsync(manufacturer2);
+                    await db.InsertItemAsync(manufacturer3);
 
-                    db.InsertItem(customer1);
-                    db.InsertItem(customer2);
-                    db.InsertItem(customer3);
+                    await db.InsertItemAsync(customer1);
+                    await db.InsertItemAsync(customer2);
+                    await db.InsertItemAsync(customer3);
 
-                    db.InsertItem(product1);
-                    db.InsertItem(product2);
-                    db.InsertItem(product3);
-                    db.InsertItem(product4);
-                    db.InsertItem(product5);
+                    await db.InsertItemAsync(product1);
+                    await db.InsertItemAsync(product2);
+                    await db.InsertItemAsync(product3);
+                    await db.InsertItemAsync(product4);
+                    await db.InsertItemAsync(product5);
 
-                    var max = db.Join<Product, Customer>(i => i.Id == 1, (p,c) => p.CustomerId == c.Id, (t1, t2) => new object[] {t1, t2});
+                    var twoJoinedTablesResult = await db.JoinAsync<Product, Customer>(null, (p, c) => p.CustomerId == c.Id, (t1, t2) => new JoinedTables { Product = t1, Customer = t2});
 
-                    
+                    var twoJoinedTables = twoJoinedTablesResult.ToArray();
+
+                    Assert.NotNull(twoJoinedTables);
+                    Assert.IsTrue(twoJoinedTables.Length == 3);
+
+                    var joined = (JoinedTables) twoJoinedTables[0];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2));
+
+                    joined = (JoinedTables) twoJoinedTables[1];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1));
+
+                    joined = (JoinedTables) twoJoinedTables[2];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3));
+
+                    var threeJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer>(null,
+                        (product, customer) => product.CustomerId == customer.Id,
+                        (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
+                        (product, customer, manufacturer) =>
+                                new JoinedTables {Customer = customer, Product = product, Manufacturer = manufacturer});
+
+                    var threeJoinedTables = threeJoinedTablesResult.ToArray();
+
+                    Assert.NotNull(threeJoinedTables);
+                    Assert.NotNull(threeJoinedTables.Length == 3);
+
+                    joined = (JoinedTables)threeJoinedTables[0];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1));
+
+                    joined = (JoinedTables)threeJoinedTables[1];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3));
+
+                    joined = (JoinedTables)threeJoinedTables[2];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3));
+
+                    var fourJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, Warehouse>(null,
+                        (product, customer) => product.CustomerId == customer.Id,
+                        (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
+                        (product, warehouse) => product.WarehouseId == warehouse.Id,
+                        (product, customer, manufacturer, warehouse) =>
+                                new JoinedTables { Customer = customer, Product = product, Manufacturer = manufacturer, Warehouse = warehouse});
+
+                    var fourJoinedTables = fourJoinedTablesResult.ToArray();
+
+                    Assert.NotNull(fourJoinedTables);
+                    Assert.NotNull(fourJoinedTables.Length == 3);
+
+                    joined = (JoinedTables)fourJoinedTables[0];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1) && joined.Warehouse.Equals(warehouse1));
+
+                    joined = (JoinedTables)fourJoinedTables[1];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
+
+                    joined = (JoinedTables)fourJoinedTables[2];
+                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
+
                 }
                 catch (CryptoSQLiteException cex)
                 {

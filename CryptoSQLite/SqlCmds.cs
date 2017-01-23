@@ -211,5 +211,77 @@ namespace CryptoSQLite
         {
             return $"SELECT AVG({columnName}) FROM {tableName} WHERE ";
         }
+
+        public static string CmdJoinTwoTables(TableMap table1, TableMap table2, string onJoin, string wherePredicate)
+        {
+            var columns1 = table1.Columns.Keys.Select(n => $"{table1.Name}.{n}").ToList();
+            var columns2 = table2.Columns.Keys.Select(n => $"{table2.Name}.{n}").ToList();
+
+            if (table1.HasEncryptedColumns)
+                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table2.HasEncryptedColumns)
+                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
+
+            var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
+
+            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin}{where}";
+
+            return cmd;
+        }
+
+        public static string CmdJoinThreeTables(TableMap table1, TableMap table2, TableMap table3, string onJoin12, string onJoin13, string wherePredicate)
+        {
+            var columns1 = table1.Columns.Keys.Select(n => $"{table1.Name}.{n}").ToList();
+            var columns2 = table2.Columns.Keys.Select(n => $"{table2.Name}.{n}").ToList();
+            var columns3 = table3.Columns.Keys.Select(n => $"{table3.Name}.{n}").ToList();
+
+            if (table1.HasEncryptedColumns)
+                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table2.HasEncryptedColumns)
+                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table3.HasEncryptedColumns)
+                columns3.Add($"{table3.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3);
+
+            var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
+
+            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13}{where}";
+
+            return cmd;
+        }
+
+        public static string CmdJoinFourTables(TableMap table1, TableMap table2, TableMap table3, TableMap table4, string onJoin12, string onJoin13, string onJoin14, string wherePredicate)
+        {
+            var columns1 = table1.Columns.Keys.Select(n => $"{table1.Name}.{n}").ToList();
+            var columns2 = table2.Columns.Keys.Select(n => $"{table2.Name}.{n}").ToList();
+            var columns3 = table3.Columns.Keys.Select(n => $"{table3.Name}.{n}").ToList();
+            var columns4 = table4.Columns.Keys.Select(n => $"{table4.Name}.{n}").ToList();
+
+            if (table1.HasEncryptedColumns)
+                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table2.HasEncryptedColumns)
+                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table3.HasEncryptedColumns)
+                columns3.Add($"{table3.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (table4.HasEncryptedColumns)
+                columns4.Add($"{table4.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3) + ", " + string.Join(", ", columns4);
+
+            var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
+
+            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13} INNER JOIN {table4.Name} ON {onJoin14}{where}";
+
+            return cmd;
+        }
     }
 }
