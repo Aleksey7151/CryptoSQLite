@@ -1,4 +1,0 @@
-Limitations of CryptoSQLite PCL.
-
-1. After using encryption key it must be cleaned immediately. 
-N. PCL implements CRUD (Create, Read, Update, Delete) functions.
