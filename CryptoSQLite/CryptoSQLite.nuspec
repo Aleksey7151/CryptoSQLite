@@ -6,7 +6,7 @@
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
-    <iconUrl>https://github.com/Aleksey7151/CryptoSQLite/blob/master/CryptoSQLite/PackageIcon.png</iconUrl>
+    <iconUrl>file://Samples/Icons/Icon_dialog.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>ORM for SQLite with data encryption.</summary>
     <description>
@@ -21,7 +21,7 @@
       3. CryptoSQLite will encrypt all properties that have '[Encrypted]' attribute automatically when you are adding (updating) elements to your Table and decrypt all [Encrypted] properties when you are getting elements from a Table in the database file.
       Last updates:
       In 2.1.8 version 'COUNT', 'MAX', 'MIN', 'SUM', and 'AVG' SQLite functions has been implemented. In ForeignKey Attribute Constructor bool parameter: 'autoResolveReference' has been added, this parameter determines if referenced table must be automatically obtained from database 
-      In 2.1.9 version 'Join' function for two, three and four tables has been implemented. 
+      In 2.1.9 version Join tables function has been implemented. You can Join two, three and four tables. 
     </description>
     <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid winphone monotouch key encrypt aes des gost linq2sql linqtosql linq win8</tags>
     <dependencies>
