@@ -41,11 +41,11 @@ namespace CryptoSQLite
 
         public static string CmdInsertOrReplace(string tableName, IEnumerable<string> columns)
         {
-            var enumerable = columns as string[] ?? columns.ToArray();
+            var enumerable = columns.ToArray();
 
-            var cols = string.Join(",", enumerable.Select(x => x));
+            var cols = string.Join(", ", enumerable.Select(x => x));
 
-            var vals = string.Join(",", enumerable.Select(x => "?"));
+            var vals = string.Join(", ", enumerable.Select(x => "?"));
 
             var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({vals})";
 
@@ -55,14 +55,22 @@ namespace CryptoSQLite
 
         public static string CmdInsert(string tableName, IEnumerable<string> columns)
         {
-            var enumerable = columns as string[] ?? columns.ToArray();
+            var enumerable = columns.ToArray();
 
-            var cols = string.Join(",", enumerable.Select(x => x));
+            var cols = string.Join(", ", enumerable.Select(x => x));
 
-            var vals = string.Join(",", enumerable.Select(x => "?"));
+            var vals = string.Join(", ", enumerable.Select(x => "?"));
 
             var cmd = $"INSERT INTO {tableName} ({cols}) VALUES ({vals})";
 
+            return cmd;
+        }
+
+        public static string CmdUpdate(string tableName, IEnumerable<string> columns, string predicate)
+        {
+            var enumerable = columns.Select(c => $"{c} = (?)");
+            var cols = string.Join(", ", enumerable);
+            var cmd = $"UPDATE {tableName} SET {cols} WHERE {predicate}";
             return cmd;
         }
 

@@ -7,7 +7,7 @@ using Tests.Tables;
 namespace Tests
 {
     [TestFixture]
-    public class UpdateItemTests : BaseTest
+    public class InsertOrReplaceItemTests : BaseTest
     {
         [Test]
         public void UpdateShortNumbers()

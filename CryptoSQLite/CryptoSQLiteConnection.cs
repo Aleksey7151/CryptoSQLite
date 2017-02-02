@@ -219,6 +219,15 @@ namespace CryptoSQLite
         void InsertOrReplaceItem<TTable>(TTable item) where TTable : class;
 
         /// <summary>
+        /// Updates the row(s) in table <typeparamref name="TTable"/> with values from <paramref name="item"/>.
+        /// <para/>LIMITATIONS: This function updates all columns in a row with values from <paramref name="item"/>. We can't specify names of columns which values we want to update. That's because some columns can be encrypted.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="item">Element with new values for updating.</param>
+        /// <param name="predicate">Condition which determines row(s) that must be updated.</param>
+        void Update<TTable>(TTable item, Expression<Predicate<TTable>> predicate) where TTable : class;
+
+        /// <summary>
         /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
         /// </summary>
         /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
@@ -545,6 +554,15 @@ namespace CryptoSQLite
         /// <param name="item">Instance of element to insert.</param>
         /// <exception cref="CryptoSQLiteException"></exception>
         Task InsertOrReplaceItemAsync<TTable>(TTable item) where TTable : class;
+
+        /// <summary>
+        /// Updates the row(s) in table <typeparamref name="TTable"/> with values from <paramref name="item"/>.
+        /// <para/>LIMITATIONS: This function updates all columns in a row with values from <paramref name="item"/>. We can't specify names of columns which values we want to update. That's because some columns can be encrypted.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="item">Element with new values for updating.</param>
+        /// <param name="predicate">Condition which determines row(s) that must be updated.</param>
+        Task UpdateAsync<TTable>(TTable item, Expression<Predicate<TTable>> predicate) where TTable : class;
 
         /// <summary>
         /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
@@ -927,6 +945,18 @@ namespace CryptoSQLite
         public async Task InsertOrReplaceItemAsync<TTable>(TTable item) where TTable : class
         {
             await Task.Run(() => _connection.InsertOrReplaceItem(item));
+        }
+
+        /// <summary>
+        /// Updates the row(s) in table <typeparamref name="TTable"/> with values from <paramref name="item"/>.
+        /// <para/>LIMITATIONS: This function updates all columns in a row with values from <paramref name="item"/>. We can't specify names of columns which values we want to update. That's because some columns can be encrypted.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="item">Element with new values for updating.</param>
+        /// <param name="predicate">Condition which determines row(s) that must be updated.</param>
+        public async Task UpdateAsync<TTable>(TTable item, Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            await Task.Run(() => _connection.Update(item, predicate));
         }
 
         /// <summary>
@@ -1672,6 +1702,94 @@ namespace CryptoSQLite
             var tableMap = CheckTable<TTable>();
 
             InsertRowInTable(tableMap, item, true);
+        }
+
+        /// <summary>
+        /// Updates the row(s) in table <typeparamref name="TTable"/> with values from <paramref name="item"/>.
+        /// <para/>LIMITATIONS: This function updates all columns in a row with values from <paramref name="item"/>. We can't specify names of columns which values we want to update. That's because some columns can be encrypted.
+        /// </summary>
+        /// <typeparam name="TTable">Type of table.</typeparam>
+        /// <param name="item">Element with new values for updating.</param>
+        /// <param name="predicate">Condition which determines row(s) that must be updated.</param>
+        public void Update<TTable>(TTable item, Expression<Predicate<TTable>> predicate) where TTable : class
+        {
+            if(predicate == null)
+                throw new CryptoSQLiteException("Predicate can't be null");
+
+            var tableMap = CheckTable<TTable>();
+
+            var columnNames = new List<string>();
+
+            var columnValues = new List<object>();
+
+            byte[] solt = null;
+
+            ICryptoProvider encryptor = null;
+
+            var tableName = tableMap.Name;
+
+            if (tableMap.HasEncryptedColumns)
+            {
+                solt = GetSolt();
+                encryptor = GetEncryptor(typeof(TTable), solt);
+            }
+
+            var columns = tableMap.Columns;
+
+            foreach (var column in columns)
+            {
+                if (column.Value.IsAutoIncremental)
+                    continue; // if column is AutoIncremental so we don't want to replace this row
+
+                var value = ((IValues<TTable>)column.Value).ValueGetter(item);
+                // Here we get value without reflection!!! We use here Expressions
+
+                if (value == null && column.Value.DefaultValue != null)
+                    continue;
+                // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
+
+                if (value == null && column.Value.IsNotNull && column.Value.DefaultValue == null)
+                    throw new CryptoSQLiteException(
+                        $"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
+
+                columnNames.Add(column.Key);
+
+                var clrType = column.Value.ClrType;
+
+                object sqlValue = null;
+
+                if (value != null)
+                {
+                    sqlValue = column.Value.IsEncrypted
+                        ? GetEncryptedValueForSql(clrType, value, column.Value.ColumnNumber, encryptor)
+                        : GetOpenValueForSql(clrType, value);
+                }
+
+                columnValues.Add(sqlValue); // NULL will be NULL
+            }
+
+            if (solt != null)
+            {
+                columnNames.Add(SoltColumnName);
+                columnValues.Add(solt);
+            }
+
+            object[] values;
+            var wherePredicate = _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values, out values);
+
+            var cmd = SqlCmds.CmdUpdate(tableName, columnNames, wherePredicate);
+
+            columnValues.AddRange(values);
+
+            try
+            {
+                _connection.Execute(cmd, columnValues.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message,
+                    "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
+            }
         }
 
         /// <summary>

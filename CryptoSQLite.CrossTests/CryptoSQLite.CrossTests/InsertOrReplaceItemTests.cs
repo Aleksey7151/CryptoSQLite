@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
-    public class UpdateItemTests : BaseTest
+    public class InsertOrReplaceItemTests : BaseTest
     {
         [Test]
         public void UpdateShortNumbers()

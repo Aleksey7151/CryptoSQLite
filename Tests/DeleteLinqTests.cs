@@ -262,6 +262,87 @@ namespace Tests
         }
 
         [Test]
+        public async Task Delete_Using_Equal_To_True_Predicate()
+        {
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<SecretTask>();
+                    await db.CreateTableAsync<SecretTask>();
+
+                    await db.InsertItemAsync(st1);
+                    await db.InsertItemAsync(st2);
+                    await db.InsertItemAsync(st3);
+
+                    await db.DeleteAsync<SecretTask>(a => a.IsDone);
+
+                    var result = await db.TableAsync<SecretTask>();
+                    Assert.NotNull(result);
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 1);
+                    Assert.IsTrue(table[0].Equal(st2));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public async Task Delete_Using_Equal_To_False_Predicate()
+        {
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
+            foreach (var db in GetAsyncConnections())
+            {
+                try
+                {
+                    await db.DeleteTableAsync<SecretTask>();
+                    await db.CreateTableAsync<SecretTask>();
+
+                    await db.InsertItemAsync(st1);
+                    await db.InsertItemAsync(st2);
+                    await db.InsertItemAsync(st3);
+
+                    await db.DeleteAsync<SecretTask>(a => !a.IsDone);
+
+                    var result = await db.TableAsync<SecretTask>();
+                    Assert.NotNull(result);
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 2);
+                    Assert.IsTrue(table[0].Equal(st1));
+                    Assert.IsTrue(table[1].Equal(st3));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public async Task Delete_Using_Equal_To_Explicit_String_Predicate()
         {
             var accounts = GetAccounts();

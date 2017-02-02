@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
     public class UpdateTests : BaseTest
@@ -19,7 +15,7 @@ namespace Tests
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
 
-            var newItem = new SecretTask {IsDone = false, Price = 19191, Description = "Updated descriptionen", SecretToDo = "Updated Secret to DO."};
+            var newItem = new SecretTask { IsDone = false, Price = 19191, Description = "Updated descriptionen", SecretToDo = "Updated Secret to DO." };
 
             foreach (var db in GetConnections())
             {
