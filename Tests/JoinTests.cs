@@ -166,26 +166,26 @@ namespace Tests
                     await db.InsertItemAsync(product4);
                     await db.InsertItemAsync(product5);
 
-                    var twoJoinedTablesResult = await db.JoinAsync<Product, Customer>(null, (p, c) => p.CustomerId == c.Id, (t1, t2) => new JoinedTables { Product = t1, Customer = t2});
+                    var twoJoinedTablesResult = await db.JoinAsync<Product, Customer, JoinedTables>(null, (p, c) => p.CustomerId == c.Id, (t1, t2) => new JoinedTables { Product = t1, Customer = t2});
 
                     var twoJoinedTables = twoJoinedTablesResult.ToArray();
 
                     Assert.NotNull(twoJoinedTables);
                     Assert.IsTrue(twoJoinedTables.Length == 3);
 
-                    var joined = (JoinedTables) twoJoinedTables[0];
+                    var joined = twoJoinedTables[0];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2));
 
-                    joined = (JoinedTables) twoJoinedTables[1];
+                    joined = twoJoinedTables[1];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1));
 
-                    joined = (JoinedTables) twoJoinedTables[2];
+                    joined = twoJoinedTables[2];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3));
 
-                    var threeJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer>(null,
+                    var threeJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
                         (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
                         (product, customer, manufacturer) =>
@@ -196,19 +196,19 @@ namespace Tests
                     Assert.NotNull(threeJoinedTables);
                     Assert.NotNull(threeJoinedTables.Length == 3);
 
-                    joined = (JoinedTables)threeJoinedTables[0];
+                    joined = threeJoinedTables[0];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1));
 
-                    joined = (JoinedTables)threeJoinedTables[1];
+                    joined = threeJoinedTables[1];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3));
 
-                    joined = (JoinedTables)threeJoinedTables[2];
+                    joined = threeJoinedTables[2];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3));
 
-                    var fourJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, Warehouse>(null,
+                    var fourJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, Warehouse, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
                         (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
                         (product, warehouse) => product.WarehouseId == warehouse.Id,
@@ -220,15 +220,15 @@ namespace Tests
                     Assert.NotNull(fourJoinedTables);
                     Assert.NotNull(fourJoinedTables.Length == 3);
 
-                    joined = (JoinedTables)fourJoinedTables[0];
+                    joined = fourJoinedTables[0];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
                     Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1) && joined.Warehouse.Equals(warehouse1));
 
-                    joined = (JoinedTables)fourJoinedTables[1];
+                    joined = fourJoinedTables[1];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
                     Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
 
-                    joined = (JoinedTables)fourJoinedTables[2];
+                    joined = fourJoinedTables[2];
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
                     Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
 
