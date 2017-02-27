@@ -93,6 +93,9 @@ namespace CryptoSQLite.Expressions
                 if (column == null)
                     throw new ArgumentException($"Table {table.Name} doesn't contain column with name {memberExp.Member.Name}.");
 
+                if(column.IsEncrypted)
+                    throw new CryptoSQLiteException("Columns that are used in joining expressions can't be Encrypted.");
+
                 _joinConditions.Add($"{table.Name}.{column.Name}");
                 
                 return memberExp;

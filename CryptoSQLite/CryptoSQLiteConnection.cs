@@ -333,8 +333,25 @@ namespace CryptoSQLite
             where TTable3 : class, new()
             where TTable4 : class, new();
 
-
         /// <summary>
+        /// The LeftJoin function returns all rows from the left table <typeparamref name="TLeftTable"/>, with the matching rows in the right table <typeparamref name="TRightTable"/>. The result is NULL in the right side when there is no match
+        /// </summary>
+        /// <typeparam name="TLeftTable">Type of the left table</typeparam>
+        /// <typeparam name="TRightTable">Type of the right table</typeparam>
+        /// <typeparam name="TJoinResult">Type of joining result</typeparam>
+        /// <param name="whereCondition">Where clause for left table</param>
+        /// <param name="keysSelectorExpression">The relationship between Left table and the Right table for joining them.</param>
+        /// <param name="joiningResult">Delegate that determines the view of the joining result.</param>
+        /// <returns></returns>
+        IEnumerable<TJoinResult> LeftJoin<TLeftTable, TRightTable, TJoinResult>(
+            Expression<Predicate<TLeftTable>> whereCondition,
+            Expression<Func<TLeftTable, TRightTable, bool>> keysSelectorExpression,
+            Func<TLeftTable, TRightTable, TJoinResult> joiningResult)
+            where TLeftTable : class, new()
+            where TRightTable : class, new();
+
+
+            /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
         /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
         /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
@@ -657,6 +674,23 @@ namespace CryptoSQLite
             where TTable2 : class, new()
             where TTable3 : class, new()
             where TTable4 : class, new();
+
+        /// <summary>
+        /// The LeftJoin function returns all rows from the left table <typeparamref name="TLeftTable"/>, with the matching rows in the right table <typeparamref name="TRightTable"/>. The result is NULL in the right side when there is no match
+        /// </summary>
+        /// <typeparam name="TLeftTable">Type of the left table</typeparam>
+        /// <typeparam name="TRightTable">Type of the right table</typeparam>
+        /// <typeparam name="TJoinResult">Type of joining result</typeparam>
+        /// <param name="whereCondition">Where clause for left table</param>
+        /// <param name="keysSelectorExpression">The relationship between Left table and the Right table for joining them.</param>
+        /// <param name="joiningResult">Delegate that determines the view of the joining result.</param>
+        /// <returns></returns>
+        Task<IEnumerable<TJoinResult>> LeftJoinAsync<TLeftTable, TRightTable, TJoinResult>(
+            Expression<Predicate<TLeftTable>> whereCondition,
+            Expression<Func<TLeftTable, TRightTable, bool>> keysSelectorExpression,
+            Func<TLeftTable, TRightTable, TJoinResult> joiningResult)
+            where TLeftTable : class, new()
+            where TRightTable : class, new();
 
         /// <summary>
         /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
@@ -1068,6 +1102,26 @@ namespace CryptoSQLite
             where TTable4 : class, new()
         {
             return await Task.Run(() => _connection.Join(whereCondition, joiningConditionWithTable2, joiningConditionWithTable3, joiningConditionWithTable4, joiningResultView));
+        }
+
+        /// <summary>
+        /// The LeftJoin function returns all rows from the left table <typeparamref name="TLeftTable"/>, with the matching rows in the right table <typeparamref name="TRightTable"/>. The result is NULL in the right side when there is no match
+        /// </summary>
+        /// <typeparam name="TLeftTable">Type of the left table</typeparam>
+        /// <typeparam name="TRightTable">Type of the right table</typeparam>
+        /// <typeparam name="TJoinResult">Type of joining result</typeparam>
+        /// <param name="whereCondition">Where clause for left table</param>
+        /// <param name="keysSelectorExpression">The relationship between Left table and the Right table for joining them.</param>
+        /// <param name="joiningResult">Delegate that determines the view of the joining result.</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TJoinResult>> LeftJoinAsync<TLeftTable, TRightTable, TJoinResult>(
+            Expression<Predicate<TLeftTable>> whereCondition,
+            Expression<Func<TLeftTable, TRightTable, bool>> keysSelectorExpression,
+            Func<TLeftTable, TRightTable, TJoinResult> joiningResult)
+            where TLeftTable : class, new()
+            where TRightTable : class, new()
+        {
+            return await Task.Run(() => _connection.LeftJoin(whereCondition, keysSelectorExpression, joiningResult));
         }
 
         /// <summary>
@@ -2120,6 +2174,76 @@ namespace CryptoSQLite
                     ProcessRow(tableMap4.Columns.Values, cols4, tableInst4);
 
                     toRet.Add(joiningResultView(tableInst1, tableInst2, tableInst3, tableInst4));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+
+            return toRet;
+        }
+
+        /// <summary>
+        /// The LeftJoin function returns all rows from the left table <typeparamref name="TLeftTable"/>, with the matching rows in the right table <typeparamref name="TRightTable"/>. The result is NULL in the right side when there is no match
+        /// </summary>
+        /// <typeparam name="TLeftTable">Type of the left table</typeparam>
+        /// <typeparam name="TRightTable">Type of the right table</typeparam>
+        /// <typeparam name="TJoinResult">Type of joining result</typeparam>
+        /// <param name="whereCondition">Where clause for left table</param>
+        /// <param name="keysSelectorExpression">The relationship between Left table and the Right table for joining them.</param>
+        /// <param name="joiningResult">Delegate that determines the view of the joining result.</param>
+        /// <returns></returns>
+        public IEnumerable<TJoinResult> LeftJoin<TLeftTable, TRightTable, TJoinResult>(
+            Expression<Predicate<TLeftTable>> whereCondition,
+            Expression<Func<TLeftTable, TRightTable, bool>> keysSelectorExpression,
+            Func<TLeftTable, TRightTable, TJoinResult> joiningResult)
+            where TLeftTable : class, new()
+            where TRightTable : class, new()
+        {
+            var tableLeft = CheckTable<TLeftTable>();
+            var tableRight = CheckTable<TRightTable>();
+
+            if (tableLeft.Type == tableRight.Type)
+                throw new CryptoSQLiteException("You can't join table with itself.");
+
+            var onJoin = _joinOnTranslator.Traslate(keysSelectorExpression, tableLeft, tableRight);
+
+            object[] values = { };
+
+            var where = whereCondition != null
+                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableLeft.Name, tableLeft.Columns.Values, out values, true)
+                : null;
+
+            var cmd = SqlCmds.CmdLeftJoinTwoTables(tableLeft, tableRight, onJoin, where);
+            var toRet = new List<TJoinResult>();
+            try
+            {
+                var tables = ReadRowsFromDatabase(cmd, values);
+
+                foreach (var row in tables)
+                {
+                    // Left Table
+                    var cols1 = row[tableLeft.Name];
+                    var tableInst1 = new TLeftTable();
+                    ProcessRow(tableLeft.Columns.Values, cols1, tableInst1);
+
+                    // Right Table
+                    var cols2 = row[tableRight.Name];
+
+                    if (cols2.All(ci => ci.SqlType == null && ci.SqlValue == null))
+                    {
+                        toRet.Add(joiningResult(tableInst1, null));
+                    }
+                    else
+                    {
+                        var tableInst2 = new TRightTable();
+
+                        ProcessRow(tableRight.Columns.Values, cols2, tableInst2);
+
+                        toRet.Add(joiningResult(tableInst1, tableInst2));
+                    }
+                    
                 }
             }
             catch (Exception ex)

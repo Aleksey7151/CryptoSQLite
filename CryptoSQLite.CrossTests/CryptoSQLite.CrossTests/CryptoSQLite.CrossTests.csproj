@@ -44,6 +44,7 @@
     <Compile Include="DifferentKeysForDifferentTables.cs" />
     <Compile Include="ForeignKeyTests.cs" />
     <Compile Include="JoinTests.cs" />
+    <Compile Include="LeftJoinTests.cs" />
     <Compile Include="NotNullAndDefaultValueTests.cs" />
     <Compile Include="EncryptionKeySetTests.cs" />
     <Compile Include="FindTests.cs" />

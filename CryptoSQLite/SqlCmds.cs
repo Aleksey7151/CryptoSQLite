@@ -240,6 +240,26 @@ namespace CryptoSQLite
             return cmd;
         }
 
+        public static string CmdLeftJoinTwoTables(TableMap tableLeft, TableMap tableRight, string joiningCondition, string wherePredicate)
+        {
+            var columns1 = tableLeft.Columns.Keys.Select(n => $"{tableLeft.Name}.{n}").ToList();
+            var columns2 = tableRight.Columns.Keys.Select(n => $"{tableRight.Name}.{n}").ToList();
+
+            if (tableLeft.HasEncryptedColumns)
+                columns1.Add($"{tableLeft.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            if (tableRight.HasEncryptedColumns)
+                columns2.Add($"{tableRight.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+
+            var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
+
+            var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
+
+            string cmd = $"SELECT {selectedColumns} FROM {tableLeft.Name} LEFT JOIN {tableRight.Name} ON {joiningCondition}{where}";
+
+            return cmd;
+        }
+
         public static string CmdJoinThreeTables(TableMap table1, TableMap table2, TableMap table3, string onJoin12, string onJoin13, string wherePredicate)
         {
             var columns1 = table1.Columns.Keys.Select(n => $"{table1.Name}.{n}").ToList();

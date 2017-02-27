@@ -15,6 +15,7 @@ namespace CryptoSQLite.CryptoProviders
     /// <summary>
     /// Generates the solt (initialization secuense) for cryptografic algoritms. solt is not secret parameter, 
     /// so it can be open and written in database.
+    /// It's more important to have different solt values for different rows, and that's all.
     /// </summary>
     internal class SoltGenerator : ISoltGenerator
     {
