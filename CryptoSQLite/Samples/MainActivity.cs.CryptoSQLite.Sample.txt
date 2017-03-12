@@ -47,6 +47,19 @@ namespace CryptoSQLiteSample.Droid
         }
     }
 
+	internal class JoinResult
+    {
+        public Tasks Tasks { get; set; }
+
+        public Info Infos { get; set; }
+
+        public JoinResult(Tasks tasks, Info info)
+        {
+            Tasks = tasks;
+            Infos = info;
+        }
+    }
+
     [Activity(Label = "CryptoSQLiteSample.Droid", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
@@ -75,12 +88,14 @@ namespace CryptoSQLiteSample.Droid
                 var keyForDatabase = new byte[32];
                 db.SetEncryptionKey(keyForDatabase);
 
-                var specificKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2};
-                // SITTING SPECIFIC ENCRYPTION KEY ONLY FOR TABLE 'Infos'. THIS KEY WILL BE USED ONLY IN TABLE 'Infos' FOR ENCRYPTION DATA.
-                db.SetEncryptionKey<Info>(specificKey);
-
                 db.CreateTable<Tasks>();
                 db.CreateTable<Info>();
+
+				/*
+				var specificKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2};
+                // SITTING SPECIFIC ENCRYPTION KEY ONLY FOR TABLE 'Infos'. THIS KEY WILL BE USED ONLY IN TABLE 'Infos' FOR ENCRYPTION DATA.
+                db.SetEncryptionKey<Info>(specificKey);
+				*/
 
 				// All Properties that have [Encrypted] attribute properties will be automatically encrypted or decrypted
                 
@@ -103,46 +118,46 @@ namespace CryptoSQLiteSample.Droid
                 db.InsertItem(new Info { SomeInfo = "SomeInfo 5", SomeValue = 4.878544 });
 
 				// FIND ELEMENTS IN LINQ MANNER:
-
                 var completedTasks = db.Find<Tasks>(t => t.IsDone);             // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 1)
 
                 var notCompletedTasks = db.Find<Tasks>(t => !t.IsDone);         // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 0)
-
                 var tasksWithoutPrice = db.Find<Tasks>(t => t.Price == null);   // SQL Request will be: SELECT * FROM MyTasks WHERE (Price IS NULL) 
-
                 var tasksWithPrice = db.Find<Tasks>(t => t.Price != null);      // SQL Request will be: SELECT * FROM MyTasks WHERE (Price IS NOT NULL) 
-
                 var completedTasksWithPriceLessThanValue = db.Find<Tasks>(t => t.IsDone && t.Price < 1400); // SQL Request will be: SELECT * FROM MyTasks WHERE ((IsDone = 1) AND (Price < 1400))
-
                 var taskWithExplisitDescription = db.Find<Tasks>(t => t.Description == "Description_3");    // SQL Request will be: SELECT * FROM MyTasks WHERE (Description = 'Description_3')
-
                 var exampleWithThreeRules = db.Find<Tasks>(t => t.IsDone && t.Price > 1000 && t.Price < 1300);  // SQL Request will be: SELECT * FROM MyTasks WHERE (((IsDone = 1) AND (Price > 1000)) AND (Price < 1300))
-			
-				// NOW WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
-				var selectedItem = db.Select<Tasks>(t => t.IsDone /*This is Predicate*/, t => t.Task /*First property*/, t => t.Price /*Second property*/);    // It will get values for only 'Task' and 'Price' properties. SQL Request will be: SELECT Task, Price FROM MyTasks WHERE (IsDone = TRUE) 
+                
+                // WE CAN SET THE "ORDER BY" COLUMN AND CHOSE ORDER TYPE: ASC/DESC
+                var withOrderByColumn = db.Find<Tasks>(t => t.Price < 100, t => t.Description /*ORDER BY COLUMN*/, SortOrder.Desc);
 
-				// DELETE USING PREDICATES
+                // WE CAN SET THE LIMIT OF RETURNED ELEMENTS
+                var limitElements = db.Find<Tasks>(t => t.IsDone, 5 /*LIMIT THE NUMBER OF RETURNED RECORDS*/);
+
+                // WE CAN SPECIFY THE "ORDER BY" COLUMN AND THE LIMIT OF RETURNED RECORDS
+                var orderByAndLimitClause = db.Find<Tasks>(task => task.Price < 500, 8/*LIMIT RECORDS*/, task => task.Price /*"ORDER BY" COLUMN*/, SortOrder.Desc /*ORDER BY TYPE*/);
+
+                // WE CAN SPECIFY WHICH COLUMNS SHOULD BE READED FROM DATABASE
+                var selectedItem = db.Select<Tasks>(t => t.IsDone /*This is Predicate*/, t => t.Task /*First property*/, t => t.Price /*Second property*/);    // It will get values for only 'Task' and 'Price' properties. SQL Request will be: SELECT Task, Price FROM MyTasks WHERE (IsDone = TRUE) 
+                
+                // DELETE USING PREDICATES
                 db.Delete<Tasks>(t => t.IsDone);    // It will removes from table all completed tasks.
-
                 db.Delete<Tasks>(t => t.Price == null);     // Removes all tasks for which Price is not set
-
                 db.Delete<Tasks>(t => t.Price == null || t.IsDone);
-
                 db.Delete<Tasks>(t => t.Price < 1300 && t.Description == "Description_1");
 
-				// NOW WE CAN CALCULATE NUMBER OF ROWS, THAT SATISFYING TO SPECIFIC CONDITIONS
-				db.Count<Tasks>();							// returns count of records in table "Tasks"
-				db.Count<Tasks>(t => t.IsDone == true);		// returns count of completed tasks
-				db.Count<Tasks>("PriceForTask");			// returns count of records, that have not null value in column "PriceForTask"
-				db.CountDistinct<Tasks>("PriceForTask");	// returns count of records, that have distinct values in column "PriceForTask"
+                // WE CAN CALCULATE NUMBER OF ROWS, THAT SATISFYING TO SPECIFIC CONDITIONS
+                db.Count<Tasks>();                          // returns count of records in table "Tasks"
+                db.Count<Tasks>(t => t.IsDone == true);     // returns count of completed tasks
+                db.Count<Tasks>("PriceForTask");            // returns count of records, that have not null value in column "PriceForTask"
+                db.CountDistinct<Tasks>("PriceForTask");    // returns count of records, that have distinct values in column "PriceForTask"
 
-				db.SelectTop<Tasks>(3);		// Returns first three elements from table Tasks
+                db.SelectTop<Tasks>(3);     // Returns first three elements from table Tasks
 
 				// NOW WE CAN JOIN UP TO FOUR TABLES:
-                var joiningResult = db.Join<Tasks, Info>(
+                var joiningResult = db.Join<Tasks, Info, JoinResult>(
                     t => t.IsDone, // Filter for Tasks table. You can pass NULL, so there won't be any filter.
                     (tasks, info) => tasks.InfoId == info.Id, // Determine columns for joining tables (joining condition)
-                    (tasks, info) => new object[] {tasks, info});   // Specifying the view of how joined tables will be returned
+                    (tasks, info) => new JoinResult(tasks, info));   // Specifying the view of how joined tables will be returned
 			}
             catch (Exception ex)
             {

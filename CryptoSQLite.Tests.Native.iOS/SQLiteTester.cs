@@ -1,12 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using CryptoSQLite;
+using System.Linq;
+using System.Text;
+
+using Foundation;
 using UIKit;
 
-namespace CryptoSQLiteSample.iOS
+namespace CryptoSQLite.Tests.Native.iOS
 {
-	// IMPORTANT ALL [Encrypted] COLUMNS STORED IN DATABASE AS A BLOB TYPE
-
     [CryptoTable("MyTasks")]
     public class Tasks
     {
@@ -16,18 +18,18 @@ namespace CryptoSQLiteSample.iOS
         [Encrypted, NotNull]
         public string Task { get; set; }
 
-		[NotNull("Default Description")]
+        [NotNull("Default Description")]
         public string Description { get; set; }
 
-		[Column("PriceForTask")]
+        [Column("PriceForTask")]
         public double? Price { get; set; }
 
         public bool IsDone { get; set; }
 
-		public int InfoId{ get; set; }		// For joining two tables: Tasks and Info.
+        public int InfoId { get; set; }		// For joining two tables: Tasks and Info.
     }
 
-	[CryptoTable("Infos")]
+    [CryptoTable("Infos")]
     internal class Info
     {
         [PrimaryKey, AutoIncremental]
@@ -45,7 +47,7 @@ namespace CryptoSQLiteSample.iOS
         }
     }
 
-	internal class JoinResult
+    internal class JoinResult
     {
         public Tasks Tasks { get; set; }
 
@@ -57,26 +59,13 @@ namespace CryptoSQLiteSample.iOS
             Infos = info;
         }
     }
-
-    public partial class ViewController : UIViewController
+    class SQLiteTester
     {
-        private string fileName = "MySqlDb.db3";
-        public ViewController(IntPtr handle) : base(handle)
+        public void StartSQLiteTests(string fileName)
         {
-        }
+            CryptoSQLiteConnection db = null;
 
-        public override void ViewDidLoad()
-        {
-            base.ViewDidLoad();
-
-            // ! IMPORTANT ! This function determines how to talk to a specific instance of the native SQLite3 library.
-            // You can call this function in AppDelegate::FinishedLaunching() function or in AppDelegate ctor.
-            SQLitePCL.Batteries_V2.Init(); // From NuGet package SQLitePCLRaw.bundle_green. 
-			//OR: SQLitePCL.Batteries.Init(); // From NuGet package SQLitePCLRaw.bundle_green
-			
-			CryptoSQLiteConnection db = null;
-            
-			try
+            try
             {
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal); // Documents folder
 
@@ -90,36 +79,33 @@ namespace CryptoSQLiteSample.iOS
                 var keyForDatabase = new byte[32];
                 db.SetEncryptionKey(keyForDatabase);
 
+                var specificKey = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2 };
+                // SITTING SPECIFIC ENCRYPTION KEY ONLY FOR TABLE 'Infos'. THIS KEY WILL BE USED ONLY IN TABLE 'Infos' FOR ENCRYPTION DATA.
+
                 db.CreateTable<Tasks>();
                 db.CreateTable<Info>();
 
-				/*
-				var specificKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2};
-                // SITTING SPECIFIC ENCRYPTION KEY ONLY FOR TABLE 'Infos'. THIS KEY WILL BE USED ONLY IN TABLE 'Infos' FOR ENCRYPTION DATA.
-                db.SetEncryptionKey<Info>(specificKey);
-				*/
-
                 // All Properties that have [Encrypted] attribute properties will be automatically encrypted or decrypted
-                
-				// Here all data in table 'Infos' will be encrypted using 'specificKey'
-				db.InsertItem(new Info {SomeInfo = "Some Info 1", SomeValue = 12343.11212});    
 
-				// In table 'Tasks' for encryption data will be used 'keyForDatabase' key, because we don't specify for table 'Tasks' cpecific encryption key
+                // Here all data in table 'Infos' will be encrypted using 'specificKey'
+                db.InsertItem(new Info { SomeInfo = "Some Info 1", SomeValue = 12343.11212 });
+
+                // In table 'Tasks' for encryption data will be used 'keyForDatabase' key, because we don't specify for table 'Tasks' cpecific encryption key
                 db.InsertItem(new Tasks { Task = "Task1", Description = "Description_1", Price = 1234.41, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task2", Description = "Description_2", Price = 1307.69, IsDone = true });
                 db.InsertItem(new Tasks { Task = "Task3", Description = "Description_1", Price = null, IsDone = true });
                 db.InsertItem(new Tasks { Task = "Task4", Description = "Description_2", Price = 1100.99, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task5", Description = "Description_2", Price = 1718.99, IsDone = false });
                 db.InsertItem(new Tasks { Task = "Task6", Description = "Description_3", Price = null, IsDone = true });
-			
-				// Infos tables. Only for JOINING TABLES example
-				db.InsertItem(new Info { SomeInfo = "SomeInfo 1", SomeValue = 1233.991});
+
+                // Infos tables. Only for JOINING TABLES example
+                db.InsertItem(new Info { SomeInfo = "SomeInfo 1", SomeValue = 1233.991 });
                 db.InsertItem(new Info { SomeInfo = "SomeInfo 2", SomeValue = 111.585 });
                 db.InsertItem(new Info { SomeInfo = "SomeInfo 3", SomeValue = 2322 });
                 db.InsertItem(new Info { SomeInfo = "SomeInfo 4", SomeValue = 0.00021 });
                 db.InsertItem(new Info { SomeInfo = "SomeInfo 5", SomeValue = 4.878544 });
 
-				// FIND ELEMENTS IN LINQ MANNER:
+                // FIND ELEMENTS IN LINQ MANNER:
                 var completedTasks = db.Find<Tasks>(t => t.IsDone);             // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 1)
 
                 var notCompletedTasks = db.Find<Tasks>(t => !t.IsDone);         // SQL Request will be: SELECT * FROM MyTasks WHERE (IsDone = 0)
@@ -143,8 +129,11 @@ namespace CryptoSQLiteSample.iOS
                 
                 // DELETE USING PREDICATES
                 db.Delete<Tasks>(t => t.IsDone);    // It will removes from table all completed tasks.
+
                 db.Delete<Tasks>(t => t.Price == null);     // Removes all tasks for which Price is not set
+
                 db.Delete<Tasks>(t => t.Price == null || t.IsDone);
+
                 db.Delete<Tasks>(t => t.Price < 1300 && t.Description == "Description_1");
 
                 // WE CAN CALCULATE NUMBER OF ROWS, THAT SATISFYING TO SPECIFIC CONDITIONS
@@ -155,8 +144,7 @@ namespace CryptoSQLiteSample.iOS
 
                 db.SelectTop<Tasks>(3);     // Returns first three elements from table Tasks
 
-				// I'M TERRIBLY SORRY BUT 'JOIN' AND 'LEFTJOIN' FUNCTIONS ARE CORRECTLY WORKING ONLY ON ANDROID, WIN8 AND WINPHONE8.
-				// RIGHT HOW I'M FIXING THIS BUG FOR IOS. THE RELEASE WITH THIS FIX WILL BE PUBLISHED IN VERSION 2.1.14 IN COUPLE OF DAYS.
+                // WE CAN JOIN UP TO FOUR TABLES:
                 var joiningResult = db.Join<Tasks, Info, JoinResult>(
                     t => t.IsDone, // Filter for Tasks table. You can pass NULL, so there won't be any filter.
                     (tasks, info) => tasks.InfoId == info.Id, // Determine columns for joining tables (joining condition)
@@ -166,17 +154,10 @@ namespace CryptoSQLiteSample.iOS
             {
                 var msg = ex.Message;
             }
-			finally
+            finally
             {
                 db?.Dispose(); // Here all internal copies of Encryption Key will be removed from memory (ZeroMemory).
             }
-		}
-
-		public override void DidReceiveMemoryWarning ()
-		{
-			base.DidReceiveMemoryWarning ();
-			// Release any cached data, images, etc that aren't in use.
-		}
-	}
+        }
+    }
 }
-

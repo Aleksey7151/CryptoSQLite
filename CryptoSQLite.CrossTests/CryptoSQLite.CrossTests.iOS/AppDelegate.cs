@@ -27,6 +27,7 @@ using UIKit;
 
 namespace CryptoSQLite.CrossTests.iOS
 {
+
     // The UIApplicationDelegate for the application. This class is responsible for launching the 
     // User Interface of the application, as well as listening (and optionally responding) to 
     // application events from iOS.
@@ -65,6 +66,6 @@ namespace CryptoSQLite.CrossTests.iOS
             LoadApplication(nunit);
 
             return base.FinishedLaunching(app, options);
-		}
+        }
     }
 }

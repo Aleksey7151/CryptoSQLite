@@ -299,7 +299,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
@@ -313,7 +313,7 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="limitNumber">Defines the number of records to return</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
@@ -679,7 +679,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
@@ -693,7 +693,7 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="limitNumber">Defines the number of records to return</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
@@ -1137,7 +1137,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
             Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
@@ -1155,7 +1155,7 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="limitNumber">Defines the number of records to return</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
             int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
@@ -2038,7 +2038,7 @@ namespace CryptoSQLite
             var cmd = SqlCmds.CmdSelectAllTable(tableName);
 
             //TODO change signature of a call
-            var table = ReadRowsFromDatabase(cmd, new object[] {});
+            var table = ReadRowsFromDatabase(cmd, new object[] {}, tableName);
 
             var items = new List<TTable>();
 
@@ -2094,7 +2094,7 @@ namespace CryptoSQLite
         /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector,
             SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
@@ -2112,7 +2112,7 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <param name="limitNumber">Defines the number of records to return</param>
         /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type</param>
+        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber,
             Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
@@ -2173,7 +2173,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values);
+                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
 
                 foreach (var row in tables)
                 {
@@ -2239,7 +2239,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values);
+                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
 
                 foreach (var row in tables)
                 {
@@ -2320,7 +2320,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values);
+                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
 
                 foreach (var row in tables)
                 {
@@ -2390,7 +2390,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values);
+                var tables = ReadRowsFromDatabase(cmd, values, tableLeft.Name);
 
                 foreach (var row in tables)
                 {
@@ -2479,7 +2479,7 @@ namespace CryptoSQLite
             var cmd = cmdForPredicate +
                       _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
-            var table = ReadRowsFromDatabase(cmd, values);
+            var table = ReadRowsFromDatabase(cmd, values, tableName);
 
             var items = new List<TTable>();
 
@@ -2513,7 +2513,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelectTop(tableName);
 
-            var table = ReadRowsFromDatabase(cmd, new object[] {count});
+            var table = ReadRowsFromDatabase(cmd, new object[] {count}, tableName);
 
             var items = new List<TTable>();
 
@@ -3060,7 +3060,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelectForPredicate(tableMap, strPredicate, orderColumnName, sortOrder, limitNumber);
 
-            var table = ReadRowsFromDatabase(cmd, values);
+            var table = ReadRowsFromDatabase(cmd, values, tableName);
 
             var items = new List<TTable>();
 
@@ -3097,7 +3097,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new[] {columnValue});
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableName);
 
             var items = new List<TTable>();
 
@@ -3130,7 +3130,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new[] {columnValue});
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableName);
 
             if (table.Count <= 0) return null;
 
@@ -3199,7 +3199,7 @@ namespace CryptoSQLite
             }
         }
 
-        private List<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values)
+        private List<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values, string tblName)
         {
             var table = new List<Dictionary<string,List<SqlColumnInfo>>>();
             try
@@ -3211,11 +3211,13 @@ namespace CryptoSQLite
                 foreach (var row in queryable)
                 {
                     var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
+                    string tableName;
                     foreach (var column in row)
                     {
-                        if (!columnsFromFile.ContainsKey(column.ColumnInfo.TableName))
+                        tableName = string.IsNullOrEmpty(column.ColumnInfo.TableName) ? tblName : column.ColumnInfo.TableName;
+                        if (!columnsFromFile.ContainsKey(tableName))
                         {
-                            columnsFromFile.Add(column.ColumnInfo.TableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
+                            columnsFromFile.Add(tableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
                         }
                         var tmp = new SqlColumnInfo {Name = column.ColumnInfo.Name};
 
@@ -3249,7 +3251,7 @@ namespace CryptoSQLite
                                     throw new CryptoSQLiteException("Type is not compatible with SQLite database");
                             }
                         }
-                        columnsFromFile[column.ColumnInfo.TableName].Add(tmp);   // NULL will be NULL.
+                        columnsFromFile[tableName].Add(tmp);   // NULL will be NULL.
                     }
                     table.Add(columnsFromFile);
                 }

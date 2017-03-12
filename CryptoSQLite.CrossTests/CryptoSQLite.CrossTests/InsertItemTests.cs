@@ -939,8 +939,8 @@ namespace CryptoSQLite.CrossTests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
-                    Assert.IsTrue(table.Any(e => e.Equal(account2)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account2)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -983,7 +983,7 @@ namespace CryptoSQLite.CrossTests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1026,7 +1026,7 @@ namespace CryptoSQLite.CrossTests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {

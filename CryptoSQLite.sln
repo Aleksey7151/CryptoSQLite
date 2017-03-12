@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoSQLite.CrossTests.Dro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoSQLite.CrossTests.iOS", "CryptoSQLite.CrossTests\CryptoSQLite.CrossTests.iOS\CryptoSQLite.CrossTests.iOS.csproj", "{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoSQLite.Tests.Native.iOS", "CryptoSQLite.Tests.Native.iOS\CryptoSQLite.Tests.Native.iOS.csproj", "{457F1881-815F-429D-A0FF-61F686781ECF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
@@ -277,6 +279,7 @@ Global
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|ARM.ActiveCfg = Debug|iPhone
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|iPhone.Build.0 = Debug|iPhone
+		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|iPhone.Deploy.0 = Debug|iPhone
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Debug|x64.ActiveCfg = Debug|iPhone
@@ -289,6 +292,38 @@ Global
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Release|x64.ActiveCfg = Release|iPhone
 		{3AAE41AB-6523-43A0-9C6C-B3155EDEBFF7}.Release|x86.ActiveCfg = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|Any CPU.ActiveCfg = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|ARM.ActiveCfg = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Ad-Hoc|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|iPhoneSimulator.Build.0 = Ad-Hoc|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|x64.ActiveCfg = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Ad-Hoc|x86.ActiveCfg = Ad-Hoc|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|Any CPU.ActiveCfg = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|ARM.ActiveCfg = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|iPhoneSimulator.ActiveCfg = AppStore|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|iPhoneSimulator.Build.0 = AppStore|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|x64.ActiveCfg = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.AppStore|x86.ActiveCfg = AppStore|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|Any CPU.ActiveCfg = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|ARM.ActiveCfg = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|iPhone.Build.0 = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|x64.ActiveCfg = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Debug|x86.ActiveCfg = Debug|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|ARM.ActiveCfg = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|iPhone.ActiveCfg = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|iPhone.Build.0 = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|x64.ActiveCfg = Release|iPhone
+		{457F1881-815F-429D-A0FF-61F686781ECF}.Release|x86.ActiveCfg = Release|iPhone
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

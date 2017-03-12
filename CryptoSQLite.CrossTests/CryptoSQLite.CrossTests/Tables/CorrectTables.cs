@@ -949,7 +949,7 @@ namespace CryptoSQLite.CrossTests.Tables
         [Ignored]
         public string IgnoredString { get; set; }
 
-        public bool Equal(AccountsData ac)
+        public bool Equals(AccountsData ac)
         {
             return IsAdministrator == ac.IsAdministrator && Name == ac.Name && Password == ac.Password &&
                    Age == ac.Age &&

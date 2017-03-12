@@ -66,7 +66,7 @@ namespace CryptoSQLite.CrossTests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
+                    Assert.IsTrue(table[0].Equals(accounts[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
