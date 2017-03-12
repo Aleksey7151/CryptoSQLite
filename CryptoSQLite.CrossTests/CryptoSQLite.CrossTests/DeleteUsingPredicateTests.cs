@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
-    public class DeleteLinqTests : BaseTest
+    public class DeleteUsingPredicateTests : BaseTest
     {
         [Test]
         public void Predicate_Can_Not_Be_Null()
@@ -16,27 +15,15 @@ namespace Tests
             var item = ULongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<ArgumentNullException>(() =>
                 {
                     db.DeleteTable<ULongNumbers>();
                     db.CreateTable<ULongNumbers>();
-
                     db.InsertItem(item);
-
                     db.Delete<ULongNumbers>(null);
-
-                }
-                catch (ArgumentNullException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Predicate can't be null", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Predicate can't be null"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -44,24 +31,13 @@ namespace Tests
         {
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<ULongNumbers>();
-
                     db.Delete<ULongNumbers>(i => i.Id == 1);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Database doesn't contain table with name:", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name:"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -71,27 +47,15 @@ namespace Tests
 
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<AccountsData>();
                     db.CreateTable<AccountsData>();
-
                     db.InsertItem(accounts[0]);
-
                     db.Delete<AccountsData>(a => a.Password == "Pass");
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You can't use Encrypted columns for finding elements in database. Colum", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("You can't use Encrypted columns for finding elements in database. Colum"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -100,27 +64,15 @@ namespace Tests
             var item = ULongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<ULongNumbers>();
                     db.CreateTable<ULongNumbers>();
-
                     db.InsertItem(item);
-
                     db.Delete<ULongNumbers>(i => i.ULongMaxVal == 1900);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -129,27 +81,15 @@ namespace Tests
             var item = LongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<LongNumbers>();
                     db.CreateTable<LongNumbers>();
-
                     db.InsertItem(item);
-
                     db.Delete<LongNumbers>(i => i.LongMaxVal == 1900);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -160,26 +100,15 @@ namespace Tests
 
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<DateTimeTable>();
                     db.CreateTable<DateTimeTable>();
-
                     db.InsertItem(item);
-
                     db.Delete<DateTimeTable>(i => i.Date == now);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]

@@ -442,25 +442,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyNullName>();
                     db.CreateTable<TableForeignKeyNullName>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Foreign Key Attribute in property '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Foreign Key Attribute in property '"));
             }
         }
 
@@ -469,25 +456,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyEmptyName>();
                     db.CreateTable<TableForeignKeyEmptyName>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Foreign Key Attribute in property '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Foreign Key Attribute in property '"));
             }
         }
 
@@ -496,25 +470,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyNotIntType>();
                     db.CreateTable<TableForeignKeyNotIntType>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTabl", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTabl"));
             }
         }
 
@@ -523,25 +484,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyCanNotBeEncrypted>();
                     db.CreateTable<TableForeignKeyCanNotBeEncrypted>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Property can't have ForeignKey and Encrypted attributes simultaneously.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and Encrypted attributes simultaneously."));
             }
         }
 
@@ -550,25 +498,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyAndPrimaryKey>();
                     db.CreateTable<TableForeignKeyAndPrimaryKey>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Property can't have ForeignKey and PrimaryKey attributes simultaneously.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and PrimaryKey attributes simultaneously."));
             }
         }
 
@@ -577,25 +512,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyAndAutoIncrement>();
                     db.CreateTable<TableForeignKeyAndAutoIncrement>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Property can't have ForeignKey and AutoIncrement attributes simultaneously.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and AutoIncrement attributes simultaneously."));
             }
         }
 
@@ -604,25 +526,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyWithDefaultValue>();
                     db.CreateTable<TableForeignKeyWithDefaultValue>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Property with ForeignKey attribute can't have Default Value.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Property with ForeignKey attribute can't have Default Value."));
             }
         }
 
@@ -631,25 +540,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyWithIncorrectName>();
                     db.CreateTable<TableForeignKeyWithIncorrectName>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Can't find Navigation Property for '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Can't find Navigation Property for '"));
             }
         }
 
@@ -658,25 +554,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyReferencedTableWithoutCryptoTableAttr>();
                     db.CreateTable<TableForeignKeyReferencedTableWithoutCryptoTableAttr>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("doesn't have Custom Attribute:", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("doesn't have Custom Attribute:"));
             }
         }
 
@@ -685,25 +568,12 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableForeignKeyReferencedTableWithoutPrimaryKey>();
                     db.CreateTable<TableForeignKeyReferencedTableWithoutPrimaryKey>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("doesn't contain property with PrimaryKey Attribute.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("doesn't contain property with PrimaryKey Attribute."));
             }
         }
 
@@ -906,16 +776,15 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
-                    
+
                     db.CreateTable<Simple>();
                     db.CreateTable<SimpleReference>();
-
-
-                    var simple1 = new Simple {SimpleString = "Some Simple String 1", SimpleValue = 283423};
+                    
+                    var simple1 = new Simple { SimpleString = "Some Simple String 1", SimpleValue = 283423 };
                     db.InsertItem(simple1);
 
                     var simpleRef1 = new SimpleReference
@@ -925,21 +794,8 @@ namespace Tests
                     };
 
                     db.InsertItem(simpleRef1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.ProbableCause.IndexOf("Column with ForeignKey constrait has invalid value or table doesn't exist in database.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.ProbableCause, Contains.Substring("Column with ForeignKey constrait has invalid value or table doesn't exist in database."));
             }
         }
 
@@ -948,28 +804,15 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
 
                     // db.CreateTable<Simple>();
                     db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Database doesn't contain table with name: Simple.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name: Simple."));
             }
         }
 
@@ -978,7 +821,7 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
@@ -997,21 +840,8 @@ namespace Tests
                     db.InsertItem(simpleRef1);
 
                     db.DeleteTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("because other tables referenced on her, using ForeignKey Constrait.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("because other tables referenced on her, using ForeignKey Constrait."));
             }
         }
 
@@ -1020,7 +850,7 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
@@ -1039,21 +869,8 @@ namespace Tests
                     db.InsertItem(simpleRef1);
 
                     db.ClearTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("because other tables referenced on her, using ForeignKey Constrait.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("because other tables referenced on her, using ForeignKey Constrait."));
             }
         }
 

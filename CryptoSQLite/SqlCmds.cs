@@ -83,9 +83,27 @@ namespace CryptoSQLite
             return cmd;
         }
 
-        public static string CmdSelectForPredicate(string tableName)
+        public static string CmdSelectForPredicate(TableMap tableMap, string predicate, string orderByColumnName, SortOrder orderType, int? limitNumber)
         {
-            var cmd = $"SELECT * FROM {tableName} WHERE ";
+            var cmd = $"SELECT * FROM {tableMap.Name} WHERE {predicate} \n";
+
+            if (!string.IsNullOrEmpty(orderByColumnName))
+            {
+                if (!tableMap.Columns.Keys.Contains(orderByColumnName))
+                    throw new CryptoSQLiteException($"Table '{tableMap.Name}' doesn't contain column '{orderByColumnName}'.");
+
+                var type = orderType == SortOrder.Desc ? "DESC" : "ASC";
+                var order = $"ORDER BY {orderByColumnName} {type} \n";
+
+                cmd += order;
+            }
+
+            if (limitNumber != null)
+            {
+                if(limitNumber <= 0)
+                    throw new CryptoSQLiteException("Limit number can't be less or equal to 0.");
+                cmd += $" LIMIT {limitNumber}";
+            }
 
             return cmd;
         }

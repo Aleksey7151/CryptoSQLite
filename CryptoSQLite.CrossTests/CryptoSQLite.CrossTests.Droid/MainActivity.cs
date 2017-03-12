@@ -28,7 +28,7 @@ using Android.OS;
 
 namespace CryptoSQLite.CrossTests.Droid
 {
-    [Activity(Label = "NUnit 3.0", MainLauncher = true, Theme = "@android:style/Theme.Holo.Light",
+    [Activity(Label = "CryptoSQLite.Tests", MainLauncher = true, Theme = "@android:style/Theme.Holo.Light",
          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
     {

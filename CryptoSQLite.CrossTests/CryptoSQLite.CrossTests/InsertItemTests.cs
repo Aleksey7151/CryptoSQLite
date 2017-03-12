@@ -37,26 +37,13 @@ namespace CryptoSQLite.CrossTests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<AccountsData>();
-
                     db.InsertItem(new AccountsData());
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Database doesn't contain table with name", StringComparison.Ordinal) >=
-                        0);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name"));
+                db.Dispose();
             }
         }
 

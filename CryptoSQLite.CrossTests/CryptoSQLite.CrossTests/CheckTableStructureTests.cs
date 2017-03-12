@@ -12,23 +12,12 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithoutCryptoTableAttribute>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf($"Table {typeof(TableWithoutCryptoTableAttribute)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring($"Table {typeof(TableWithoutCryptoTableAttribute)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -36,22 +25,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithNullName>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Table name can't be null or empty."));
             }
         }
 
@@ -60,22 +38,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithEmptyName>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Table name can't be null or empty.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Table name can't be null or empty."));
             }
         }
 
@@ -84,22 +51,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
                     db.CreateTable<TableWithNullColumnName>();
-                }
-                catch (ArgumentException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Column name can't be null.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Column name can't be null."));
             }
         }
 
@@ -108,22 +64,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
                     db.CreateTable<TableWithEmptyColumnName>();
-                }
-                catch (ArgumentException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Column name can't be empty.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Column name can't be empty."));
             }
         }
 
@@ -132,22 +77,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithSoltColumnNameFirst>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("This name is reserved for CryptoSQLite needs.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("This name is reserved for CryptoSQLite needs."));
             }
         }
 
@@ -156,22 +90,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithSoltColumnNameSecond>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("This name is reserved for CryptoSQLite needs.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("This name is reserved for CryptoSQLite needs."));
             }
         }
 
@@ -180,22 +103,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithoutPrimaryKeyColumn>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Crypto table must contain at least one PrimaryKey column.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Crypto table must contain at least one PrimaryKey column."));
             }
         }
 
@@ -204,22 +116,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithTwoPrimaryKeyColumns>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Crypto Table can't contain more that one PrimaryKey column.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Crypto Table can't contain more that one PrimaryKey column."));
             }
         }
 
@@ -228,21 +129,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithEncryptedPrimaryKey>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Column with PrimaryKey Attribute can't be Encrypted.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Column with PrimaryKey Attribute can't be Encrypted."));
             }
         }
 
@@ -251,21 +142,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithEncryptedAutoIncrementalKey>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Column with AutoIncremental Attribute can't be Encrypted.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Column with AutoIncremental Attribute can't be Encrypted."));
             }
         }
 
@@ -274,21 +155,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithEncryptedDefaultValue>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Encrypted columns can't have default value, but they can be Not Null", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Encrypted columns can't have default value, but they can be Not Null"));
             }
         }
 
@@ -310,7 +181,6 @@ namespace CryptoSQLite.CrossTests
                 {
                     Assert.Fail();
                 }
-
             }
         }
 
@@ -319,22 +189,11 @@ namespace CryptoSQLite.CrossTests
         {
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.CreateTable<TableWithTwoEqualColumnNames>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.ProbableCause.IndexOf("Table can't contain two columns with same names.", StringComparison.Ordinal) >=
-                        0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.ProbableCause, Contains.Substring("Table can't contain two columns with same names."));
             }
         }
     }

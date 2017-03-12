@@ -17,7 +17,7 @@ namespace CryptoSQLite
     /// <summary>
     /// Class represents CryptoSQLite Exception.
     /// </summary>
-    public class CryptoSQLiteException : Exception
+    public sealed class CryptoSQLiteException : Exception
     {
         /// <summary>
         /// Propable cause of exception.
@@ -33,6 +33,21 @@ namespace CryptoSQLite
         {
             ProbableCause = cause;
         }
+    }
+
+    /// <summary>
+    /// Sort orders
+    /// </summary>
+    public enum SortOrder
+    {
+        /// <summary>
+        /// Sorts the records in ascending order. This is default order.
+        /// </summary>
+        Asc,
+        /// <summary>
+        /// Sorts the records in a descending order
+        /// </summary>
+        Desc
     }
 
     /// <summary>
@@ -262,6 +277,45 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
@@ -603,6 +657,45 @@ namespace CryptoSQLite
         /// <param name="predicate">Predicate that contains condition for finding elements</param>
         /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
         Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new();
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> contain value == <paramref name="columnValue"/>
@@ -1017,6 +1110,60 @@ namespace CryptoSQLite
             var elements = await Task.Run(() => _connection.Find(predicate));
             return elements;
         }
+
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            int limitNumber) where TTable : class, new()
+        {
+            return await Task.Run(() => _connection.Find(predicate, limitNumber));
+        }
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
+        {
+            return await Task.Run(() => _connection.Find(predicate, orderByColumnSelector, sortOrder));
+        }
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
+            int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
+        {
+            return await Task.Run(() => _connection.Find(predicate, limitNumber, orderByColumnSelector, sortOrder));
+        }
+
+
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> value equal to<paramref name="columnValue"/>
@@ -1919,37 +2066,61 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
         {
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
-
-            var tableMap = CheckTable<TTable>();
-
-            var tableName = tableMap.Name;
-
-            var mappedColumns = tableMap.Columns.Values;
-
-            object[] values;
-
-            var cmd = SqlCmds.CmdSelectForPredicate(tableName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
-
-            var table = ReadRowsFromDatabase(cmd, values);
-
-            var items = new List<TTable>();
-
-            foreach (var row in table)
-            {
-                var item = new TTable();
-
-                ProcessRow(mappedColumns, row[tableName], item);
-
-                FindReferencedTables(item); // here we get all referenced tables if they exist
-
-                items.Add(item);
-            }
-
-            return items;
+            return FindRecords(predicate, null, null);
         }
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber)
+            where TTable : class, new()
+        {
+            return FindRecords(predicate, limitNumber, null);
+        }
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, Expression<Func<TTable, object>> orderByColumnSelector,
+            SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
+        {
+            return FindRecords(predicate, null, orderByColumnSelector, sortOrder);
+        }
+
+        /// <summary>
+        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
+        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
+        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
+        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
+        /// </summary>
+        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
+        /// <param name="predicate">Predicate that contains condition for finding elements</param>
+        /// <param name="limitNumber">Defines the number of records to return</param>
+        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
+        /// <param name="sortOrder">Sort order type</param>
+        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
+        public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber,
+            Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
+        {
+            return FindRecords(predicate, limitNumber, orderByColumnSelector, sortOrder);
+        }
+
+        
 
         /// <summary>
         /// Finds all elements in table whose <paramref name="columnName"/> value equal to <paramref name="columnValue"/>
@@ -2679,7 +2850,7 @@ namespace CryptoSQLite
         private void CheckKey(byte[] key)
         {
             if (key == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(key));
 
             if ((_algorithm == CryptoAlgoritms.AesWith256BitsKey ||
                  _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length < 32)
@@ -2824,8 +2995,7 @@ namespace CryptoSQLite
                 // if column has dafault value, so when column passed without value, we don't use this column in SQL command for insert element 
 
                 if (value == null && column.Value.IsNotNull && column.Value.DefaultValue == null)
-                    throw new CryptoSQLiteException(
-                        $"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
+                    throw new CryptoSQLiteException($"You are trying to pass NULL-value for Column '{column.Value.Name}', but this column has NotNull atribute and Default Value is not defined.");
 
                 columnNames.Add(column.Key);
 
@@ -2861,6 +3031,51 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(ex.Message,
                     "Column with ForeignKey constrait has invalid value or table doesn't exist in database.");
             }
+        }
+
+        private IEnumerable<TTable> FindRecords<TTable>(Expression<Predicate<TTable>> predicate, int? limitNumber, Expression<Func<TTable, object>> orderByColumnSelector = null, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate), "Predicate can't be null");
+
+            var tableMap = CheckTable<TTable>();
+
+            var tableName = tableMap.Name;
+
+            var mappedColumns = tableMap.Columns.Values;
+
+            object[] values;
+
+            var strPredicate = _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+
+            bool isOrderByEncrypted = false;
+            string orderByPropertyName;
+            var orderColumnName = orderByColumnSelector != null
+                ? AccessMemberTraslator.GetColumnName(orderByColumnSelector, tableName, tableMap.Columns.Values,
+                    out isOrderByEncrypted, out orderByPropertyName)
+                : null;
+
+            if(isOrderByEncrypted)
+                throw new CryptoSQLiteException("Order By column can't be encrypted.");
+
+            var cmd = SqlCmds.CmdSelectForPredicate(tableMap, strPredicate, orderColumnName, sortOrder, limitNumber);
+
+            var table = ReadRowsFromDatabase(cmd, values);
+
+            var items = new List<TTable>();
+
+            foreach (var row in table)
+            {
+                var item = new TTable();
+
+                ProcessRow(mappedColumns, row[tableName], item);
+
+                FindReferencedTables(item); // here we get all referenced tables if they exist
+
+                items.Add(item);
+            }
+
+            return items;
         }
 
         private IList<TTable> FindUsingColumnValue<TTable>(TableMap tableMap, string columnName, object columnValue)

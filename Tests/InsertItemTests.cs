@@ -38,26 +38,13 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<AccountsData>();
-
                     db.InsertItem(new AccountsData());
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(
-                        cex.Message.IndexOf("Database doesn't contain table with name", StringComparison.Ordinal) >=
-                        0);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name"));
+                db.Dispose();
             }
         }
         
@@ -953,8 +940,8 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
-                    Assert.IsTrue(table.Any(e => e.Equal(account2)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account2)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -997,7 +984,7 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1040,7 +1027,7 @@ namespace Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equal(account1)));
+                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
                 }
                 catch (CryptoSQLiteException cex)
                 {

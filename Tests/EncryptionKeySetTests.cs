@@ -11,24 +11,13 @@ namespace Tests
         [Test]
         public void SetNullKey()
         {
-            foreach (var db in GetOnlyConnections())
+            using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<ArgumentNullException>(() =>
                 {
                     db.SetEncryptionKey(null);
-                }
-                catch (ArgumentNullException)
-                {
-                    Assert.IsTrue(true);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
+                });
+                Assert.That(ex.ParamName, Contains.Substring("key"));
             }
         }
 
@@ -37,24 +26,13 @@ namespace Tests
         {
             using (var db = GetGostConnection())
             {
-                var smallKey = new byte[31];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var smallKey = new byte[31];
                     db.SetEncryptionKey(smallKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 256 bit key and GOST must be 32 bytes.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for AES with 256 bit key and GOST must be 32 bytes."));
             }
-
         }
 
         [Test]
@@ -62,24 +40,13 @@ namespace Tests
         {
             using (var db = GetAes256Connection())
             {
-                var smallKey = new byte[31];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var smallKey = new byte[31];
                     db.SetEncryptionKey(smallKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 256 bit key and GOST must be 32 bytes.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for AES with 256 bit key and GOST must be 32 bytes."));
             }
-
         }
 
         [Test]
@@ -87,22 +54,12 @@ namespace Tests
         {
             using (var db = GetAes192Connection())
             {
-                var bigKey = new byte[23];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var bigKey = new byte[23];
                     db.SetEncryptionKey(bigKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 192 bit key must be 24 bytes.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for AES with 192 bit key must be 24 bytes."));
             }
         }
 
@@ -111,22 +68,12 @@ namespace Tests
         {
             using (var db = GetAes128Connection())
             {
-                var bigKey = new byte[15];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var bigKey = new byte[15];
                     db.SetEncryptionKey(bigKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for AES with 128 bit key must be 16 bytes.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for AES with 128 bit key must be 16 bytes."));
             }
         }
 
@@ -135,24 +82,13 @@ namespace Tests
         {
             using (var db = GetDesConnection())
             {
-                var smallKey = new byte[7];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var smallKey = new byte[7];
                     db.SetEncryptionKey(smallKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for DES must be at least 8 bytes", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for DES must be at least 8 bytes"));
             }
-
         }
 
         [Test]
@@ -160,24 +96,13 @@ namespace Tests
         {
             using (var db = GetTripleDesConnection())
             {
-                var smallKey = new byte[23];
-
-                try
+                var ex = Assert.Throws<ArgumentException>(() =>
                 {
+                    var smallKey = new byte[23];
                     db.SetEncryptionKey(smallKey);
-                }
-                catch (ArgumentException ex)
-                {
-                    Assert.IsTrue(ex.Message.IndexOf("Key length for 3DES must be at least 24 bytes.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("Key length for 3DES must be at least 24 bytes."));
             }
-
         }
 
         [Test]
@@ -186,25 +111,14 @@ namespace Tests
             var tasks = GetTasks();
             foreach (var db in GetOnlyConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     //Key is not setted!
                     db.DeleteTable<SecretTask>();
                     db.CreateTable<SecretTask>();
                     db.InsertItem(tasks[0]);
-                }
-                catch (CryptoSQLiteException ae)
-                {
-                    Assert.IsTrue(ae.Message.IndexOf("Encryption key has not been installed.", StringComparison.Ordinal) >= 0);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Encryption key has not been installed."));
             }
         }
 
@@ -241,22 +155,11 @@ namespace Tests
             // trying to get items from database without encryption key
             foreach (var db in GetOnlyConnections())    // connections without setted encryption key
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.Find<SecretTask>(st => st.Id == 1);
-                }
-                catch (CryptoSQLiteException ae)
-                {
-                    Assert.IsTrue(ae.Message.IndexOf("Encryption key has not been installed.", StringComparison.Ordinal) >= 0);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Encryption key has not been installed."));
             }
         }
 

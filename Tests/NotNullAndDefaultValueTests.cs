@@ -67,32 +67,16 @@ namespace Tests
         [Test]
         public void ErrorWhenPassingNullForNotNullColumn()
         {
-            
             using (var db = GetGostConnection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     var item = new TableWithNotNullAttrs();     // here we have defined NotNull attributes, but not defined Default Values for them!!
-
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
-
                     db.InsertItem(item);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column ", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column "));
             }
         }
 
@@ -133,28 +117,14 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
-
-                    var item1 = new TableWithNotNullAttrs {/*NotNullInt = 5,*/ NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882};
+                    var item1 = new TableWithNotNullAttrs {/*NotNullInt = 5,*/ NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
             }
         }
 
@@ -163,28 +133,14 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
-
-                    var item1 = new TableWithNotNullAttrs {NotNullInt = 5, /*NotNullString = "Hello",*/ NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
+                    var item1 = new TableWithNotNullAttrs { NotNullInt = 5, /*NotNullString = "Hello",*/ NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
             }
         }
 
@@ -193,28 +149,14 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
-
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", /*NotNullBytes = new byte[8],*/ NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
             }
         }
 
@@ -223,28 +165,14 @@ namespace Tests
         {
             foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<TableWithNotNullAttrs>();
                     db.CreateTable<TableWithNotNullAttrs>();
-
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", NotNullBytes = new byte[8]/*,NotNullDouble = 4578783.23882*/ };
                     db.InsertItem(item1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You are trying to pass NULL-value for Column '", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                });
+                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
             }
         }
 

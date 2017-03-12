@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CryptoSQLite;
+using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
-using Tests.Tables;
 
-namespace Tests
+namespace CryptoSQLite.CrossTests
 {
     [TestFixture]
-    public class FindLinqTests : BaseTest
+    public class FindUsingPredicateTests : BaseTest
     {
+
         [Test]
         public async Task Empty_If_Not_Found()
         {
@@ -50,7 +50,7 @@ namespace Tests
             var item = ULongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<ArgumentNullException>(() =>
                 {
                     db.DeleteTable<ULongNumbers>();
                     db.CreateTable<ULongNumbers>();
@@ -58,19 +58,9 @@ namespace Tests
                     db.InsertItem(item);
 
                     db.Find<ULongNumbers>(null);
-
-                }
-                catch (ArgumentNullException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Predicate can't be null", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Predicate can't be null"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -80,7 +70,7 @@ namespace Tests
 
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<AccountsData>();
                     db.CreateTable<AccountsData>();
@@ -88,19 +78,9 @@ namespace Tests
                     db.InsertItem(accounts[0]);
 
                     db.Find<AccountsData>(a => a.Password == "Pass");
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("You can't use Encrypted columns for finding elements in database. Colum", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("You can't use Encrypted columns for finding elements in database. Colum"));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -109,7 +89,7 @@ namespace Tests
             var item = ULongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<ULongNumbers>();
                     db.CreateTable<ULongNumbers>();
@@ -117,19 +97,9 @@ namespace Tests
                     db.InsertItem(item);
 
                     db.Find<ULongNumbers>(i => i.ULongMaxVal == 1900);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -138,7 +108,7 @@ namespace Tests
             var item = LongNumbers.GetDefault();
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<LongNumbers>();
                     db.CreateTable<LongNumbers>();
@@ -146,19 +116,9 @@ namespace Tests
                     db.InsertItem(item);
 
                     db.Find<LongNumbers>(i => i.LongMaxVal == 1900);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]
@@ -169,7 +129,7 @@ namespace Tests
 
             using (var db = GetAes256Connection())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
                     db.DeleteTable<DateTimeTable>();
                     db.CreateTable<DateTimeTable>();
@@ -177,24 +137,16 @@ namespace Tests
                     db.InsertItem(item);
 
                     db.Find<DateTimeTable>(i => i.Date == now);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
+                });
+
+                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
             }
-            Assert.Fail();
         }
 
         [Test]
         public async Task Strings_Find_Using_Equal_To_Null_Predicate()
         {
-            var st1 = new SecretTask {IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task"};
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
             foreach (var db in GetAsyncConnections())
@@ -286,7 +238,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
+                    Assert.IsTrue(table[0].Equals(accounts[1]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -321,9 +273,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[3], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -358,8 +311,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -394,11 +348,12 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[4]));
-                    Assert.IsTrue(table[3].Equal(accounts[6]));
-                    Assert.IsTrue(table[4].Equal(accounts[7]));
+                    var correct = new[] { accounts[0], accounts[3], accounts[4], accounts[6], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -433,9 +388,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
-                    Assert.IsTrue(table[1].Equal(accounts[2]));
-                    Assert.IsTrue(table[2].Equal(accounts[5]));
+                    var correct = new[] { accounts[1], accounts[2], accounts[5] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -470,9 +426,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
-                    Assert.IsTrue(table[1].Equal(accounts[2]));
-                    Assert.IsTrue(table[2].Equal(accounts[5]));
+                    var correct = new[] { accounts[1], accounts[2], accounts[5] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -497,6 +454,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -507,9 +465,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[2]));
-                    Assert.IsTrue(table[1].Equal(accounts[5]));
-                    Assert.IsTrue(table[2].Equal(accounts[7]));
+                    var correct = new[] { accounts[2], accounts[5], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -534,6 +493,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -544,11 +504,12 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[1]));
-                    Assert.IsTrue(table[2].Equal(accounts[3]));
-                    Assert.IsTrue(table[3].Equal(accounts[4]));
-                    Assert.IsTrue(table[4].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[1], accounts[3], accounts[4], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -573,6 +534,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -583,7 +545,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[4]));
+                    Assert.IsTrue(table[0].Equals(accounts[4]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -618,8 +580,8 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[5]));
+                    Assert.IsTrue(table[0].Equals(accounts[0]));
+                    Assert.IsTrue(table[1].Equals(accounts[5]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -644,6 +606,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -654,10 +617,13 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[2]));
-                    Assert.IsTrue(table[2].Equal(accounts[3]));
-                    Assert.IsTrue(table[3].Equal(accounts[5]));
+
+                    var correct = new[] { accounts[0], accounts[2], accounts[3], accounts[5] };
+
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -682,6 +648,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -692,11 +659,13 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[1]));
-                    Assert.IsTrue(table[2].Equal(accounts[2]));
-                    Assert.IsTrue(table[3].Equal(accounts[3]));
-                    Assert.IsTrue(table[4].Equal(accounts[5]));
+                    var correct = new[] { accounts[0], accounts[1], accounts[2], accounts[3], accounts[5] };
+
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -721,6 +690,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -731,9 +701,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[4]));
-                    Assert.IsTrue(table[1].Equal(accounts[6]));
-                    Assert.IsTrue(table[2].Equal(accounts[7]));
+                    var correct = new[] { accounts[4], accounts[6], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -758,6 +729,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -768,10 +740,11 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
-                    Assert.IsTrue(table[1].Equal(accounts[4]));
-                    Assert.IsTrue(table[2].Equal(accounts[6]));
-                    Assert.IsTrue(table[3].Equal(accounts[7]));
+                    var correct = new[] { accounts[1], accounts[4], accounts[6], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -796,6 +769,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -806,7 +780,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
+                    Assert.IsTrue(table[0].Equals(accounts[1]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -831,6 +805,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -841,10 +816,11 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[1]));
-                    Assert.IsTrue(table[2].Equal(accounts[5]));
-                    Assert.IsTrue(table[3].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[1], accounts[5], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -869,6 +845,7 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
                     await db.CreateTableAsync<AccountsData>();
 
@@ -879,11 +856,12 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[2]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[4]));
-                    Assert.IsTrue(table[3].Equal(accounts[6]));
-                    Assert.IsTrue(table[4].Equal(accounts[7]));
+                    var correct = new[] { accounts[2], accounts[3], accounts[4], accounts[6], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -908,7 +886,9 @@ namespace Tests
             {
                 try
                 {
+                    await db.ClearTableAsync<AccountsData>();
                     await db.DeleteTableAsync<AccountsData>();
+
                     await db.CreateTableAsync<AccountsData>();
 
                     foreach (var account in accounts)
@@ -918,10 +898,13 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[2]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[4]));
-                    Assert.IsTrue(table[3].Equal(accounts[7]));
+
+                    var correct = new[] { accounts[2], accounts[3], accounts[4], accounts[7] };
+
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -956,7 +939,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
+                    Assert.IsTrue(table[0].Equals(accounts[0]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -991,10 +974,11 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
-                    Assert.IsTrue(table[1].Equal(accounts[2]));
-                    Assert.IsTrue(table[2].Equal(accounts[5]));
-                    Assert.IsTrue(table[3].Equal(accounts[7]));
+                    var correct = new[] { accounts[1], accounts[2], accounts[5], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1029,12 +1013,13 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[1]));
-                    Assert.IsTrue(table[2].Equal(accounts[2]));
-                    Assert.IsTrue(table[3].Equal(accounts[5]));
-                    Assert.IsTrue(table[4].Equal(accounts[7]));
+                    var correct = new[] { accounts[0], accounts[1], accounts[2], accounts[5], accounts[7] };
 
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1069,9 +1054,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[3]));
-                    Assert.IsTrue(table[1].Equal(accounts[4]));
-                    Assert.IsTrue(table[2].Equal(accounts[6]));
+                    var correct = new[] { accounts[3], accounts[4], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1106,10 +1092,11 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[4]));
-                    Assert.IsTrue(table[3].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[3], accounts[4], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1144,9 +1131,10 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[6]));
+                    var correct = new[] { accounts[0], accounts[3], accounts[6] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1181,11 +1169,12 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equal(accounts[1]));
-                    Assert.IsTrue(table[1].Equal(accounts[2]));
-                    Assert.IsTrue(table[2].Equal(accounts[4]));
-                    Assert.IsTrue(table[3].Equal(accounts[5]));
-                    Assert.IsTrue(table[4].Equal(accounts[7]));
+                    var correct = new[] { accounts[1], accounts[2], accounts[4], accounts[5], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[4])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1220,7 +1209,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[7]));
+                    Assert.IsTrue(table[0].Equals(accounts[7]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1255,8 +1244,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].Equal(accounts[2]));
-                    Assert.IsTrue(table[1].Equal(accounts[5]));
+                    var correct = new[] { accounts[2], accounts[5] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1291,10 +1281,11 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[3]));
-                    Assert.IsTrue(table[2].Equal(accounts[5]));
-                    Assert.IsTrue(table[3].Equal(accounts[7]));
+                    var correct = new[] { accounts[0], accounts[3], accounts[5], accounts[7] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[2])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[3])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1312,36 +1303,22 @@ namespace Tests
         }
 
         [Test]
-        public async Task NullableULong_Equal_To_Explicit_Value_Forbidden_In_Predicate()
+        public void NullableULong_Equal_To_Explicit_Value_Forbidden_In_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                        db.InsertItem(account);
 
-                    await db.FindAsync<AccountsData>(a => a.Salary == 1900);
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal)>=0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                    db.Find<AccountsData>(a => a.Salary == 1900);
+                });
+                Assert.That(ex.Message, Contains.Substring("or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements."));
             }
         }
 
@@ -1363,8 +1340,9 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].Equal(accounts[0]));
-                    Assert.IsTrue(table[1].Equal(accounts[5]));
+                    var correct = new[] { accounts[0], accounts[5] };
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[0])) == 1);
+                    Assert.IsTrue(correct.Count(c => c.Equals(table[1])) == 1);
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1399,7 +1377,7 @@ namespace Tests
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(accounts[5]));
+                    Assert.IsTrue(table[0].Equals(accounts[5]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
@@ -1429,7 +1407,7 @@ namespace Tests
                     await db.DeleteTableAsync<DecimalNumbers>();
                     await db.CreateTableAsync<DecimalNumbers>();
 
-  
+
                     await db.InsertItemAsync(item1);
                     await db.InsertItemAsync(item2);
 
@@ -1495,29 +1473,84 @@ namespace Tests
         }
 
         [Test]
-        public async Task NullableDecimal_Equal_To_Explicit_Value_Forbidden_In_Predicate()
+        public void NullableDecimal_Equal_To_Explicit_Value_Forbidden_In_Predicate()
         {
             var item1 = DecimalNumbers.GetDefault();
             var item2 = DecimalNumbers.GetDefault();
             item2.NullAble2 = 9492893892.29384928m;
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
+            {
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                {
+                    db.DeleteTable<DecimalNumbers>();
+                    db.CreateTable<DecimalNumbers>();
+                    db.InsertItem(item1);
+                    db.InsertItem(item2);
+                    db.Find<DecimalNumbers>(a => a.NullAble2 == 1231312333m);
+                });
+
+                Assert.That(ex.Message, Contains.Substring("or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements."));
+            }
+        }
+
+        [Test]
+        public void OrderByColumnCanNotBeEncrypted()
+        {
+            using (var db = GetAes128Connection())
+            {
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                {
+                    db.CreateTable<AccountsData>();
+                    db.Find<AccountsData>(d => d.Age < 100, d => d.Password);
+                });
+                Assert.That(ex.Message, Contains.Substring("Order By column can't be encrypted."));
+            }
+        }
+
+        [Test]
+        public void LimitNumberCanNotBeLessOrEqualToZero()
+        {
+            using (var db = GetAes128Connection())
+            {
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                {
+                    db.CreateTable<AccountsData>();
+                    db.Find<AccountsData>(d => d.Age < 100, 0);
+                });
+                Assert.That(ex.Message, Contains.Substring("Limit number can't be less or equal to 0."));
+            }
+        }
+
+        [Test]
+        public void FindUsingPredicateWithOrderByColumnAscending()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<DecimalNumbers>();
-                    await db.CreateTableAsync<DecimalNumbers>();
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
 
+                    foreach (var account in accounts)
+                        db.InsertItem(account);
 
-                    await db.InsertItemAsync(item1);
-                    await db.InsertItemAsync(item2);
+                    var result = db.Find<AccountsData>(a => a.Age < 80, a => a.Age);
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 8);
 
-                    var result = await db.FindAsync<DecimalNumbers>(a => a.NullAble2 == 1231312333m);
-
+                    Assert.IsTrue(table[0].Equals(accounts[2]));
+                    Assert.IsTrue(table[1].Equals(accounts[0]));
+                    Assert.IsTrue(table[2].Equals(accounts[1]));
+                    Assert.IsTrue(table[3].Equals(accounts[5]));
+                    Assert.IsTrue(table[4].Equals(accounts[6]));
+                    Assert.IsTrue(table[5].Equals(accounts[3]));
+                    Assert.IsTrue(table[6].Equals(accounts[7]));
+                    Assert.IsTrue(table[7].Equals(accounts[4]));
                 }
                 catch (CryptoSQLiteException cex)
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate", StringComparison.Ordinal) >= 0);
-                    return;
+                    Assert.Fail(cex.Message + cex.ProbableCause);
                 }
                 catch (Exception ex)
                 {
@@ -1527,7 +1560,85 @@ namespace Tests
                 {
                     db.Dispose();
                 }
-                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void FindUsingPredicateWithOrderByColumnDescending()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
+
+                    foreach (var account in accounts)
+                        db.InsertItem(account);
+
+                    var result = db.Find<AccountsData>(a => a.Age < 80, a => a.Age, SortOrder.Desc);
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 8);
+                    Assert.IsTrue(table[0].Equals(accounts[4]));
+                    Assert.IsTrue(table[1].Equals(accounts[7]));
+                    Assert.IsTrue(table[2].Equals(accounts[3]));
+                    Assert.IsTrue(table[3].Equals(accounts[6]));
+                    Assert.IsTrue(table[4].Equals(accounts[5]));
+                    Assert.IsTrue(table[5].Equals(accounts[1]));
+                    Assert.IsTrue(table[6].Equals(accounts[0]));
+                    Assert.IsTrue(table[7].Equals(accounts[2]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void FindUsingPredicateWithOrderByColumnAndLimitNumber()
+        {
+            var accounts = GetAccounts();
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<AccountsData>();
+                    db.CreateTable<AccountsData>();
+
+                    foreach (var account in accounts)
+                        db.InsertItem(account);
+
+                    var result = db.Find<AccountsData>(a => a.Age < 80, 5, a => a.Age);
+                    var table = result.ToArray();
+                    Assert.IsTrue(table.Length == 5);
+                    Assert.IsTrue(table[0].Equals(accounts[2]));
+                    Assert.IsTrue(table[1].Equals(accounts[0]));
+                    Assert.IsTrue(table[2].Equals(accounts[1]));
+                    Assert.IsTrue(table[3].Equals(accounts[5]));
+                    Assert.IsTrue(table[4].Equals(accounts[6]));
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
             }
         }
     }

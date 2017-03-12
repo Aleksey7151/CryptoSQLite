@@ -78,33 +78,35 @@ namespace Tests
     {
 
         [Test]
-        public async Task CanNotUseEncryptedColumnsInJoiningConditions()
+        public void CanNotUseEncryptedColumnsInJoiningConditions()
         {
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
-                try
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
-                    await db.CreateTableAsync<RightTable>();
-                    await db.CreateTableAsync<LeftTable>();
+                    db.CreateTable<RightTable>();
+                    db.CreateTable<LeftTable>();
 
-                    var leftJoin = await db.LeftJoinAsync<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.SomeData/*Has Encrypted Attribute*/ == right.SomeData,
+                    var leftJoin = db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.SomeData/*Has Encrypted Attribute*/ == right.SomeData,
                                 (left, right) => new LeftJoinResult(left, right));
-                   
-                }
-                catch (CryptoSQLiteException cex)
+                });
+                Assert.That(ex.Message, Contains.Substring("Columns that are used in joining expressions can't be Encrypted"));
+            }
+        }
+
+        [Test]
+        public void CanNotJoinSameTables()
+        {
+            foreach (var db in GetConnections())
+            {
+                var ex = Assert.Throws<CryptoSQLiteException>(() =>
                 {
-                    Assert.IsTrue(cex.Message.IndexOf("Columns that are used in joining expressions can't be Encrypted", StringComparison.Ordinal) >= 0);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                finally
-                {
-                    db.Dispose();
-                }
-                Assert.Fail();
+                    db.CreateTable<LeftTable>();
+
+                    var leftJoin = db.LeftJoin<LeftTable, LeftTable, LeftJoinResult>(null, (left, right) => left.SomeData/*Has Encrypted Attribute*/ == right.SomeData,
+                                (left, right) => null);
+                });
+                Assert.That(ex.Message, Contains.Substring("You can't join table with itself."));
             }
         }
 

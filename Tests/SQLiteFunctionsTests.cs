@@ -9,6 +9,92 @@ namespace Tests
     public class SQLiteFunctionsTests : BaseTest
     {
         [Test]
+        public void SQLite_COUNT_WithPredicate_Function()
+        {
+            var item1 = new IntNumbers { IntMinVal = 44 };
+            var item2 = new IntNumbers { IntMinVal = 13 };
+            var item3 = new IntNumbers { IntMinVal = 83 };
+            var item4 = new IntNumbers { IntMinVal = 7 };
+            var item5 = new IntNumbers { IntMinVal = 37 };
+            var item6 = new IntNumbers { IntMinVal = 54 };
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<IntNumbers>();
+                    db.CreateTable<IntNumbers>();
+
+                    db.InsertItem(item1);
+                    db.InsertItem(item2);
+                    db.InsertItem(item3);
+                    db.InsertItem(item4);
+                    db.InsertItem(item5);
+                    db.InsertItem(item6);
+
+                    var cnt = db.Count<IntNumbers>(i => i.IntMinVal < 40);
+
+                    Assert.IsTrue(cnt == 3);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
+        public void SQLite_TOTAL_COUNT_Function()
+        {
+            var item1 = new IntNumbers { IntMinVal = 44 };
+            var item2 = new IntNumbers { IntMinVal = 13 };
+            var item3 = new IntNumbers { IntMinVal = 83 };
+            var item4 = new IntNumbers { IntMinVal = 7 };
+            var item5 = new IntNumbers { IntMinVal = 37 };
+            var item6 = new IntNumbers { IntMinVal = 54 };
+
+            foreach (var db in GetConnections())
+            {
+                try
+                {
+                    db.DeleteTable<IntNumbers>();
+                    db.CreateTable<IntNumbers>();
+
+                    db.InsertItem(item1);
+                    db.InsertItem(item2);
+                    db.InsertItem(item3);
+                    db.InsertItem(item4);
+                    db.InsertItem(item5);
+                    db.InsertItem(item6);
+
+                    var cnt = db.Count<IntNumbers>();
+
+                    Assert.IsTrue(cnt == 6);
+                }
+                catch (CryptoSQLiteException cex)
+                {
+                    Assert.Fail(cex.Message + cex.ProbableCause);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
+        }
+
+        [Test]
         public void SQLite_MAX_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
