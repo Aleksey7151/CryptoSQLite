@@ -1748,6 +1748,8 @@ namespace CryptoSQLite
             }
             catch (SQLiteException ex)
             {
+                var cex = new CryptoSQLiteException($"Please check if table {tableName} exists in database.");
+                
                 var msg = ex.Message;
                 throw;
             }
@@ -2038,7 +2040,7 @@ namespace CryptoSQLite
             var cmd = SqlCmds.CmdSelectAllTable(tableName);
 
             //TODO change signature of a call
-            var table = ReadRowsFromDatabase(cmd, new object[] {}, tableName);
+            var table = ReadRowsFromDatabase(cmd, new object[] {}, tableMap);
 
             var items = new List<TTable>();
 
@@ -2066,7 +2068,7 @@ namespace CryptoSQLite
         /// <exception cref="CryptoSQLiteException"></exception>
         public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class, new()
         {
-            return FindRecords(predicate, null, null);
+            return FindRecords(predicate, null);
         }
 
         /// <summary>
@@ -2082,7 +2084,7 @@ namespace CryptoSQLite
         public IEnumerable<TTable> Find<TTable>(Expression<Predicate<TTable>> predicate, int limitNumber)
             where TTable : class, new()
         {
-            return FindRecords(predicate, limitNumber, null);
+            return FindRecords(predicate, limitNumber);
         }
 
         /// <summary>
@@ -2173,7 +2175,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
+                var tables = ReadRowsFromDatabaseForTwoTables(cmd, values, tableMap1, tableMap2);
 
                 foreach (var row in tables)
                 {
@@ -2239,7 +2241,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
+                var tables = ReadRowsFromDatabaseForThreeTables(cmd, values, tableMap1, tableMap2, tableMap3);
 
                 foreach (var row in tables)
                 {
@@ -2320,7 +2322,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values, tableMap1.Name);
+                var tables = ReadRowsFromDatabaseForFourTables(cmd, values, tableMap1, tableMap2, tableMap3, tableMap4);
 
                 foreach (var row in tables)
                 {
@@ -2390,7 +2392,7 @@ namespace CryptoSQLite
             var toRet = new List<TJoinResult>();
             try
             {
-                var tables = ReadRowsFromDatabase(cmd, values, tableLeft.Name);
+                var tables = ReadRowsFromDatabaseForTwoTables(cmd, values, tableLeft, tableRight);
 
                 foreach (var row in tables)
                 {
@@ -2479,7 +2481,7 @@ namespace CryptoSQLite
             var cmd = cmdForPredicate +
                       _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
-            var table = ReadRowsFromDatabase(cmd, values, tableName);
+            var table = ReadRowsFromDatabase(cmd, values, tableMap);
 
             var items = new List<TTable>();
 
@@ -2513,7 +2515,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelectTop(tableName);
 
-            var table = ReadRowsFromDatabase(cmd, new object[] {count}, tableName);
+            var table = ReadRowsFromDatabase(cmd, new object[] {count}, tableMap);
 
             var items = new List<TTable>();
 
@@ -3060,7 +3062,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelectForPredicate(tableMap, strPredicate, orderColumnName, sortOrder, limitNumber);
 
-            var table = ReadRowsFromDatabase(cmd, values, tableName);
+            var table = ReadRowsFromDatabase(cmd, values, tableMap);
 
             var items = new List<TTable>();
 
@@ -3097,7 +3099,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableName);
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableMap);
 
             var items = new List<TTable>();
 
@@ -3130,7 +3132,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
 
-            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableName);
+            var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableMap);
 
             if (table.Count <= 0) return null;
 
@@ -3199,7 +3201,7 @@ namespace CryptoSQLite
             }
         }
 
-        private List<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values, string tblName)
+        private List<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabase(string cmd, IEnumerable<object> values, TableMap tableMap1)
         {
             var table = new List<Dictionary<string,List<SqlColumnInfo>>>();
             try
@@ -3211,10 +3213,9 @@ namespace CryptoSQLite
                 foreach (var row in queryable)
                 {
                     var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
-                    string tableName;
                     foreach (var column in row)
                     {
-                        tableName = string.IsNullOrEmpty(column.ColumnInfo.TableName) ? tblName : column.ColumnInfo.TableName;
+                        var tableName = string.IsNullOrEmpty(column.ColumnInfo.TableName) ? tableMap1.Name : column.ColumnInfo.TableName;
                         if (!columnsFromFile.ContainsKey(tableName))
                         {
                             columnsFromFile.Add(tableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
@@ -3252,6 +3253,242 @@ namespace CryptoSQLite
                             }
                         }
                         columnsFromFile[tableName].Add(tmp);   // NULL will be NULL.
+                    }
+                    table.Add(columnsFromFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+            return table;
+        }
+
+        private IEnumerable<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabaseForTwoTables(string cmd, IEnumerable<object> values, TableMap tableMap1, TableMap tableMap2)
+        {
+            var table = new List<Dictionary<string, List<SqlColumnInfo>>>();
+            var countOfColumnsInFirstTable = tableMap1.HasEncryptedColumns ? tableMap1.Columns.Count + 1 : tableMap1.Columns.Count;
+            try
+            {
+                var notNullValues = values.Where(v => v != null).ToArray();
+
+                var queryable = notNullValues.Length == 0 ? _connection.Query(cmd) : _connection.Query(cmd, notNullValues);
+
+                foreach (var row in queryable)
+                {
+                    var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
+                    var colNumber = 0;
+                    foreach (var column in row)
+                    {
+                        var tableName = colNumber < countOfColumnsInFirstTable ? tableMap1.Name : tableMap2.Name;
+
+                        if (!columnsFromFile.ContainsKey(tableName))
+                        {
+                            columnsFromFile.Add(tableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
+                        }
+                        var tmp = new SqlColumnInfo { Name = column.ColumnInfo.Name };
+
+                        if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
+                        {
+                            switch (column.ColumnInfo.DeclaredType)
+                            {
+                                case "BLOB":
+                                    tmp.SqlValue = column.ToBlob();
+                                    break;
+                                case "REAL":
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                    {
+                                        var str = column.ToString();
+                                        double val;
+                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                    }
+                                    else
+                                        tmp.SqlValue = column.ToDouble();
+                                    break;
+                                case "INTEGER":
+                                    tmp.SqlValue = column.ToInt64();
+                                    break;
+                                case "TEXT":
+                                    tmp.SqlValue = column.ToString();
+                                    break;
+                                case "NULL":
+                                    tmp.SqlValue = null;
+                                    break;
+                                default:
+                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                            }
+                        }
+                        columnsFromFile[tableName].Add(tmp);   // NULL will be NULL.
+                        colNumber++;
+                    }
+                    table.Add(columnsFromFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+            return table;
+        }
+
+        private IEnumerable<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabaseForThreeTables(string cmd, IEnumerable<object> values, TableMap tableMap1, TableMap tableMap2, TableMap tableMap3)
+        {
+            var table = new List<Dictionary<string, List<SqlColumnInfo>>>();
+            var countOfColumnsInFirstTable = tableMap1.HasEncryptedColumns ? tableMap1.Columns.Count + 1 : tableMap1.Columns.Count;
+            var countOfColumnsInSecondTable = tableMap2.HasEncryptedColumns ? tableMap2.Columns.Count + 1 : tableMap2.Columns.Count;
+            try
+            {
+                var notNullValues = values.Where(v => v != null).ToArray();
+
+                var queryable = notNullValues.Length == 0 ? _connection.Query(cmd) : _connection.Query(cmd, notNullValues);
+
+                foreach (var row in queryable)
+                {
+                    var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
+                    var colNumber = 0;
+                    foreach (var column in row)
+                    {
+                        string tableName = string.Empty;// = colNumber < countOfColumnsInFirstTable ? tableMap1.Name : tableMap2.Name;
+
+                        if (colNumber < countOfColumnsInFirstTable)
+                        {
+                            tableName = tableMap1.Name;
+                        }
+                        else if(countOfColumnsInFirstTable <= colNumber && colNumber < countOfColumnsInFirstTable + countOfColumnsInSecondTable)
+                        {
+                            tableName = tableMap2.Name;
+                        }
+                        else if (countOfColumnsInFirstTable + countOfColumnsInSecondTable <= colNumber)
+                        {
+                            tableName = tableMap3.Name;
+                        }
+
+                        if (!columnsFromFile.ContainsKey(tableName))
+                        {
+                            columnsFromFile.Add(tableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
+                        }
+                        var tmp = new SqlColumnInfo { Name = column.ColumnInfo.Name };
+
+                        if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
+                        {
+                            switch (column.ColumnInfo.DeclaredType)
+                            {
+                                case "BLOB":
+                                    tmp.SqlValue = column.ToBlob();
+                                    break;
+                                case "REAL":
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                    {
+                                        var str = column.ToString();
+                                        double val;
+                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                    }
+                                    else
+                                        tmp.SqlValue = column.ToDouble();
+                                    break;
+                                case "INTEGER":
+                                    tmp.SqlValue = column.ToInt64();
+                                    break;
+                                case "TEXT":
+                                    tmp.SqlValue = column.ToString();
+                                    break;
+                                case "NULL":
+                                    tmp.SqlValue = null;
+                                    break;
+                                default:
+                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                            }
+                        }
+                        columnsFromFile[tableName].Add(tmp);   // NULL will be NULL.
+                        colNumber++;
+                    }
+                    table.Add(columnsFromFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoSQLiteException(ex.Message);
+            }
+            return table;
+        }
+
+        private IEnumerable<Dictionary<string, List<SqlColumnInfo>>> ReadRowsFromDatabaseForFourTables(string cmd, IEnumerable<object> values, TableMap tableMap1, TableMap tableMap2, TableMap tableMap3, TableMap tableMap4)
+        {
+            var table = new List<Dictionary<string, List<SqlColumnInfo>>>();
+
+            var countOfColumnsInFirstTable = tableMap1.HasEncryptedColumns ? tableMap1.Columns.Count + 1 : tableMap1.Columns.Count;
+            var countOfColumnsInSecondTable = tableMap2.HasEncryptedColumns ? tableMap2.Columns.Count + 1 : tableMap2.Columns.Count;
+            var countOfColumnsInThirdTable = tableMap3.HasEncryptedColumns ? tableMap3.Columns.Count + 1 : tableMap3.Columns.Count;
+
+            try
+            {
+                var notNullValues = values.Where(v => v != null).ToArray();
+
+                var queryable = notNullValues.Length == 0 ? _connection.Query(cmd) : _connection.Query(cmd, notNullValues);
+
+                foreach (var row in queryable)
+                {
+                    var columnsFromFile = new Dictionary<string, List<SqlColumnInfo>>();
+                    var colNumber = 0;
+                    foreach (var column in row)
+                    {
+                        string tableName = string.Empty;
+
+                        if (colNumber < countOfColumnsInFirstTable)
+                        {
+                            tableName = tableMap1.Name;
+                        }
+                        else if (countOfColumnsInFirstTable <= colNumber && colNumber < countOfColumnsInFirstTable + countOfColumnsInSecondTable)
+                        {
+                            tableName = tableMap2.Name;
+                        }
+                        else if (countOfColumnsInFirstTable + countOfColumnsInSecondTable <= colNumber && colNumber < countOfColumnsInFirstTable + countOfColumnsInSecondTable + countOfColumnsInThirdTable)
+                        {
+                            tableName = tableMap3.Name;
+                        }
+                        else if(countOfColumnsInFirstTable + countOfColumnsInSecondTable + countOfColumnsInThirdTable <= colNumber)
+                        {
+                            tableName = tableMap4.Name;
+                        }
+
+                        if (!columnsFromFile.ContainsKey(tableName))
+                        {
+                            columnsFromFile.Add(tableName, new List<SqlColumnInfo>());    // если для очередной таблицы еще не создан список со столбцами, то создаем его.
+                        }
+                        var tmp = new SqlColumnInfo { Name = column.ColumnInfo.Name };
+
+                        if (column.SQLiteType != SQLiteType.Null)   // if we get NULL type, then NULL will stay NULL
+                        {
+                            switch (column.ColumnInfo.DeclaredType)
+                            {
+                                case "BLOB":
+                                    tmp.SqlValue = column.ToBlob();
+                                    break;
+                                case "REAL":
+                                    if (column.SQLiteType == SQLiteType.Text)   // for default double values
+                                    {
+                                        var str = column.ToString();
+                                        double val;
+                                        tmp.SqlValue = double.TryParse(str, out val) ? val : column.ToDouble();
+                                    }
+                                    else
+                                        tmp.SqlValue = column.ToDouble();
+                                    break;
+                                case "INTEGER":
+                                    tmp.SqlValue = column.ToInt64();
+                                    break;
+                                case "TEXT":
+                                    tmp.SqlValue = column.ToString();
+                                    break;
+                                case "NULL":
+                                    tmp.SqlValue = null;
+                                    break;
+                                default:
+                                    throw new CryptoSQLiteException("Type is not compatible with SQLite database");
+                            }
+                        }
+                        columnsFromFile[tableName].Add(tmp);   // NULL will be NULL.
+                        colNumber++;
                     }
                     table.Add(columnsFromFile);
                 }
