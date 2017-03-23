@@ -1,0 +1,11 @@
+﻿Account Database has next structure:
+
+Name		Pass		Social?			Productivity		Posts		Age			Salary?			IsAdmin
+Account0	Pass0		1				1778.99998			45			20			NULL			TRUE
+Account1	Pass1		2				-123456.78901		50			21			2700			FALSE
+Account2	Pass2		NULL			0.998176532			40			18			1900			FALSE
+Account3	Pass3		3				1873.20007			30			27			NULL			TRUE
+Account4	Pass4		4				1907.6710173		70			33			3200			TRUE
+Account5	Pass5		NULL			1605.37217			45			22			NULL			FALSE
+Account6	Pass6		5				1801.77781			60			25			1500			TRUE
+Account7	Pass7		NULL			-0.91178654321		65			29			NULL			TRUE
