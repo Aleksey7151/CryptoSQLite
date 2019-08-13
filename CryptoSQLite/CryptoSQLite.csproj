@@ -2,4 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="SQLitePCL.pretty" Version="1.1.0" />
+    <PackageReference Include="SQLitePCL.raw" Version="0.9.2" />
+  </ItemGroup>
 </Project>

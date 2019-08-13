@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CryptoSQLite.CrossTests;
 using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [TestFixture]
     public class AsyncTests : BaseTest

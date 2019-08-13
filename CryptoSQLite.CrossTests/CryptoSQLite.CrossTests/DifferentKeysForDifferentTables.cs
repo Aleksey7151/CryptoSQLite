@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using CryptoSQLite.CrossTests;
 using CryptoSQLite.CrossTests.Tables;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [TestFixture]
     public class DifferentKeysForDifferentTables : BaseTest

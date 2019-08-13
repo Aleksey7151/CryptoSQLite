@@ -53,7 +53,7 @@ namespace CryptoSQLite
     /// <summary>
     /// Enumerates crypto algorithms, that can be used for data encryption in CryptoSQLite library
     /// </summary>
-    public enum CryptoAlgoritms
+    public enum CryptoAlgorithms
     {
         /// <summary>
         /// USSR encryption algorithm. It uses the 256 bit encryption key.
@@ -882,537 +882,6 @@ namespace CryptoSQLite
     }
 
     /// <summary>
-    /// Represents SQLite async connection to database file
-    /// </summary>
-    public class CryptoSQLiteAsyncConnection : ICryptoSQLiteAsyncConnection, IDisposable
-    {
-        private readonly ICryptoSQLiteConnection _connection;
-
-        /// <summary>
-        /// Constructor. Creates connection to SQLite datebase file with data encryption.
-        /// </summary>
-        /// <param name="dbFileName">Path to SQLite database file</param>
-        public CryptoSQLiteAsyncConnection(string dbFileName)
-        {
-            _connection = new CryptoSQLiteConnection(dbFileName);
-        }
-
-        /// <summary>
-        /// Constructor. Creates connection to SQLite datebase file with data encryption.
-        /// </summary>
-        /// <param name="dbFileName">Path to database file</param>
-        /// <param name="cryptoAlgoritms">Type of crypto algorithm that will be used for data encryption</param>
-        public CryptoSQLiteAsyncConnection(string dbFileName, CryptoAlgoritms cryptoAlgoritms)
-        {
-            _connection = new CryptoSQLiteConnection(dbFileName, cryptoAlgoritms);
-        }
-
-        /// <summary>
-        /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.
-        /// <para/>AesWith256BitsKey key length must be 32 bytes.
-        /// <para/>AesWith192BitsKey key length must be 24 bytes.
-        /// <para/>AesWith128BitsKey key length must be 16 bytes.
-        /// <para/>DesWith56BitsKey key length must be 8 bytes.
-        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
-        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
-        /// immediately after you finish your work with database.
-        /// </summary>
-        /// <param name="key">Buffer, that contains encryption key.</param>
-        /// <exception cref="NullReferenceException"></exception>
-        public void SetEncryptionKey(byte[] key)
-        {
-            _connection.SetEncryptionKey(key);
-        }
-
-        /// <summary>
-        /// Sets the specific encryption key for specific table. This key will be used for encryption data only for specified table: <typeparamref name="TTable"></typeparamref>.
-        /// That allows you to set up different encryption keys for different tables.
-        /// This feature significantly increases data security.
-        /// <para/>AesWith256BitsKey key length must be 32 bytes.
-        /// <para/>AesWith192BitsKey key length must be 24 bytes.
-        /// <para/>AesWith128BitsKey key length must be 16 bytes.
-        /// <para/>DesWith56BitsKey key length must be 8 bytes.
-        /// <para/>TripleDesWith168BitsKey key length must be 24 bytes.
-        /// <para/>Gost28147With256BitsKey key length must be 32 bytes.
-        /// <para/>WARNING <paramref name="key"/> is a secret parameter. You must clean (Zero) key buffer 
-        /// immediately after you finish your work with database.
-        /// </summary>
-        /// <param name="key">Buffer, that contains encryption key.</param>
-        /// <typeparam name="TTable">Table for which Encryption Key will be set</typeparam>
-        /// <exception cref="NullReferenceException"></exception>
-        public void SetEncryptionKey<TTable>(byte[] key) where TTable : class
-        {
-            _connection.SetEncryptionKey<TTable>(key);
-        }
-
-        /// <summary>
-        /// Creates a new ordinary table (if it not already exists) in database, that can contain encrypted columns.
-        /// <para/>Warning! If table contains any Properties marked as [Encrypted], so 
-        /// this table will be containing automatically generated column with name: "SoltColumn". 
-        /// <para/>SoltColumn is used in encryption algoritms. If you change value of this column you
-        /// won't be able to decrypt data.
-        /// <para/>Warning! If you insert element in the table, and then change Properties order in table type (in your class),
-        /// you won't be able to decrypt elements. Properties order in table is important thing.
-        /// </summary>
-        /// <typeparam name="TTable">Type of table to create in database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task CreateTableAsync<TTable>() where TTable : class
-        {
-            await Task.Run(() => _connection.CreateTable<TTable>());
-        }
-
-        /// <summary>
-        /// Deletes the table from database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of table to delete from database.</typeparam>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task DeleteTableAsync<TTable>() where TTable : class
-        {
-            await Task.Run(() => _connection.DeleteTable<TTable>());
-        }
-
-        /// <summary>
-        /// Deletes all data inside the table <typeparamref name="TTable"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        public async Task ClearTableAsync<TTable>() where TTable : class
-        {
-            await Task.Run(() => _connection.CreateTable<TTable>());
-        }
-
-        /// <summary>
-        /// Returns the number of records in table: <typeparamref name="TTable"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        /// <returns></returns>
-        public async Task<int> CountAsync<TTable>() where TTable : class
-        {
-            return await Task.Run(() => _connection.Count<TTable>());
-        }
-
-        /// <summary>
-        /// Returns the number of records in table that satisfying the condition defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        /// <param name="predicate">Condition</param>
-        /// <returns></returns>
-        public async Task<int> CountAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
-        {
-            return await Task.Run(() => _connection.Count(predicate));
-        }
-
-        /// <summary>
-        /// Returns the number of values (NULL values won't be counted) for the specified column
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        /// <param name="columnName">Name of specified column</param>
-        /// <returns></returns>
-        public async Task<int> CountAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.Count<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Returns the number of distinct values for the specified column
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        /// <param name="columnName">Name of specified column</param>
-        /// <returns></returns>
-        public async Task<int> CountDistinctAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.CountDistinct<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Inserts new element (row) in table.
-        /// The table must be already created.
-        /// </summary>
-        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
-        /// <param name="item">Instance of element to insert.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task InsertItemAsync<TTable>(TTable item) where TTable : class
-        {
-            await Task.Run(() => _connection.InsertItem(item));
-        }
-
-        /// <summary>
-        /// Inserts or replaces the element if it exists in database.
-        /// <para/>If you insert element with specified PrimaryKey value this element will replace element in database, that has the same value.
-        /// </summary>
-        /// <typeparam name="TTable">Type of table in which the new element will be inserted.</typeparam>
-        /// <param name="item">Instance of element to insert.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task InsertOrReplaceItemAsync<TTable>(TTable item) where TTable : class
-        {
-            await Task.Run(() => _connection.InsertOrReplaceItem(item));
-        }
-
-        /// <summary>
-        /// Updates the row(s) in table <typeparamref name="TTable"/> with values from <paramref name="item"/>.
-        /// <para/>LIMITATIONS: This function updates all columns in a row with values from <paramref name="item"/>. We can't specify names of columns which values we want to update. That's because some columns can be encrypted.
-        /// </summary>
-        /// <typeparam name="TTable">Type of table.</typeparam>
-        /// <param name="item">Element with new values for updating.</param>
-        /// <param name="predicate">Condition which determines row(s) that must be updated.</param>
-        public async Task UpdateAsync<TTable>(TTable item, Expression<Predicate<TTable>> predicate) where TTable : class
-        {
-            await Task.Run(() => _connection.Update(item, predicate));
-        }
-
-        /// <summary>
-        /// Removes from table <typeparamref name="TTable"/> all elements which column values satisfy conditions defined in <paramref name="predicate"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of table in which elements will be removed</typeparam>
-        /// <param name="predicate">condition for column values</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public async Task DeleteAsync<TTable>(Expression<Predicate<TTable>> predicate) where TTable : class
-        {
-            await Task.Run(() => _connection.Delete(predicate));
-        }
-
-        /// <summary>
-        /// Removes element from table <typeparamref name="TTable"/> in database.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element will be removed.</typeparam>
-        /// <param name="columnName">Column name.</param>
-        /// <param name="columnValue">Column value.</param>
-        /// <exception cref="CryptoSQLiteException"></exception>
-        public async Task DeleteAsync<TTable>(string columnName, object columnValue) where TTable : class
-        {
-            await Task.Run(() => _connection.Delete<TTable>(columnName, columnValue));
-        }
-
-        /// <summary>
-        /// Gets all elements from table <typeparamref name="TTable"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of table with information about table</typeparam>
-        /// <returns>All elements from table <typeparamref name="TTable"/></returns>
-        public async Task<IEnumerable<TTable>> TableAsync<TTable>() where TTable : class, new()
-        {
-            var table = await Task.Run(() => _connection.Table<TTable>());
-            return table;
-        }
-
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
-        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
-        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate)
-            where TTable : class, new()
-        {
-            var elements = await Task.Run(() => _connection.Find(predicate));
-            return elements;
-        }
-
-
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
-        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
-        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <param name="limitNumber">Defines the number of records to return</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
-            int limitNumber) where TTable : class, new()
-        {
-            return await Task.Run(() => _connection.Find(predicate, limitNumber));
-        }
-
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
-        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
-        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
-            Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
-        {
-            return await Task.Run(() => _connection.Find(predicate, orderByColumnSelector, sortOrder));
-        }
-
-        /// <summary>
-        /// Finds all elements in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
-        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
-        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <param name="limitNumber">Defines the number of records to return</param>
-        /// <param name="orderByColumnSelector">Expression that defines ORDER BY column</param>
-        /// <param name="sortOrder">Sort order type. Ascending order is default.</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> FindAsync<TTable>(Expression<Predicate<TTable>> predicate,
-            int limitNumber, Expression<Func<TTable, object>> orderByColumnSelector, SortOrder sortOrder = SortOrder.Asc) where TTable : class, new()
-        {
-            return await Task.Run(() => _connection.Find(predicate, limitNumber, orderByColumnSelector, sortOrder));
-        }
-
-
-
-        /// <summary>
-        /// Finds all elements in table whose <paramref name="columnName"/> value equal to<paramref name="columnValue"/>
-        /// <para/>If <paramref name="columnValue"/> == null, it will find all elements which <paramref name="columnName"/> value is null.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table in which the element should be finded.</typeparam>
-        /// <param name="columnName">Column name in table which values will be used in finding elements.</param>
-        /// <param name="columnValue">Value for find</param>
-        /// <returns>All elements from table that are satisfying conditions.</returns>
-        public async Task<IEnumerable<TTable>> FindByValueAsync<TTable>(string columnName, object columnValue)
-            where TTable : class, new()
-        {
-            var elements = await Task.Run(() => _connection.FindByValue<TTable>(columnName, columnValue));
-            return elements;
-        }
-
-        /// <summary>
-        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningOnCondition"/>' between the columns in both tables.
-        /// </summary>
-        /// <typeparam name="TTable1">Left table type</typeparam>
-        /// <typeparam name="TTable2">Right table type</typeparam>
-        /// <typeparam name="TJoinResult">Type of join result</typeparam>
-        /// <param name="whereCondition">Where clause</param>
-        /// <param name="joiningOnCondition">The relationship between the two tables for joining them.</param>
-        /// <param name="joiningResultView">Delegate that determines view of returning result.</param>
-        /// <returns>Results of Jioning request</returns>
-        public async Task<IEnumerable<TJoinResult>> JoinAsync<TTable1, TTable2, TJoinResult>(Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningOnCondition,
-            Func<TTable1, TTable2, TJoinResult> joiningResultView)
-            where TTable1 : class, new()
-            where TTable2 : class, new()
-        {
-            return await Task.Run(() => _connection.Join(whereCondition, joiningOnCondition, joiningResultView));
-        }
-
-        /// <summary>
-        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
-        /// </summary>
-        /// <typeparam name="TTable1">Main table type</typeparam>
-        /// <typeparam name="TTable2">First joined table type</typeparam>
-        /// <typeparam name="TTable3">Second joined table type</typeparam>
-        /// <typeparam name="TJoinResult">Type of join result</typeparam>
-        /// <param name="whereCondition">Where clause</param>
-        /// <param name="joiningConditionWithTable2">The relationship between Main table and the first table for joining them.</param>
-        /// <param name="joiningConditionWithTable3">The relationship between Main table and the second table for joining them.</param>
-        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
-        /// <returns>Joined tables</returns>
-        public async Task<IEnumerable<TJoinResult>> JoinAsync<TTable1, TTable2, TTable3, TJoinResult>(
-            Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
-            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
-            Func<TTable1, TTable2, TTable3, TJoinResult> joiningResultView)
-            where TTable1 : class, new()
-            where TTable2 : class, new()
-            where TTable3 : class, new()
-        {
-            return await Task.Run(() => _connection.Join(whereCondition, joiningConditionWithTable2, joiningConditionWithTable3, joiningResultView));
-        }
-
-        /// <summary>
-        /// Returns all rows from both tables as long as there is a match defined by '<paramref name="joiningConditionWithTable2"/>' between the columns in both tables.
-        /// </summary>
-        /// <typeparam name="TTable1">Main table type</typeparam>
-        /// <typeparam name="TTable2">First joined table type</typeparam>
-        /// <typeparam name="TTable3">Second joined table type</typeparam>
-        /// <typeparam name="TTable4">Third joined table type</typeparam>
-        /// <typeparam name="TJoinResult">Type of join result</typeparam>
-        /// <param name="whereCondition">Where clause</param>
-        /// <param name="joiningConditionWithTable2">The relationship between Main table and the First table for joining them.</param>
-        /// <param name="joiningConditionWithTable3">The relationship between Main table and the Second table for joining them.</param>
-        /// <param name="joiningConditionWithTable4">The relationship between Main table and the Third table for joining them.</param>
-        /// <param name="joiningResultView">Delegate that determines the view of returning result.</param>
-        /// <returns>Joined tables</returns>
-        public async Task<IEnumerable<TJoinResult>> JoinAsync<TTable1, TTable2, TTable3, TTable4, TJoinResult>(
-            Expression<Predicate<TTable1>> whereCondition,
-            Expression<Func<TTable1, TTable2, bool>> joiningConditionWithTable2,
-            Expression<Func<TTable1, TTable3, bool>> joiningConditionWithTable3,
-            Expression<Func<TTable1, TTable4, bool>> joiningConditionWithTable4,
-            Func<TTable1, TTable2, TTable3, TTable4, TJoinResult> joiningResultView)
-            where TTable1 : class, new()
-            where TTable2 : class, new()
-            where TTable3 : class, new()
-            where TTable4 : class, new()
-        {
-            return await Task.Run(() => _connection.Join(whereCondition, joiningConditionWithTable2, joiningConditionWithTable3, joiningConditionWithTable4, joiningResultView));
-        }
-
-        /// <summary>
-        /// The LeftJoin function returns all rows from the left table <typeparamref name="TLeftTable"/>, with the matching rows in the right table <typeparamref name="TRightTable"/>. The result is NULL in the right side when there is no match
-        /// </summary>
-        /// <typeparam name="TLeftTable">Type of the left table</typeparam>
-        /// <typeparam name="TRightTable">Type of the right table</typeparam>
-        /// <typeparam name="TJoinResult">Type of joining result</typeparam>
-        /// <param name="whereCondition">Where clause for left table</param>
-        /// <param name="keysSelectorExpression">The relationship between Left table and the Right table for joining them.</param>
-        /// <param name="joiningResult">Delegate that determines the view of the joining result.</param>
-        /// <returns></returns>
-        public async Task<IEnumerable<TJoinResult>> LeftJoinAsync<TLeftTable, TRightTable, TJoinResult>(
-            Expression<Predicate<TLeftTable>> whereCondition,
-            Expression<Func<TLeftTable, TRightTable, bool>> keysSelectorExpression,
-            Func<TLeftTable, TRightTable, TJoinResult> joiningResult)
-            where TLeftTable : class, new()
-            where TRightTable : class, new()
-        {
-            return await Task.Run(() => _connection.LeftJoin(whereCondition, keysSelectorExpression, joiningResult));
-        }
-
-        /// <summary>
-        /// Finds all elements, but not all columns, in table <typeparamref name="TTable"/> which satisfy the condition defined in <paramref name="predicate"/>
-        /// <para/>Warning: Properties with type 'UInt64?', 'Int64?', 'DateTime?', 'Byte[]'
-        /// <para/>can be used only in Equal To Null or Not Equal To Null Predicate Statements: PropertyValue == null or PropertyValue != null. In any other Predicate statements they can't be used.
-        /// <para/>Warning: Properties with type 'UInt64', 'Int64', 'DateTime' can't be used in Predicate statements, because they stored in SQL database file as BLOB data. This is done to protect against data loss.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table (element) in which items will be searched.</typeparam>
-        /// <param name="predicate">Predicate that contains condition for finding elements</param>
-        /// <param name="selectedProperties">Properties whose values will be obtained from database.</param>
-        /// <returns>All elements in Table <typeparamref name="TTable"/> that are satisfy condition defined in <paramref name="predicate"/></returns>
-        public async Task<IEnumerable<TTable>> SelectAsync<TTable>(Expression<Predicate<TTable>> predicate,
-            params Expression<Func<TTable, object>>[] selectedProperties)
-            where TTable : class, new()
-        {
-            return await Task.Run(() => _connection.Select(predicate, selectedProperties));
-        }
-
-        /// <summary>
-        /// Returns the first '<paramref name="count"/>' records from the table: <typeparamref name="TTable"/>
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="count">Count of first elements, that will be returned.</param>
-        /// <returns></returns>
-        public async Task<IEnumerable<TTable>> SelectTopAsync<TTable>(int count) where TTable : class, new()
-        {
-            return await Task.Run(() => _connection.SelectTop<TTable>(count));
-        }
-
-        #region SQLiteFunctions
-
-        /// <summary>
-        /// Returns the largest value of the selected column: <paramref name="columnName"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> MaxAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.Max<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Returns the largest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <param name="predicate">Addition condition for determining Max value.</param>
-        /// <returns>Largest value of selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> MaxAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
-            where TTable : class
-        {
-            return await Task.Run(() => _connection.Max(columnName, predicate));
-        }
-
-        /// <summary>
-        /// Returns the smallest value of the selected column: <paramref name="columnName"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> MinAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.Min<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Returns the smallest value of the selected column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <param name="predicate">Addition condition for determining Min value.</param>
-        /// <returns>Smallest value of selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> MinAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
-            where TTable : class
-        {
-            return await Task.Run(() => _connection.Min(columnName, predicate));
-        }
-
-        /// <summary>
-        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> SumAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.Sum<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Returns the total sum of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <param name="predicate">Addition condition for determining Summary value.</param>
-        /// <returns>Total sum of all values in selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> SumAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
-            where TTable : class
-        {
-            return await Task.Run(() => _connection.Sum(columnName, predicate));
-        }
-
-        /// <summary>
-        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> AvgAsync<TTable>(string columnName) where TTable : class
-        {
-            return await Task.Run(() => _connection.Avg<TTable>(columnName));
-        }
-
-        /// <summary>
-        /// Returns the average value of all values in the selected numeric column: <paramref name="columnName"/>, that are satisfying condition defined in <paramref name="predicate"/>.
-        /// </summary>
-        /// <typeparam name="TTable">Type of Table.</typeparam>
-        /// <param name="columnName">Selected column name.</param>
-        /// <param name="predicate">Addition condition for determining average value.</param>
-        /// <returns>Average value of all values in selected column: <paramref name="columnName"/>.</returns>
-        public async Task<double> AvgAsync<TTable>(string columnName, Expression<Predicate<TTable>> predicate)
-            where TTable : class
-        {
-            return await Task.Run(() => _connection.Avg(columnName, predicate));
-        }
-
-        #endregion  //SQLiteFunctions
-
-
-        /// <summary>
-        /// Closes connection to SQLite database file. And cleans internal copies of encryption keys.
-        /// !! WARNING !! You must clean encryption key, that you have set using 'SetEncryptionKey()'
-        /// function, on your own. 
-        /// </summary>
-        public void Dispose()
-        {
-            (_connection as IDisposable)?.Dispose();
-        }
-    }
-
-
-    /// <summary>
     /// Represents a connection to the SQLite database file.
     /// </summary>
     public class CryptoSQLiteConnection : ICryptoSQLiteConnection, IDisposable
@@ -1447,7 +916,7 @@ namespace CryptoSQLite
         /// <summary>
         /// Encryption algorithm that is used for data protection
         /// </summary>
-        private readonly CryptoAlgoritms _algorithm;
+        private readonly CryptoAlgorithms _algorithm;
 
         /// <summary>
         /// Default encryption key, this key is used for all tables which don't have specific encryption key
@@ -1469,31 +938,31 @@ namespace CryptoSQLite
 
         #region Constructors
 
-        private CryptoSQLiteConnection(CryptoAlgoritms cryptoAlgoritm)
+        private CryptoSQLiteConnection(CryptoAlgorithms cryptoAlgorithm)
         {
-            switch (cryptoAlgoritm)
+            switch (cryptoAlgorithm)
             {
-                case CryptoAlgoritms.AesWith256BitsKey:
+                case CryptoAlgorithms.AesWith256BitsKey:
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
                     break;
 
-                case CryptoAlgoritms.AesWith192BitsKey:
+                case CryptoAlgorithms.AesWith192BitsKey:
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes192);
                     break;
 
-                case CryptoAlgoritms.AesWith128BitsKey:
+                case CryptoAlgorithms.AesWith128BitsKey:
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes128);
                     break;
 
-                case CryptoAlgoritms.Gost28147With256BitsKey:
+                case CryptoAlgorithms.Gost28147With256BitsKey:
                     _cryptor = new GostCryptoProvider();
                     break;
 
-                case CryptoAlgoritms.DesWith56BitsKey:
+                case CryptoAlgorithms.DesWith56BitsKey:
                     _cryptor = new DesCryptoProvider();
                     break;
 
-                case CryptoAlgoritms.TripleDesWith168BitsKey:
+                case CryptoAlgorithms.TripleDesWith168BitsKey:
                     _cryptor = new TripleDesCryptoProvider();
                     break;
 
@@ -1501,7 +970,7 @@ namespace CryptoSQLite
                     _cryptor = new AesCryptoProvider(Aes.AesKeyType.Aes256);
                     break;
             }
-            _algorithm = cryptoAlgoritm;
+            _algorithm = cryptoAlgorithm;
             _solter = new SoltGenerator();
             _predicateTranslator = new PredicateTranslator();
             _tables = new Dictionary<Type, TableMap>();
@@ -1511,7 +980,7 @@ namespace CryptoSQLite
         /// Constructor. Creates connection to SQLite datebase file with data encryption.
         /// </summary>
         /// <param name="dbFilename">Path to SQLite database file.</param>
-        public CryptoSQLiteConnection(string dbFilename) : this(CryptoAlgoritms.AesWith256BitsKey)
+        public CryptoSQLiteConnection(string dbFilename) : this(CryptoAlgorithms.AesWith256BitsKey)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
         }
@@ -1521,7 +990,7 @@ namespace CryptoSQLite
         /// </summary>
         /// <param name="dbFilename">Path to database file</param>
         /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
-        public CryptoSQLiteConnection(string dbFilename, CryptoAlgoritms cryptoAlgorithm) : this(cryptoAlgorithm)
+        public CryptoSQLiteConnection(string dbFilename, CryptoAlgorithms cryptoAlgorithm) : this(cryptoAlgorithm)
         {
             _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
         }
@@ -2854,20 +2323,20 @@ namespace CryptoSQLite
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            if ((_algorithm == CryptoAlgoritms.AesWith256BitsKey ||
-                 _algorithm == CryptoAlgoritms.Gost28147With256BitsKey) && key.Length < 32)
+            if ((_algorithm == CryptoAlgorithms.AesWith256BitsKey ||
+                 _algorithm == CryptoAlgorithms.Gost28147With256BitsKey) && key.Length < 32)
                 throw new ArgumentException("Key length for AES with 256 bit key and GOST must be 32 bytes.");
 
-            if ((_algorithm == CryptoAlgoritms.AesWith192BitsKey) && key.Length < 24)
+            if ((_algorithm == CryptoAlgorithms.AesWith192BitsKey) && key.Length < 24)
                 throw new ArgumentException("Key length for AES with 192 bit key must be 24 bytes.");
 
-            if ((_algorithm == CryptoAlgoritms.AesWith128BitsKey) && key.Length < 16)
+            if ((_algorithm == CryptoAlgorithms.AesWith128BitsKey) && key.Length < 16)
                 throw new ArgumentException("Key length for AES with 128 bit key must be 16 bytes.");
 
-            if (_algorithm == CryptoAlgoritms.DesWith56BitsKey && key.Length < 8)
+            if (_algorithm == CryptoAlgorithms.DesWith56BitsKey && key.Length < 8)
                 throw new ArgumentException("Key length for DES must be at least 8 bytes.");
 
-            if (_algorithm == CryptoAlgoritms.TripleDesWith168BitsKey && key.Length < 24)
+            if (_algorithm == CryptoAlgorithms.TripleDesWith168BitsKey && key.Length < 24)
                 throw new ArgumentException("Key length for 3DES must be at least 24 bytes.");
         }
 
