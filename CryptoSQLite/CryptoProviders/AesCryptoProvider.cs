@@ -16,34 +16,6 @@ namespace CryptoSQLite.CryptoProviders
             _solt = new byte[16];
         }
 
-        private byte[] GetGamma(int gammaLength, int columnNumber)
-        {
-            if (gammaLength < 1)
-                throw new ArgumentException();
-
-            var takts = gammaLength / 16;
-            if (gammaLength % 16 > 0)
-                takts += 1;
-
-            var gamma = new byte[takts * 16];
-            var solt = new byte[16];
-            solt.MemCpy(_solt, solt.Length);
-            solt.UpdateSolt(columnNumber);
-
-            for (var t = 0; t < takts; t++)
-            {
-                var tmp = _aes.ElectronicCodeBook(solt);    // get gamma from gost
-
-                solt.Xor(tmp, 16);
-                
-                gamma.MemCpy(tmp, 16, 16*t);
-
-                tmp.ZeroMemory();
-            }
-
-            return gamma;
-        }
-
         public void XorGamma(byte[] data, int numberOfColumn, int dataLen = 0)
         {
             if (_key == null)
@@ -62,10 +34,7 @@ namespace CryptoSQLite.CryptoProviders
 
         public void SetKey(byte[] key)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            _key = key;
+            _key = key ?? throw new ArgumentNullException(nameof(key));
 
             _aes.SetKey(key, Aes.AesKeyType.Aes256);
         }
@@ -86,6 +55,34 @@ namespace CryptoSQLite.CryptoProviders
         {
             _key = null;
             _aes?.Dispose();
+        }
+
+        private byte[] GetGamma(int gammaLength, int columnNumber)
+        {
+            if (gammaLength < 1)
+                throw new ArgumentException();
+
+            var takts = gammaLength / 16;
+            if (gammaLength % 16 > 0)
+                takts += 1;
+
+            var gamma = new byte[takts * 16];
+            var solt = new byte[16];
+            solt.MemCpy(_solt, solt.Length);
+            solt.UpdateSolt(columnNumber);
+
+            for (var t = 0; t < takts; t++)
+            {
+                var tmp = _aes.ElectronicCodeBook(solt);    // get gamma from gost
+
+                solt.Xor(tmp, 16);
+
+                gamma.MemCpy(tmp, 16, 16 * t);
+
+                tmp.ZeroMemory();
+            }
+
+            return gamma;
         }
     }
 

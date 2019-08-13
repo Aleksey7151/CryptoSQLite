@@ -1626,7 +1626,7 @@ namespace CryptoSQLite
         {
             var tableMap = CheckTable<TTable>(false); // here we don't check if table exists in database file
 
-            var cmd = SqlCmds.CmdCreateTable(tableMap);
+            var cmd = SqlCommands.CmdCreateTable(tableMap);
 
             try
             {
@@ -1651,7 +1651,7 @@ namespace CryptoSQLite
 
             try
             {
-                _connection.Execute(SqlCmds.CmdDeleteTable(tableName));
+                _connection.Execute(SqlCommands.CmdDeleteTable(tableName));
                 // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
             catch (SQLiteException ex)
@@ -1679,7 +1679,7 @@ namespace CryptoSQLite
 
             try
             {
-                _connection.Execute(SqlCmds.CmdClearTable(tableName));
+                _connection.Execute(SqlCommands.CmdClearTable(tableName));
                 // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
             catch (SQLiteException ex)
@@ -1702,7 +1702,7 @@ namespace CryptoSQLite
 
             var tableName = tableMap.Name;
 
-            var countCmd = SqlCmds.CmdCount(tableName);
+            var countCmd = SqlCommands.CmdCount(tableName);
 
             var queryable = _connection.Query(countCmd);
 
@@ -1730,8 +1730,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var countCmd = SqlCmds.CmdCountForPredicate(tableName) +
-                           _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
+            var countCmd = SqlCommands.CmdCountForPredicate(tableName) +
+                           _predicateTranslator.TranslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
                                out values);
 
             try
@@ -1774,7 +1774,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var countCmd = SqlCmds.CmdCount(tableName, columnName);
+            var countCmd = SqlCommands.CmdCount(tableName, columnName);
 
             try
             {
@@ -1814,7 +1814,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var countCmd = SqlCmds.CmdCount(tableName, columnName, true);
+            var countCmd = SqlCommands.CmdCount(tableName, columnName, true);
 
             try
             {
@@ -1935,9 +1935,9 @@ namespace CryptoSQLite
             }
 
             object[] values;
-            var wherePredicate = _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values, out values);
+            var wherePredicate = _predicateTranslator.TranslateToSqlStatement(predicate, tableName, tableMap.Columns.Values, out values);
 
-            var cmd = SqlCmds.CmdUpdate(tableName, columnNames, wherePredicate);
+            var cmd = SqlCommands.CmdUpdate(tableName, columnNames, wherePredicate);
 
             columnValues.AddRange(values);
 
@@ -1970,8 +1970,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = SqlCmds.CmdDeleteForPredicate(tableName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
+            var cmd = SqlCommands.CmdDeleteForPredicate(tableName) +
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, tableMap.Columns.Values,
                           out values);
 
             try
@@ -2009,7 +2009,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     "You can't use [Encrypted] column as a column in which the columnValue should be deleted.");
 
-            var cmd = SqlCmds.CmdDeleteRow(tableName, columnName, columnValue);
+            var cmd = SqlCommands.CmdDeleteRow(tableName, columnName, columnValue);
 
             try
             {
@@ -2037,7 +2037,7 @@ namespace CryptoSQLite
 
             var mappedColumns = tableMap.Columns.Values;
 
-            var cmd = SqlCmds.CmdSelectAllTable(tableName);
+            var cmd = SqlCommands.CmdSelectAllTable(tableName);
 
             //TODO change signature of a call
             var table = ReadRowsFromDatabase(cmd, new object[] {}, tableMap);
@@ -2163,15 +2163,15 @@ namespace CryptoSQLite
             if (tableMap1.Type == tableMap2.Type)
                 throw new CryptoSQLiteException("You can't join table with itself.");
             
-            var onJoin = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+            var onJoin = _joinOnTranslator.Translate(joiningConditionWithTable2, tableMap1, tableMap2);
 
             object[] values = {};
 
             var where = whereCondition != null
-                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                ? _predicateTranslator.TranslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
                 : null;
 
-            var cmd = SqlCmds.CmdJoinTwoTables(tableMap1, tableMap2, onJoin, where);
+            var cmd = SqlCommands.CmdJoinTwoTables(tableMap1, tableMap2, onJoin, where);
             var toRet = new List<TJoinResult>();
             try
             {
@@ -2227,17 +2227,17 @@ namespace CryptoSQLite
             if (tableMap1.Type == tableMap2.Type || tableMap1.Type == tableMap3.Type || tableMap2.Type == tableMap3.Type)
                 throw new CryptoSQLiteException("You can't join table with itself.");
 
-            var onJoin12 = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+            var onJoin12 = _joinOnTranslator.Translate(joiningConditionWithTable2, tableMap1, tableMap2);
 
-            var onJoin13 = _joinOnTranslator.Traslate(joiningConditionWithTable3, tableMap1, tableMap3);
+            var onJoin13 = _joinOnTranslator.Translate(joiningConditionWithTable3, tableMap1, tableMap3);
 
             object[] values = { };
 
             var where = whereCondition != null
-                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                ? _predicateTranslator.TranslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
                 : null;
 
-            var cmd = SqlCmds.CmdJoinThreeTables(tableMap1, tableMap2, tableMap3, onJoin12, onJoin13, where);
+            var cmd = SqlCommands.CmdJoinThreeTables(tableMap1, tableMap2, tableMap3, onJoin12, onJoin13, where);
             var toRet = new List<TJoinResult>();
             try
             {
@@ -2304,21 +2304,21 @@ namespace CryptoSQLite
                 tableMap1.Type == tableMap4.Type || tableMap2.Type == tableMap4.Type || tableMap3.Type == tableMap4.Type)
                 throw new CryptoSQLiteException("You can't join table with itself.");
 
-            var onJoin12 = _joinOnTranslator.Traslate(joiningConditionWithTable2, tableMap1, tableMap2);
+            var onJoin12 = _joinOnTranslator.Translate(joiningConditionWithTable2, tableMap1, tableMap2);
 
-            var onJoin13 = _joinOnTranslator.Traslate(joiningConditionWithTable3, tableMap1, tableMap3);
+            var onJoin13 = _joinOnTranslator.Translate(joiningConditionWithTable3, tableMap1, tableMap3);
 
-            var onJoin14 = _joinOnTranslator.Traslate(joiningConditionWithTable4, tableMap1, tableMap4);
+            var onJoin14 = _joinOnTranslator.Translate(joiningConditionWithTable4, tableMap1, tableMap4);
 
 
 
             object[] values = { };
 
             var where = whereCondition != null
-                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
+                ? _predicateTranslator.TranslateToSqlStatement(whereCondition, tableMap1.Name, tableMap1.Columns.Values, out values, true)
                 : null;
 
-            var cmd = SqlCmds.CmdJoinFourTables(tableMap1, tableMap2, tableMap3, tableMap4, onJoin12, onJoin13, onJoin14, where);
+            var cmd = SqlCommands.CmdJoinFourTables(tableMap1, tableMap2, tableMap3, tableMap4, onJoin12, onJoin13, onJoin14, where);
             var toRet = new List<TJoinResult>();
             try
             {
@@ -2380,15 +2380,15 @@ namespace CryptoSQLite
             if (tableLeft.Type == tableRight.Type)
                 throw new CryptoSQLiteException("You can't join table with itself.");
 
-            var onJoin = _joinOnTranslator.Traslate(keysSelectorExpression, tableLeft, tableRight);
+            var onJoin = _joinOnTranslator.Translate(keysSelectorExpression, tableLeft, tableRight);
 
             object[] values = { };
 
             var where = whereCondition != null
-                ? _predicateTranslator.TraslateToSqlStatement(whereCondition, tableLeft.Name, tableLeft.Columns.Values, out values, true)
+                ? _predicateTranslator.TranslateToSqlStatement(whereCondition, tableLeft.Name, tableLeft.Columns.Values, out values, true)
                 : null;
 
-            var cmd = SqlCmds.CmdLeftJoinTwoTables(tableLeft, tableRight, onJoin, where);
+            var cmd = SqlCommands.CmdLeftJoinTwoTables(tableLeft, tableRight, onJoin, where);
             var toRet = new List<TJoinResult>();
             try
             {
@@ -2458,7 +2458,7 @@ namespace CryptoSQLite
                 bool isEncrypted;
                 string propertyName;
 
-                var columnName = AccessMemberTraslator.GetColumnName(expression, tableName, mappedColumns, out isEncrypted, out propertyName);
+                var columnName = AccessMemberTranslator.GetColumnName(expression, tableName, mappedColumns, out isEncrypted, out propertyName);
 
                 if (isEncrypted)
                 {
@@ -2479,7 +2479,7 @@ namespace CryptoSQLite
             object[] values;
 
             var cmd = cmdForPredicate +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             var table = ReadRowsFromDatabase(cmd, values, tableMap);
 
@@ -2513,7 +2513,7 @@ namespace CryptoSQLite
 
             var mappedColumns = tableMap.Columns.Values;
 
-            var cmd = SqlCmds.CmdSelectTop(tableName);
+            var cmd = SqlCommands.CmdSelectTop(tableName);
 
             var table = ReadRowsFromDatabase(cmd, new object[] {count}, tableMap);
 
@@ -2553,7 +2553,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var cmd = SqlCmds.CmdMax(tableName, columnName);
+            var cmd = SqlCommands.CmdMax(tableName, columnName);
 
             return SQLiteMathFunction(cmd, null);
         }
@@ -2585,8 +2585,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = SqlCmds.CmdMaxForPredicate(tableName, columnName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+            var cmd = SqlCommands.CmdMaxForPredicate(tableName, columnName) +
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             return SQLiteMathFunction(cmd, values);
         }
@@ -2609,7 +2609,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var cmd = SqlCmds.CmdMin(tableName, columnName);
+            var cmd = SqlCommands.CmdMin(tableName, columnName);
 
             return SQLiteMathFunction(cmd, null);
         }
@@ -2641,8 +2641,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = SqlCmds.CmdMinForPredicate(tableName, columnName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+            var cmd = SqlCommands.CmdMinForPredicate(tableName, columnName) +
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             return SQLiteMathFunction(cmd, values);
         }
@@ -2665,7 +2665,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var cmd = SqlCmds.CmdSum(tableName, columnName);
+            var cmd = SqlCommands.CmdSum(tableName, columnName);
 
             return SQLiteMathFunction(cmd, null);
         }
@@ -2696,8 +2696,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = SqlCmds.CmdSumForPredicate(tableName, columnName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+            var cmd = SqlCommands.CmdSumForPredicate(tableName, columnName) +
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             return SQLiteMathFunction(cmd, values);
         }
@@ -2720,7 +2720,7 @@ namespace CryptoSQLite
             if (!tableMap.Columns.Keys.Contains(columnName))
                 throw new CryptoSQLiteException($"Table {tableName} doesn't contain column with name {columnName}.");
 
-            var cmd = SqlCmds.CmdAvg(tableName, columnName);
+            var cmd = SqlCommands.CmdAvg(tableName, columnName);
 
             return SQLiteMathFunction(cmd, null);
         }
@@ -2751,8 +2751,8 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var cmd = SqlCmds.CmdAvgForPredicate(tableName, columnName) +
-                      _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+            var cmd = SqlCommands.CmdAvgForPredicate(tableName, columnName) +
+                      _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             return SQLiteMathFunction(cmd, values);
         }
@@ -2883,7 +2883,7 @@ namespace CryptoSQLite
 
             try
             {
-                foreach (var row in _connection.Query(SqlCmds.CmdGetTableInfo(tableName)))
+                foreach (var row in _connection.Query(SqlCommands.CmdGetTableInfo(tableName)))
                 {
                     var colName = row[1].ToString();
                     if (!colName.Equals(SoltColumnName))
@@ -3022,8 +3022,8 @@ namespace CryptoSQLite
             }
 
             var cmd = replaceRowIfExisits
-                ? SqlCmds.CmdInsertOrReplace(tableName, columnNames)
-                : SqlCmds.CmdInsert(tableName, columnNames);
+                ? SqlCommands.CmdInsertOrReplace(tableName, columnNames)
+                : SqlCommands.CmdInsert(tableName, columnNames);
             try
             {
                 _connection.Execute(cmd, columnValues.ToArray()); // Do not remove '.ToArray()' or you'll get a error 
@@ -3048,19 +3048,19 @@ namespace CryptoSQLite
 
             object[] values;
 
-            var strPredicate = _predicateTranslator.TraslateToSqlStatement(predicate, tableName, mappedColumns, out values);
+            var strPredicate = _predicateTranslator.TranslateToSqlStatement(predicate, tableName, mappedColumns, out values);
 
             bool isOrderByEncrypted = false;
             string orderByPropertyName;
             var orderColumnName = orderByColumnSelector != null
-                ? AccessMemberTraslator.GetColumnName(orderByColumnSelector, tableName, tableMap.Columns.Values,
+                ? AccessMemberTranslator.GetColumnName(orderByColumnSelector, tableName, tableMap.Columns.Values,
                     out isOrderByEncrypted, out orderByPropertyName)
                 : null;
 
             if(isOrderByEncrypted)
                 throw new CryptoSQLiteException("Order By column can't be encrypted.");
 
-            var cmd = SqlCmds.CmdSelectForPredicate(tableMap, strPredicate, orderColumnName, sortOrder, limitNumber);
+            var cmd = SqlCommands.CmdSelectForPredicate(tableMap, strPredicate, orderColumnName, sortOrder, limitNumber);
 
             var table = ReadRowsFromDatabase(cmd, values, tableMap);
 
@@ -3097,7 +3097,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     "You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
+            var cmd = SqlCommands.CmdSelect(tableName, columnName, columnValue);
 
             var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableMap);
 
@@ -3130,7 +3130,7 @@ namespace CryptoSQLite
                 throw new CryptoSQLiteException(
                     "You can't use [Encrypted] column as a column in which the columnValue should be found.");
 
-            var cmd = SqlCmds.CmdSelect(tableName, columnName, columnValue);
+            var cmd = SqlCommands.CmdSelect(tableName, columnName, columnValue);
 
             var table = ReadRowsFromDatabase(cmd, new[] {columnValue}, tableMap);
 

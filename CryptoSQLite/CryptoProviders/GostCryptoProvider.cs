@@ -51,10 +51,7 @@ namespace CryptoSQLite.CryptoProviders
 
         public void SetKey(byte[] key)
         {
-            if(key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            _key = key;
+            _key = key ?? throw new ArgumentNullException(nameof(key));
 
             _gost.SetKey(key);
         }

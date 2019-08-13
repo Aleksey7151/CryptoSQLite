@@ -6,31 +6,6 @@ namespace CryptoSQLite.Mapping
 {
     internal class TableMap
     {
-        /// <summary>
-        /// Table name in database file
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// Type of table
-        /// </summary>
-        public Type Type { get; }
-
-        /// <summary>
-        /// Determines if table contains encrypted columns
-        /// </summary>
-        public bool HasEncryptedColumns { get; }
-
-        /// <summary>
-        /// Encryption key, that is used for data encryption only for this table
-        /// </summary>
-        public byte[] Key { get; set; }
-
-        /// <summary>
-        /// Dictionary [Key]ColumnName --> [Value]ColumnMap
-        /// </summary>
-        public IDictionary<string, ColumnMap> Columns { get; }
-
         public TableMap(string name, Type tableType, bool hasEncryptedColumns, IDictionary<string, ColumnMap> columns)
         {
             Name = name;
@@ -38,6 +13,16 @@ namespace CryptoSQLite.Mapping
             HasEncryptedColumns = hasEncryptedColumns;
             Columns = columns;
         }
+
+        public string Name { get; }
+
+        public Type Type { get; }
+
+        public bool HasEncryptedColumns { get; }
+
+        public byte[] Key { get; set; }
+
+        public IDictionary<string, ColumnMap> Columns { get; }
     }
 
     internal static class TableMapExtensions
@@ -50,7 +35,19 @@ namespace CryptoSQLite.Mapping
 
     internal class ColumnMap
     {
-        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, int columnNumber, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey)
+        public ColumnMap(
+            string name,
+            string propertyName,
+            Type clrType,
+            string sqlType,
+            int columnNumber,
+            bool isPrimaryKey,
+            bool isAutoIncrement,
+            bool isEncrypted,
+            bool isNotNull,
+            object defaultValue,
+            bool isForeignKey,
+            ForeignKey foreignKey)
         {
             Name = name;
             PropertyName = propertyName;
@@ -71,59 +68,26 @@ namespace CryptoSQLite.Mapping
         /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// Represents the name of corresponding Property
-        /// </summary>
         public string PropertyName { get; }
 
-        /// <summary>
-        /// CLR data Type of Column
-        /// </summary>
         public Type ClrType { get; }
 
-        /// <summary>
-        /// SQL data type of column
-        /// </summary>
         public string SqlType { get; }
 
-        /// <summary>
-        /// Represents the column (property) number in table (object)
-        /// </summary>
         public int ColumnNumber { get; }
 
-        /// <summary>
-        /// Determines if column has PrimaryKey constraint
-        /// </summary>
         public bool IsPrimaryKey { get; }
 
-        /// <summary>
-        /// Determines if column has AutoIncrement constarint
-        /// </summary>
         public bool IsAutoIncremental { get; }
 
-        /// <summary>
-        /// Determines if column should be stored in database in encrypted View
-        /// </summary>
         public bool IsEncrypted { get; }
 
-        /// <summary>
-        /// Determines if column has NOT NULL constrait
-        /// </summary>
         public bool IsNotNull { get; }
 
-        /// <summary>
-        /// Contains default value for column
-        /// </summary>
         public object DefaultValue { get; }
 
-        /// <summary>
-        /// Determines if column has ForeignKey Constarait
-        /// </summary>
         public bool IsForeignKey { get; }
 
-        /// <summary>
-        /// ForeignKey constrait information for this column
-        /// </summary>
         public ForeignKey ForeignKey { get; }
     }
 
@@ -146,8 +110,34 @@ namespace CryptoSQLite.Mapping
 
     internal class ColumnMap<TTable> : ColumnMap, IValues<TTable>
     {
-        public ColumnMap(string name, string propertyName, Type clrType, string sqlType, int columnNumber, bool isPrimaryKey, bool isAutoIncrement, bool isEncrypted, bool isNotNull, object defaultValue, bool isForeignKey, ForeignKey foreignKey, Action<TTable, object> valueSetter, Func<TTable, object> valueGetter) 
-            : base(name, propertyName, clrType, sqlType, columnNumber, isPrimaryKey, isAutoIncrement, isEncrypted, isNotNull, defaultValue, isForeignKey, foreignKey)
+        public ColumnMap(
+            string name,
+            string propertyName,
+            Type clrType,
+            string sqlType,
+            int columnNumber,
+            bool isPrimaryKey,
+            bool isAutoIncrement,
+            bool isEncrypted,
+            bool isNotNull,
+            object defaultValue,
+            bool isForeignKey,
+            ForeignKey foreignKey, 
+            Action<TTable, object> valueSetter,
+            Func<TTable, object> valueGetter) 
+            : base(
+                name,
+                propertyName, 
+                clrType,
+                sqlType,
+                columnNumber,
+                isPrimaryKey,
+                isAutoIncrement,
+                isEncrypted,
+                isNotNull,
+                defaultValue,
+                isForeignKey,
+                foreignKey)
         {
             ValueSetter = valueSetter;
             ValueGetter = valueGetter;

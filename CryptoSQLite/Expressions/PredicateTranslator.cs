@@ -10,32 +10,23 @@ namespace CryptoSQLite.Expressions
     internal class PredicateTranslator
     {
         private readonly StringBuilder _builder = new StringBuilder();
-
         private ColumnMap[] _mappedColumns;
-
         private string _tableName;
-
         private bool _addTableNameToColumns;
-
         private readonly List<object> _values = new List<object>();
 
-        public string TraslateToSqlStatement(LambdaExpression predicate, string tableName,
+        public string TranslateToSqlStatement(LambdaExpression predicate, string tableName,
             ICollection<ColumnMap> mappedColumns, out object[] values, bool addTableNameToColumns = false)
         {
             _tableName = tableName;
-
             _addTableNameToColumns = addTableNameToColumns;
-
             _mappedColumns = mappedColumns.ToArray();
-
             _values.Clear();
-
             _builder.Clear();
 
             TranslateExpression(predicate);
 
             _builder.Replace("= NULL", "IS NULL");
-
             _builder.Replace("<> NULL", "IS NOT NULL");
 
             values = _values.ToArray();
@@ -65,41 +56,44 @@ namespace CryptoSQLite.Expressions
         private Expression TranslateConstantExpression(ConstantExpression constExp)
         {
             _builder.Append(constExp.Value == null ? "NULL" : "(?)");
-            if (constExp.Value != null)
+
+            if (constExp.Value == null)
             {
-                if(OrmUtils.TypesForOnlyNullFindRequests.Contains(_memberAccessLastType))
-                    throw new CryptoSQLiteException("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements.");
-                
-                // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL in SQL request.
-                _values.Add(constExp.Value);
+                return constExp;
             }
+
+            if(OrmUtils.TypesForOnlyNullFindRequests.Contains(_memberAccessLastType))
+                throw new CryptoSQLiteException("Properties with types 'UInt64?', 'Int64?', 'DateTime?', 'Decimal' or 'Byte[]' can be used only in Equal To NULL (==null) or Not Equal To NULL (!=null) Predicate statements.");
+                
+            // Add only NOT NULL values, because NULL values written as IS NULL or IS NOT NULL in SQL request.
+            _values.Add(constExp.Value);
+
             return constExp;
         }
 
         private Type _memberAccessLastType;
         private Expression TranslateMemberAccess(MemberExpression memberExp)
         {
-            if (memberExp.Expression != null && memberExp.Expression.NodeType == ExpressionType.Parameter)
-            {
-                //Get real column name:
-                var column = _mappedColumns.FirstOrDefault(col => col.PropertyName == memberExp.Member.Name);
-                if(column == null)
-                    throw new ArgumentException($"Table {_tableName} doesn't contain column with name {memberExp.Member.Name}.");
+            if (memberExp.Expression == null || memberExp.Expression.NodeType != ExpressionType.Parameter)
+                throw new NotSupportedException($"Member {memberExp.Member.Name} is not supported.");
 
-                _memberAccessLastType = column.ClrType;
+            //Get real column name:
+            var column = _mappedColumns.FirstOrDefault(col => col.PropertyName == memberExp.Member.Name);
+            if(column == null)
+                throw new ArgumentException($"Table {_tableName} doesn't contain column with name {memberExp.Member.Name}.");
 
-                // Check forbidden types, they can't be used in Predicate to find items, because they are stored in database in BLOB view.
-                if(column.ClrType.IsForbiddenInFindRequests())
-                    throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.");
+            _memberAccessLastType = column.ClrType;
 
-                if(column.IsEncrypted)
-                    throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column '{column.Name}' is Encrypted.");
+            // Check forbidden types, they can't be used in Predicate to find items, because they are stored in database in BLOB view.
+            if(column.ClrType.IsForbiddenInFindRequests())
+                throw new CryptoSQLiteException("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.");
 
-                _builder.Append(_addTableNameToColumns ? $"{_tableName}.{column.Name}" : column.Name);
+            if(column.IsEncrypted)
+                throw new CryptoSQLiteException($"You can't use Encrypted columns for finding elements in database. Column '{column.Name}' is Encrypted.");
 
-                return memberExp;
-            }
-            throw new NotSupportedException($"Member {memberExp.Member.Name} is not supported.");
+            _builder.Append(_addTableNameToColumns ? $"{_tableName}.{column.Name}" : column.Name);
+
+            return memberExp;
         }
 
         private Expression TranslateBinaryExpression(BinaryExpression binaryExp)

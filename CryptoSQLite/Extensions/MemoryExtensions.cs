@@ -29,7 +29,12 @@ namespace CryptoSQLite.Extensions
                 buf[i] = 0;
         }
 
-        public static void MemCpy(this byte[] destination, byte[] source, int len, int destinationStartIndex = 0, int sourceStartIndex = 0)
+        public static void MemCpy(
+            this byte[] destination,
+            byte[] source,
+            int len,
+            int destinationStartIndex = 0,
+            int sourceStartIndex = 0)
         {
             if(destination.Length < len + destinationStartIndex || source.Length < len + sourceStartIndex)
                 throw new ArgumentException(nameof(len));

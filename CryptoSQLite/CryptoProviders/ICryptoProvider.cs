@@ -9,6 +9,7 @@ namespace CryptoSQLite.CryptoProviders
         /// </summary>
         /// <param name="key">Buffer that contains encryption key. Length must be 32 bytes.</param>
         void SetKey(byte[] key);
+
         /// <summary>
         /// The solt of encryption algoritm. Solt is not secret parameter of encryption algoritm.
         /// But it is recommened to use unique solt for each database file. 

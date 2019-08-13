@@ -169,9 +169,9 @@
       <Project>{fe2f0037-9c69-44cd-a14e-07de44233cf7}</Project>
       <Name>CryptoSQLite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CryptoSQLite.CrossTests\CryptoSQLite.CrossTests.csproj">
+    <ProjectReference Include="..\CryptoSQLite.CrossTests\CryptoSQLite.Tests.csproj">
       <Project>{b5b0e6e4-a8c1-45c4-ba73-21d2456833ad}</Project>
-      <Name>CryptoSQLite.CrossTests</Name>
+      <Name>CryptoSQLite.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

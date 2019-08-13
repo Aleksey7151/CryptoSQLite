@@ -9,7 +9,9 @@ namespace CryptoSQLite
     internal class SqlColumnInfo
     {
         public string Name { get; set; }
+
         public string SqlType { get; set; }
+
         public object SqlValue { get; set; }
     }
 
@@ -51,8 +53,6 @@ namespace CryptoSQLite
             typeof(long?), typeof(ulong?), typeof(DateTime?), typeof(byte[]), typeof(decimal?)
         };
 
-        
-
         public static SqlColumnInfo[] GetColumnsMappingWithSqlTypes(this IList<PropertyInfo> properties)
         {
             var columnsMapping = new SqlColumnInfo[properties.Count];
@@ -63,6 +63,7 @@ namespace CryptoSQLite
                 columnsMapping[i] = new SqlColumnInfo {Name = property.ColumnName(), SqlType = property.SqlType()};
                 i++;
             }
+
             return columnsMapping;
         }
 
@@ -76,8 +77,9 @@ namespace CryptoSQLite
 
             foreach (var t in table1)
             {
-                var finded = table2.Select(sqlInf => sqlInf.Name == t.Name && sqlInf.SqlType == t.SqlType);
-                if (!finded.Any())
+                var found = table2.Select(sqlInf => sqlInf.Name == t.Name && sqlInf.SqlType == t.SqlType);
+
+                if (!found.Any())
                     return false;
             }
 

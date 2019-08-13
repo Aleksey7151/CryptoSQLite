@@ -8,11 +8,11 @@ namespace CryptoSQLite.Expressions
 {
     internal class JoinOnTranslator
     {
+        private readonly List<string> _joinConditions = new List<string>();
         private TableMap _table1;   // Left table
         private TableMap _table2;   // Right table
 
-        private readonly List<string> _joinConditions = new List<string>();
-        public string Traslate(LambdaExpression predicate, TableMap table1, TableMap table2)
+        public string Translate(LambdaExpression predicate, TableMap table1, TableMap table2)
         {
             _table1 = table1;
             _table2 = table2;
@@ -58,49 +58,44 @@ namespace CryptoSQLite.Expressions
 
         private Expression TranslateUnaryExpression(UnaryExpression unaryExp)
         {
-            if (unaryExp.NodeType == ExpressionType.Convert)
-            {
-                TranslateExpression(unaryExp.Operand);
-            }
-            else if (unaryExp.NodeType == ExpressionType.Not)
+            if (unaryExp.NodeType == ExpressionType.Convert || unaryExp.NodeType == ExpressionType.Not)
             {
                 TranslateExpression(unaryExp.Operand);
             }
             else
+            {
                 throw new CryptoSQLiteException($"Operator {unaryExp.NodeType} not supported.");
+            }
 
             return unaryExp;
-
         }
 
         private Expression VisitLambda(LambdaExpression lambda)
         {
-
-            Expression body = TranslateExpression(lambda.Body);
+            var body = TranslateExpression(lambda.Body);
 
             return body != lambda.Body ? Expression.Lambda(lambda.Type, body, lambda.Parameters) : lambda;
         }
 
         private Expression TranslateMemberAccess(MemberExpression memberExp)
         {
-            if (memberExp.Expression != null && memberExp.Expression.NodeType == ExpressionType.Parameter)
-            {
-                var tableType = memberExp.Expression.Type;
-                var table = _table1.Type == tableType ? _table1 : _table2;
-                
-                //Get real column name:
-                var column = table.Columns.Values.FirstOrDefault(col => col.PropertyName == memberExp.Member.Name);
-                if (column == null)
-                    throw new ArgumentException($"Table {table.Name} doesn't contain column with name {memberExp.Member.Name}.");
+            if (memberExp.Expression == null || memberExp.Expression.NodeType != ExpressionType.Parameter)
+                throw new CryptoSQLiteException($"Member {memberExp.Member.Name} is not supported.");
 
-                if(column.IsEncrypted)
-                    throw new CryptoSQLiteException("Columns that are used in joining expressions can't be Encrypted.");
-
-                _joinConditions.Add($"{table.Name}.{column.Name}");
+            var tableType = memberExp.Expression.Type;
+            var table = _table1.Type == tableType ? _table1 : _table2;
                 
-                return memberExp;
-            }
-            throw new CryptoSQLiteException($"Member {memberExp.Member.Name} is not supported.");
+            //Get real column name:
+            var column = table.Columns.Values.FirstOrDefault(col => col.PropertyName == memberExp.Member.Name);
+            if (column == null)
+                throw new ArgumentException($"Table {table.Name} doesn't contain column with name {memberExp.Member.Name}.");
+
+            if(column.IsEncrypted)
+                throw new CryptoSQLiteException("Columns that are used in joining expressions can't be Encrypted.");
+
+            _joinConditions.Add($"{table.Name}.{column.Name}");
+                
+            return memberExp;
         }
 
         private Expression TranslateBinaryExpression(BinaryExpression binaryExp)

@@ -4,7 +4,7 @@ using CryptoSQLite.Mapping;
 
 namespace CryptoSQLite
 {
-    internal static class SqlCmds
+    internal static class SqlCommands
     {
         public static string CmdCreateTable(TableMap table, FullTextSearchFlags fullTextSearchFlags = FullTextSearchFlags.None)
         {
@@ -44,10 +44,8 @@ namespace CryptoSQLite
             var enumerable = columns.ToArray();
 
             var cols = string.Join(", ", enumerable.Select(x => x));
-
-            var vals = string.Join(", ", enumerable.Select(x => "?"));
-
-            var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({vals})";
+            var values = string.Join(", ", enumerable.Select(x => "?"));
+            var cmd = $"INSERT OR REPLACE INTO {tableName} ({cols}) VALUES ({values})";
 
             return cmd;
         }
@@ -58,10 +56,8 @@ namespace CryptoSQLite
             var enumerable = columns.ToArray();
 
             var cols = string.Join(", ", enumerable.Select(x => x));
-
-            var vals = string.Join(", ", enumerable.Select(x => "?"));
-
-            var cmd = $"INSERT INTO {tableName} ({cols}) VALUES ({vals})";
+            var values = string.Join(", ", enumerable.Select(x => "?"));
+            var cmd = $"INSERT INTO {tableName} ({cols}) VALUES ({values})";
 
             return cmd;
         }
@@ -71,13 +67,13 @@ namespace CryptoSQLite
             var enumerable = columns.Select(c => $"{c} = (?)");
             var cols = string.Join(", ", enumerable);
             var cmd = $"UPDATE {tableName} SET {cols} WHERE {predicate}";
+
             return cmd;
         }
 
         public static string CmdSelect(string tableName, string columnName, object columnValue)
         {
             var value = columnValue == null ? "IS NULL" : "= (?)";
-
             var cmd = $"SELECT * FROM {tableName} WHERE {columnName} {value}";
 
             return cmd;
@@ -123,7 +119,6 @@ namespace CryptoSQLite
         public static string CmdDeleteRow(string tableName, string columnName, object columnValue)
         {
             var value = columnValue == null ? "IS NULL" : "= (?)";
-
             var cmd = $"DELETE FROM {tableName} WHERE {columnName} {value}";
 
             return cmd;
@@ -132,9 +127,7 @@ namespace CryptoSQLite
         public static string CmdCount(string tableName, string columnName = null, bool isDistinct = false)
         {
             var column = columnName ?? "*";
-
             var distinct = isDistinct ? "DISTINCT " : "";
-
             var cmd = $"SELECT COUNT({distinct}{column}) FROM {tableName}";
 
             return cmd;
@@ -154,29 +147,29 @@ namespace CryptoSQLite
         /// <returns>string with column map</returns>
         public static string MapPropertyToColumn(this ColumnMap column)
         {
-            string clmnMap = $"{column.Name} {column.SqlType}";
+            string columnMap = $"{column.Name} {column.SqlType}";
 
             //TODO you need think here a lot
 
             if (column.IsPrimaryKey && column.IsAutoIncremental)
             {
-                clmnMap += " PRIMARY KEY AUTOINCREMENT";
+                columnMap += " PRIMARY KEY AUTOINCREMENT";
             }
             else if (column.IsPrimaryKey)
             {
-                clmnMap += " PRIMARY KEY NOT NULL";
+                columnMap += " PRIMARY KEY NOT NULL";
             }
             else if (column.IsNotNull)
             {
-                clmnMap += " NOT NULL";
+                columnMap += " NOT NULL";
                 var defaultValue = column.DefaultValue;
                 if (defaultValue != null)
                 {
-                    clmnMap += $" DEFAULT \"{defaultValue}\"";
+                    columnMap += $" DEFAULT \"{defaultValue}\"";
                 }
             }
 
-            return clmnMap;
+            return columnMap;
         }
         public static string CmdDeleteTable(string tableName)
         {
@@ -249,11 +242,11 @@ namespace CryptoSQLite
             if (table2.HasEncryptedColumns)
                 columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
 
-            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
+            var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
 
             var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
 
-            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin}{where}";
+            string cmd = $"SELECT {selectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin}{where}";
 
             return cmd;
         }
@@ -293,11 +286,11 @@ namespace CryptoSQLite
             if (table3.HasEncryptedColumns)
                 columns3.Add($"{table3.Name}.{CryptoSQLiteConnection.SoltColumnName}");
 
-            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3);
+            var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3);
 
             var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
 
-            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13}{where}";
+            string cmd = $"SELECT {selectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13}{where}";
 
             return cmd;
         }
@@ -321,11 +314,11 @@ namespace CryptoSQLite
             if (table4.HasEncryptedColumns)
                 columns4.Add($"{table4.Name}.{CryptoSQLiteConnection.SoltColumnName}");
 
-            var selsectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3) + ", " + string.Join(", ", columns4);
+            var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3) + ", " + string.Join(", ", columns4);
 
             var where = !string.IsNullOrEmpty(wherePredicate) ? $" WHERE {wherePredicate}" : "";
 
-            string cmd = $"SELECT {selsectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13} INNER JOIN {table4.Name} ON {onJoin14}{where}";
+            string cmd = $"SELECT {selectedColumns} FROM {table1.Name} INNER JOIN {table2.Name} ON {onJoin12} INNER JOIN {table3.Name} ON {onJoin13} INNER JOIN {table4.Name} ON {onJoin14}{where}";
 
             return cmd;
         }

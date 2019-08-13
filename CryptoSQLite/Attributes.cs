@@ -9,11 +9,6 @@ namespace CryptoSQLite
     public class CryptoTableAttribute : Attribute
     {
         /// <summary>
-        /// Contains crypto table name, that will be used in database file 
-        /// </summary>
-        public string TableName { get; }
-        
-        /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="tableName">Table name</param>
@@ -21,6 +16,11 @@ namespace CryptoSQLite
         {
             TableName = tableName;
         }
+
+        /// <summary>
+        /// Contains crypto table name, that will be used in database file 
+        /// </summary>
+        public string TableName { get; }
     }
 
     /// <summary>
@@ -29,7 +29,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class EncryptedAttribute : Attribute
     {
-
     }
 
     /// <summary>
@@ -38,11 +37,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
     {
-        /// <summary>
-        /// Contain column name in table
-        /// </summary>
-        public string ColumnName { get; }
-
         /// <summary>
         /// Ctor
         /// </summary>
@@ -58,6 +52,11 @@ namespace CryptoSQLite
                 
             ColumnName = columnName;
         }
+
+        /// <summary>
+        /// Contain column name in table
+        /// </summary>
+        public string ColumnName { get; }
     }
 
     /// <summary>
@@ -66,7 +65,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class PrimaryKeyAttribute : Attribute
     {
-        
     }
 
     /// <summary>
@@ -75,7 +73,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class AutoIncrementalAttribute : Attribute
     {
-        
     }
 
     /// <summary>
@@ -86,16 +83,6 @@ namespace CryptoSQLite
     public class ForeignKeyAttribute : Attribute
     {
         /// <summary>
-        /// Column name that will be Foreing Key in table 
-        /// </summary>
-        public string NavigationPropertyName { get; }
-
-        /// <summary>
-        /// Determines if referenced table must be automatically obtained from database, when you are getting this table.
-        /// </summary>
-        public bool IsAutoResolved { get; }
-
-        /// <summary>
         /// Ctor.
         /// </summary>
         /// <param name="navigationPropertyName">Name of property (Navigation Property). This property will be containing reference to a instance of foreign Table</param>
@@ -105,6 +92,16 @@ namespace CryptoSQLite
             NavigationPropertyName = navigationPropertyName;
             IsAutoResolved = autoResolveReference;
         }
+
+        /// <summary>
+        /// Column name that will be Foreing Key in table 
+        /// </summary>
+        public string NavigationPropertyName { get; }
+
+        /// <summary>
+        /// Determines if referenced table must be automatically obtained from database, when you are getting this table.
+        /// </summary>
+        public bool IsAutoResolved { get; }
     }
 
     /// <summary>
@@ -113,7 +110,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class IgnoredAttribute : Attribute
     {
-        
     }
 
     /// <summary>
@@ -122,11 +118,6 @@ namespace CryptoSQLite
     [AttributeUsage(AttributeTargets.Property)]
     public class NotNullAttribute : Attribute
     {
-        /// <summary>
-        /// Default value that is used when property doesn't have value.
-        /// </summary>
-        public object DefaultValue { get; }
-
         /// <summary>
         /// Ctor. Default value will be NULL.
         /// </summary>
@@ -143,5 +134,10 @@ namespace CryptoSQLite
         {
             DefaultValue = defaultValue;
         }
+
+        /// <summary>
+        /// Default value that is used when property doesn't have value.
+        /// </summary>
+        public object DefaultValue { get; }
     }
 }
