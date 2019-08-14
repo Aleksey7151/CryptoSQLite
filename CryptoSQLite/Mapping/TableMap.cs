@@ -91,20 +91,10 @@ namespace CryptoSQLite.Mapping
         public ForeignKey ForeignKey { get; }
     }
 
-    /// <summary>
-    /// Interface for working with value getters and setters
-    /// </summary>
-    /// <typeparam name="TTable"></typeparam>
     internal interface IValues<in TTable>
     {
-        /// <summary>
-        /// Value Setter for corresponding property
-        /// </summary>
         Action<TTable, object> ValueSetter { get; }
 
-        /// <summary>
-        /// Value Getter for corresponding property
-        /// </summary>
         Func<TTable, object> ValueGetter { get; }
     }
 
@@ -143,14 +133,8 @@ namespace CryptoSQLite.Mapping
             ValueGetter = valueGetter;
         }
         
-        /// <summary>
-        /// Value Setter for corresponding property
-        /// </summary>
         public Action<TTable, object> ValueSetter { get; }
 
-        /// <summary>
-        /// Value Getter for corresponding property
-        /// </summary>
         public Func<TTable, object> ValueGetter { get; }
     }
 }
