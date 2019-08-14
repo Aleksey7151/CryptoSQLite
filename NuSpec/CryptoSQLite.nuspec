@@ -28,21 +28,21 @@
   </metadata>
   <files>
     <!--.NET Standart-->
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.dll" />
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.xml" />
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.dll" />
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.xml" />
 
     <!--Xamarin.Android-->
-    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.dll" target="lib/MonoAndroid10/CryptoSQLite.Droid.dll" />
-    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.xml" target="lib/MonoAndroid10/CryptoSQLite.Droid.xml" />
+    <file src="../CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.dll" target="lib/MonoAndroid10/CryptoSQLite.Droid.dll" />
+    <file src="../CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.xml" target="lib/MonoAndroid10/CryptoSQLite.Droid.xml" />
 
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/MonoAndroid10/CryptoSQLite.dll" />
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/MonoAndroid10/CryptoSQLite.xml" />
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/MonoAndroid10/CryptoSQLite.dll" />
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/MonoAndroid10/CryptoSQLite.xml" />
 
     <!--Xamarin.iOS-->
-    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.iOS.dll" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.dll" />
-    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.iOS.xml" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.xml" />
+    <file src="../CryptoSQLite.iOS/bin/Release/CryptoSQLite.iOS.dll" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.dll" />
+    <file src="../CryptoSQLite.iOS/bin/Release/CryptoSQLite.iOS.xml" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.xml" />
 
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.dll"/>
-    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.xml"/>
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/Xamarin.iOS10/CryptoSQLite.dll"/>
+    <file src="../CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/Xamarin.iOS10/CryptoSQLite.xml"/>
   </files>
 </package>
