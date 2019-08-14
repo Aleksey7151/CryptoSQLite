@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>CryptoSQLite.ORM</id>
+    <version>3.0.0</version>
+    <title>CryptoSQLite.ORM</title>
+    <authors>Alexei Safonov</authors>
+    <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
+    <iconUrl>https://github.com/Aleksey7151/CryptoSQLite/blob/master/CryptoSQLite/package_icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>ORM for SQLite with data encryption.</summary>
+    <description>
+      ORM for SQLite with data encryption.
+      Supported Xamarin platforms:
+      - Android
+      - iOS
+      1. Just add [CryptoTable("TableName")] attribute to your class definition (Table) and [Encrypted] attribute to properties in your class that you want to be stored in a database file in encrypted view.
+      2. Generate your own personal encryption key, and pass it to CryptoSQLite library.
+      3. CryptoSQLite will encrypt all properties that have '[Encrypted]' attribute automatically when you are adding (updating) elements to your Table and decrypt all [Encrypted] properties when you are getting elements from a Table in the database file.
+      Last updates:
+      In 3.0.0 version .NET Standard compatibility added
+    </description>
+    <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid winphone monotouch key encrypt aes des gost linq2sql linqtosql linq win8</tags>
+    <dependencies>
+      <dependency id="SQLitePCL.pretty" version="1.1.0" />
+      <dependency id="SQLitePCL.raw" version="0.9.2" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!--.NET Standart-->
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.dll" />
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0/CryptoSQLite.xml" />
+
+    <!--Xamarin.Android-->
+    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.dll" target="lib/MonoAndroid10/CryptoSQLite.Droid.dll" />
+    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.Droid.xml" target="lib/MonoAndroid10/CryptoSQLite.Droid.xml" />
+
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/MonoAndroid10/CryptoSQLite.dll" />
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/MonoAndroid10/CryptoSQLite.xml" />
+
+    <!--Xamarin.iOS-->
+    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.iOS.dll" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.dll" />
+    <file src="CryptoSQLite.Droid/bin/Release/CryptoSQLite.iOS.xml" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.xml" />
+
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.dll" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.dll"/>
+    <file src="CryptoSQLite/bin/Release/netstandard2.0/CryptoSQLite.xml" target="lib/Xamarin.iOS10/CryptoSQLite.iOS.xml"/>
+  </files>
+</package>

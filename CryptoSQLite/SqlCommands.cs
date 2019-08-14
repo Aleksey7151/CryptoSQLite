@@ -22,7 +22,7 @@ namespace CryptoSQLite
             var mappedColumns = columns.Select(col => col.MapPropertyToColumn()).ToList();
 
             if (table.HasEncryptedColumns)
-                mappedColumns.Add($"{CryptoSQLiteConnection.SoltColumnName} BLOB");
+                mappedColumns.Add($"{CryptoSQLite.SoltColumnName} BLOB");
 
             var joinedColumns = string.Join(",\n", mappedColumns);
 
@@ -237,10 +237,10 @@ namespace CryptoSQLite
             var columns2 = table2.Columns.Keys.Select(n => $"{table2.Name}.{n}").ToList();
 
             if (table1.HasEncryptedColumns)
-                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns1.Add($"{table1.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table2.HasEncryptedColumns)
-                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns2.Add($"{table2.Name}.{CryptoSQLite.SoltColumnName}");
 
             var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
 
@@ -257,10 +257,10 @@ namespace CryptoSQLite
             var columns2 = tableRight.Columns.Keys.Select(n => $"{tableRight.Name}.{n}").ToList();
 
             if (tableLeft.HasEncryptedColumns)
-                columns1.Add($"{tableLeft.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns1.Add($"{tableLeft.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (tableRight.HasEncryptedColumns)
-                columns2.Add($"{tableRight.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns2.Add($"{tableRight.Name}.{CryptoSQLite.SoltColumnName}");
 
             var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2);
 
@@ -278,13 +278,13 @@ namespace CryptoSQLite
             var columns3 = table3.Columns.Keys.Select(n => $"{table3.Name}.{n}").ToList();
 
             if (table1.HasEncryptedColumns)
-                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns1.Add($"{table1.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table2.HasEncryptedColumns)
-                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns2.Add($"{table2.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table3.HasEncryptedColumns)
-                columns3.Add($"{table3.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns3.Add($"{table3.Name}.{CryptoSQLite.SoltColumnName}");
 
             var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3);
 
@@ -303,16 +303,16 @@ namespace CryptoSQLite
             var columns4 = table4.Columns.Keys.Select(n => $"{table4.Name}.{n}").ToList();
 
             if (table1.HasEncryptedColumns)
-                columns1.Add($"{table1.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns1.Add($"{table1.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table2.HasEncryptedColumns)
-                columns2.Add($"{table2.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns2.Add($"{table2.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table3.HasEncryptedColumns)
-                columns3.Add($"{table3.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns3.Add($"{table3.Name}.{CryptoSQLite.SoltColumnName}");
 
             if (table4.HasEncryptedColumns)
-                columns4.Add($"{table4.Name}.{CryptoSQLiteConnection.SoltColumnName}");
+                columns4.Add($"{table4.Name}.{CryptoSQLite.SoltColumnName}");
 
             var selectedColumns = string.Join(", ", columns1) + ", " + string.Join(", ", columns2) + ", " + string.Join(", ", columns3) + ", " + string.Join(", ", columns4);
 
