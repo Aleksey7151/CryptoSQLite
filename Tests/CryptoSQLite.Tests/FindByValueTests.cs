@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using CryptoSQLite.CrossTests.Tables;
+using CryptoSQLite.Tests.Tables;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [TestFixture]
     public class FindByValueTests : BaseTest
     {
         [Test]
-        public async Task FindRowsInTableThatHaveNullValues()
+        public void FindRowsInTableThatHaveNullValues()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<SecretTask>();
-                    await db.CreateTableAsync<SecretTask>();
+                     db.DeleteTable<SecretTask>();
+                     db.CreateTable<SecretTask>();
 
-                    await db.InsertItemAsync(st1);
-                    await db.InsertItemAsync(st2);
-                    await db.InsertItemAsync(st3);
+                     db.InsertItem(st1);
+                     db.InsertItem(st2);
+                     db.InsertItem(st3);
 
-                    var result = await db.FindByValueAsync<SecretTask>("Description", null);
+                    var result =  db.FindByValue<SecretTask>("Description", null);
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
@@ -49,20 +48,20 @@ namespace CryptoSQLite.CrossTests
 
 
         [Test]
-        public async Task FindByValueFunction()
+        public void FindByValueFunction()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    var result = await db.FindByValueAsync<AccountsData>("Age", 20);
+                    var result =  db.FindByValue<AccountsData>("Age", 20);
 
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);

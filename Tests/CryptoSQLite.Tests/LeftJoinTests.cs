@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     #region Joining Tables
 
@@ -108,7 +107,7 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task LeftJoinTablesUsingInt()
+        public void LeftJoinTablesUsingInt()
         {
 
             var rightTable1 = new RightTable { IntJoinKey = 1, SomeData = "Some data for check 1", SomeInt = 12311, StringJoinKey = "Key1" };
@@ -126,30 +125,30 @@ namespace CryptoSQLite.CrossTests
             var leftTable6 = new LeftTable { IntJoinKey = 1, SomeData = "Some Inner data 1 - 3", SomeInt = 9383, StringJoinKey = "Bilbo Beggins" };
             var leftTable7 = new LeftTable { IntJoinKey = 5, SomeData = "Some Inner data 3 - 3", SomeInt = 345, StringJoinKey = "Key2" };
 
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<RightTable>();
-                    await db.DeleteTableAsync<LeftTable>();
+                     db.DeleteTable<RightTable>();
+                     db.DeleteTable<LeftTable>();
 
-                    await db.CreateTableAsync<RightTable>();
-                    await db.CreateTableAsync<LeftTable>();
+                     db.CreateTable<RightTable>();
+                     db.CreateTable<LeftTable>();
 
-                    await db.InsertItemAsync(rightTable1);
-                    await db.InsertItemAsync(rightTable2);
-                    await db.InsertItemAsync(rightTable3);
+                     db.InsertItem(rightTable1);
+                     db.InsertItem(rightTable2);
+                     db.InsertItem(rightTable3);
 
-                    await db.InsertItemAsync(leftTable1);
-                    await db.InsertItemAsync(leftTable2);
-                    await db.InsertItemAsync(leftTable3);
-                    await db.InsertItemAsync(leftTable4);
-                    await db.InsertItemAsync(leftTable5);
-                    await db.InsertItemAsync(leftTable6);
-                    await db.InsertItemAsync(leftTable7);
+                     db.InsertItem(leftTable1);
+                     db.InsertItem(leftTable2);
+                     db.InsertItem(leftTable3);
+                     db.InsertItem(leftTable4);
+                     db.InsertItem(leftTable5);
+                     db.InsertItem(leftTable6);
+                     db.InsertItem(leftTable7);
 
 
-                    var leftJoin = await db.LeftJoinAsync<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.IntJoinKey == right.IntJoinKey,
+                    var leftJoin =  db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.IntJoinKey == right.IntJoinKey,
                                 (left, right) => new LeftJoinResult(left, right));
 
                     Assert.IsTrue(leftJoin != null);
@@ -195,7 +194,7 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task LeftJoinTablesUsingStringKey()
+        public void LeftJoinTablesUsingStringKey()
         {
 
             var rightTable1 = new RightTable { IntJoinKey = 1, SomeData = "Some data for check 1", SomeInt = 12311, StringJoinKey = "Key1" };
@@ -213,30 +212,30 @@ namespace CryptoSQLite.CrossTests
             var leftTable6 = new LeftTable { IntJoinKey = 1, SomeData = "Some Inner data 1 - 3", SomeInt = 9383, StringJoinKey = "Bilbo Beggins" };
             var leftTable7 = new LeftTable { IntJoinKey = 5, SomeData = "Some Inner data 3 - 3", SomeInt = 345, StringJoinKey = "Key2" };
 
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<RightTable>();
-                    await db.DeleteTableAsync<LeftTable>();
+                     db.DeleteTable<RightTable>();
+                     db.DeleteTable<LeftTable>();
 
-                    await db.CreateTableAsync<RightTable>();
-                    await db.CreateTableAsync<LeftTable>();
+                     db.CreateTable<RightTable>();
+                     db.CreateTable<LeftTable>();
 
-                    await db.InsertItemAsync(rightTable1);
-                    await db.InsertItemAsync(rightTable2);
-                    await db.InsertItemAsync(rightTable3);
+                     db.InsertItem(rightTable1);
+                     db.InsertItem(rightTable2);
+                     db.InsertItem(rightTable3);
 
-                    await db.InsertItemAsync(leftTable1);
-                    await db.InsertItemAsync(leftTable2);
-                    await db.InsertItemAsync(leftTable3);
-                    await db.InsertItemAsync(leftTable4);
-                    await db.InsertItemAsync(leftTable5);
-                    await db.InsertItemAsync(leftTable6);
-                    await db.InsertItemAsync(leftTable7);
+                     db.InsertItem(leftTable1);
+                     db.InsertItem(leftTable2);
+                     db.InsertItem(leftTable3);
+                     db.InsertItem(leftTable4);
+                     db.InsertItem(leftTable5);
+                     db.InsertItem(leftTable6);
+                     db.InsertItem(leftTable7);
 
 
-                    var leftJoin = await db.LeftJoinAsync<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.StringJoinKey == right.StringJoinKey,
+                    var leftJoin =  db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.StringJoinKey == right.StringJoinKey,
                                 (left, right) => new LeftJoinResult(left, right));
 
                     Assert.IsTrue(leftJoin != null);

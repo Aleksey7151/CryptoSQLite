@@ -58,7 +58,7 @@ namespace CryptoSQLite.CrossTests.iOS
             var nunit = new NUnit.Runner.App();
 
             // If you want to add tests in another assembly
-            nunit.AddTestAssembly(typeof(global::CryptoSQLite.CrossTests.CheckTableStructureTests).Assembly);
+            nunit.AddTestAssembly(typeof(global::CryptoSQLite.Tests.CheckTableStructureTests).Assembly);
 
             // Do you want to automatically run tests when the app starts?
             nunit.AutoRun = true;

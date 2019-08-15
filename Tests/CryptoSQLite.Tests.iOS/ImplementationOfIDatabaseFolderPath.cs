@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CryptoSQLite.CrossTests.iOS;
+using CryptoSQLite.Tests;
 
 [assembly: Xamarin.Forms.Dependency(typeof(ImplementationOfIDatabaseFolderPath))]
 namespace CryptoSQLite.CrossTests.iOS

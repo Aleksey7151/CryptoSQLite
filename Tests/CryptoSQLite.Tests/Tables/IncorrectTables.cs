@@ -1,4 +1,4 @@
-﻿namespace CryptoSQLite.CrossTests.Tables
+﻿namespace CryptoSQLite.Tests.Tables
 {
     internal class TableWithoutCryptoTableAttribute
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CryptoSQLite.CrossTests.Tables
+namespace CryptoSQLite.Tests.Tables
 {
     [CryptoTable("OpenStrings")]
     internal class OpenStrings

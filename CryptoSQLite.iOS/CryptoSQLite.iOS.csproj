@@ -69,9 +69,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CryptoSQLite\CryptoSQLite.csproj">
+    <ProjectReference Include="..\CryptoSQLite.Abstractions\CryptoSQLite.Abstractions.csproj">
       <Project>{fe2f0037-9c69-44cd-a14e-07de44233cf7}</Project>
-      <Name>CryptoSQLite</Name>
+      <Name>CryptoSQLite.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

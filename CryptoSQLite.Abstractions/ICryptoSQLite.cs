@@ -7,7 +7,7 @@ namespace CryptoSQLite
     /// <summary>
     /// Interface of SQLite connection to database file with data encryption
     /// </summary>
-    public interface ICryptoSQLite
+    public interface ICryptoSQLite : IDisposable
     {
         /// <summary>
         /// Sets the encryption key for all tables in database file. That key will be used for encryption data for all tables, that don't have specific encryption key.

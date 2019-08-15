@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using CryptoSQLite.CrossTests.Tables;
+using CryptoSQLite.Tests.Tables;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [TestFixture]
     public class DeleteUsingPredicateTests : BaseTest
@@ -112,25 +111,25 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Equal_To_Null_Predicate()
+        public void Delete_Using_Equal_To_Null_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = null, SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<SecretTask>();
-                    await db.CreateTableAsync<SecretTask>();
+                     db.DeleteTable<SecretTask>();
+                     db.CreateTable<SecretTask>();
 
-                    await db.InsertItemAsync(st1);
-                    await db.InsertItemAsync(st2);
-                    await db.InsertItemAsync(st3);
+                     db.InsertItem(st1);
+                     db.InsertItem(st2);
+                     db.InsertItem(st3);
 
-                    await db.DeleteAsync<SecretTask>(a => a.Description == null);
+                     db.Delete<SecretTask>(a => a.Description == null);
 
-                    var result = await db.TableAsync<SecretTask>();
+                    var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
@@ -152,24 +151,24 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Not_Equal_To_Null_Predicate()
+        public void Delete_Using_Not_Equal_To_Null_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<SecretTask>();
-                    await db.CreateTableAsync<SecretTask>();
+                     db.DeleteTable<SecretTask>();
+                     db.CreateTable<SecretTask>();
 
-                    await db.InsertItemAsync(st1);
-                    await db.InsertItemAsync(st2);
-                    await db.InsertItemAsync(st3);
+                     db.InsertItem(st1);
+                     db.InsertItem(st2);
+                     db.InsertItem(st3);
 
-                    await db.DeleteAsync<SecretTask>(a => a.Description != null);
-                    var result = await db.TableAsync<SecretTask>();
+                     db.Delete<SecretTask>(a => a.Description != null);
+                    var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
@@ -191,25 +190,25 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Equal_To_True_Predicate()
+        public void Delete_Using_Equal_To_True_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = null, SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<SecretTask>();
-                    await db.CreateTableAsync<SecretTask>();
+                     db.DeleteTable<SecretTask>();
+                     db.CreateTable<SecretTask>();
 
-                    await db.InsertItemAsync(st1);
-                    await db.InsertItemAsync(st2);
-                    await db.InsertItemAsync(st3);
+                     db.InsertItem(st1);
+                     db.InsertItem(st2);
+                     db.InsertItem(st3);
 
-                    await db.DeleteAsync<SecretTask>(a => a.IsDone);
+                     db.Delete<SecretTask>(a => a.IsDone);
 
-                    var result = await db.TableAsync<SecretTask>();
+                    var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 1);
@@ -231,25 +230,25 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Equal_To_False_Predicate()
+        public void Delete_Using_Equal_To_False_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
             var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = null, SecretToDo = "Some Secret Task" };
             var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<SecretTask>();
-                    await db.CreateTableAsync<SecretTask>();
+                     db.DeleteTable<SecretTask>();
+                     db.CreateTable<SecretTask>();
 
-                    await db.InsertItemAsync(st1);
-                    await db.InsertItemAsync(st2);
-                    await db.InsertItemAsync(st3);
+                     db.InsertItem(st1);
+                     db.InsertItem(st2);
+                     db.InsertItem(st3);
 
-                    await db.DeleteAsync<SecretTask>(a => !a.IsDone);
+                     db.Delete<SecretTask>(a => !a.IsDone);
 
-                    var result = await db.TableAsync<SecretTask>();
+                    var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 2);
@@ -272,21 +271,21 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Equal_To_Explicit_String_Predicate()
+        public void Delete_Using_Equal_To_Explicit_String_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Name == "Account0");
-                    var result = await db.TableAsync<AccountsData>();
+                     db.Delete<AccountsData>(a => a.Name == "Account0");
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 5);
@@ -312,21 +311,21 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_LessThan_Predicate()
+        public void Delete_Using_LessThan_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Age < 27);
-                    var result = await db.TableAsync<AccountsData>();
+                     db.Delete<AccountsData>(a => a.Age < 27);
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
@@ -350,21 +349,21 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_GreaterThan_Or_Equal_Predicate()
+        public void Delete_Using_GreaterThan_Or_Equal_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Age >= 25);
-                    var result = await db.TableAsync<AccountsData>();
+                     db.Delete<AccountsData>(a => a.Age >= 25);
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 4);
@@ -389,22 +388,22 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Inclusive_Between_Two_Values_Predicate()
+        public void Delete_Using_Inclusive_Between_Two_Values_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Posts <= 60 && a.Posts >= 40);
+                     db.Delete<AccountsData>(a => a.Posts <= 60 && a.Posts >= 40);
 
-                    var result = await db.TableAsync<AccountsData>();
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
@@ -428,22 +427,22 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Inclusive_LessThan_Or_GreaterThan_Predicate()
+        public void Delete_Using_Inclusive_LessThan_Or_GreaterThan_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Posts >= 60 || a.Posts <= 40);
+                     db.Delete<AccountsData>(a => a.Posts >= 60 || a.Posts <= 40);
 
-                    var result = await db.TableAsync<AccountsData>();
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
@@ -467,22 +466,22 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task Delete_Using_Double_Greater_Than_Explicit_Value_Predicate()
+        public void Delete_Using_Double_Greater_Than_Explicit_Value_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Productivity > 1605.005);
+                     db.Delete<AccountsData>(a => a.Productivity > 1605.005);
 
-                    var result = await db.TableAsync<AccountsData>();
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);
@@ -506,22 +505,22 @@ namespace CryptoSQLite.CrossTests
         }
 
         [Test]
-        public async Task NullableULong_And_UShort_Equal_To_NUll_And_LessThan_Predicate()
+        public void NullableULong_And_UShort_Equal_To_NUll_And_LessThan_Predicate()
         {
             var accounts = GetAccounts();
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<AccountsData>();
-                    await db.CreateTableAsync<AccountsData>();
+                     db.DeleteTable<AccountsData>();
+                     db.CreateTable<AccountsData>();
 
                     foreach (var account in accounts)
-                        await db.InsertItemAsync(account);
+                         db.InsertItem(account);
 
-                    await db.DeleteAsync<AccountsData>(a => a.Salary == null || a.Age > 27);
+                     db.Delete<AccountsData>(a => a.Salary == null || a.Age > 27);
 
-                    var result = await db.TableAsync<AccountsData>();
+                    var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
                     Assert.IsTrue(table.Length == 3);

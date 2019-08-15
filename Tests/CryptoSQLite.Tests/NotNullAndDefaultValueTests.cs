@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [CryptoTable("TableWithNotNullAttrs")]
     public class TableWithNotNullAttrs

@@ -3,9 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CryptoSQLite.ORM" Version="3.0.1" />
     <PackageReference Include="NUnitLite" Version="3.12.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CryptoSQLite\CryptoSQLite.csproj" />
   </ItemGroup>
 </Project>

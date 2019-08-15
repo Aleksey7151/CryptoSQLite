@@ -1,4 +1,4 @@
-﻿namespace CryptoSQLite.CrossTests
+﻿namespace CryptoSQLite.Tests
 {
     public interface IDatabaseFolderPathGetter
     {

@@ -15,7 +15,7 @@ namespace CryptoSQLite
     /// <summary>
     /// Represents a connection to the SQLite database file.
     /// </summary>
-    public class CryptoSQLite : ICryptoSQLite, IDisposable
+    public class CryptoSQLite : ICryptoSQLite
     {
         internal const string SoltColumnName = "SoltColumn";
         private readonly MethodInfo _methodFindFirstByValue = typeof(CryptoSQLite).GetRuntimeMethods().FirstOrDefault(mi => mi.Name == nameof(FindFirstUsingColumnValue)); // FindFirstByValue Method

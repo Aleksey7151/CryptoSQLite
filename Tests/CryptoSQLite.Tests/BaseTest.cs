@@ -1,15 +1,12 @@
 ﻿using System;
-using CryptoSQLite.CrossTests.Tables;
-using Xamarin.Forms;
+using CryptoSQLite.Tests.Tables;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     public class BaseTest
     {
         private readonly byte[] _key = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                                         18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
-
-
         public const string GostDbFile = "TestGost.db3";
         public const string Aes256DbFile = "TestAes256.db3";
         public const string Aes192DbFile = "TestAes192.db3";
@@ -24,118 +21,63 @@ namespace CryptoSQLite.CrossTests
             Folder = DependencyService.Get<IDatabaseFolderPathGetter>();
         }
 
-        public CryptoSQLiteConnection GetAes256Connection()
+        public ICryptoSQLite GetAes256Connection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection GetAes192Connection()
+        public ICryptoSQLite GetAes192Connection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection GetAes128Connection()
+        public ICryptoSQLite GetAes128Connection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection GetGostConnection()
+        public ICryptoSQLite GetGostConnection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection GetDesConnection()
+        public ICryptoSQLite GetDesConnection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection GetTripleDesConnection()
+        public ICryptoSQLite GetTripleDesConnection()
         {
-            var conn = new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
-        public CryptoSQLiteConnection[] GetConnections()
+        public ICryptoSQLite[] GetConnections()
         {
             return new[] { GetGostConnection(), GetAes256Connection(), GetAes192Connection(), GetAes128Connection(), GetDesConnection(), GetTripleDesConnection() };
         }
 
-        public CryptoSQLiteConnection[] GetOnlyConnections()
+        public ICryptoSQLite[] GetOnlyConnections()
         {
             return new[]
             {
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey),
-                new CryptoSQLiteConnection(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey)
-            };
-        }
-
-        public CryptoSQLiteAsyncConnection GetGostAsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection GetAes256AsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection GetAes192AsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection GetAes128AsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection GetDesAsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection GetTripleDesAsyncConnection()
-        {
-            var conn = new CryptoSQLiteAsyncConnection(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
-        }
-
-        public CryptoSQLiteAsyncConnection[] GetAsyncConnections()
-        {
-            return new[]
-            {
-                GetAes256AsyncConnection(),
-                GetAes192AsyncConnection(),
-                GetAes128AsyncConnection(),
-                GetGostAsyncConnection(),
-                GetDesAsyncConnection(),
-                GetTripleDesAsyncConnection()
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey),
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey),
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey),
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey),
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey),
+                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey)
             };
         }
 

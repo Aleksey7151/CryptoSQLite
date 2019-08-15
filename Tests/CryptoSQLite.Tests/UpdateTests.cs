@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using CryptoSQLite.CrossTests.Tables;
+using CryptoSQLite.Tests.Tables;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
     [TestFixture]
     public class UpdateTests : BaseTest

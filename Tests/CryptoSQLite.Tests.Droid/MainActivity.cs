@@ -38,7 +38,7 @@ namespace CryptoSQLite.CrossTests.Droid
             base.OnCreate(savedInstanceState);
             try
             {
-                SQLitePCL.Batteries_V2.Init();      // From NuGet Package SQLitePCLRaw.bundle_green by Eric Sink
+                CryptoSQLiteFactory.Current.Init();
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace CryptoSQLite.CrossTests.Droid
             nunit.AutoRun = true;
 
             // If you want to add tests in another assembly
-            nunit.AddTestAssembly(typeof(CryptoSQLite.CrossTests.InsertItemTests).Assembly);
+            nunit.AddTestAssembly(typeof(CryptoSQLite.Tests.InsertItemTests).Assembly);
 
             // Do you want to automatically run tests when the app starts?
 

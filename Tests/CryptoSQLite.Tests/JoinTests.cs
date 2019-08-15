@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace CryptoSQLite.CrossTests
+namespace CryptoSQLite.Tests
 {
 
     #region Join Tables
@@ -113,7 +112,7 @@ namespace CryptoSQLite.CrossTests
     public class JoinTests : BaseTest
     {
         [Test]
-        public async Task JoinTwoTables()
+        public void JoinTwoTables()
         {
 
             var warehouse1 = new Warehouse { Address = "Tuchachevskogo 31-30", Manager = "Safonova Anna", PhoneNumber = "7000665" };
@@ -133,39 +132,39 @@ namespace CryptoSQLite.CrossTests
             var product4 = new Product { Serial = 44444, Description = "Train", CustomerId = null, ManufacturerId = 1, WarehouseId = 1 };
             var product5 = new Product { Serial = 55555, Description = "MotoByke", CustomerId = 3, ManufacturerId = 3, WarehouseId = 2 };
 
-            foreach (var db in GetAsyncConnections())
+            foreach (var db in GetConnections())
             {
                 try
                 {
-                    await db.DeleteTableAsync<Product>();
-                    await db.DeleteTableAsync<Warehouse>();
-                    await db.DeleteTableAsync<Manufacturer>();
-                    await db.DeleteTableAsync<Customer>();
+                    db.DeleteTable<Product>();
+                    db.DeleteTable<Warehouse>();
+                    db.DeleteTable<Manufacturer>();
+                    db.DeleteTable<Customer>();
 
 
-                    await db.CreateTableAsync<Warehouse>();
-                    await db.CreateTableAsync<Manufacturer>();
-                    await db.CreateTableAsync<Customer>();
-                    await db.CreateTableAsync<Product>();
+                    db.CreateTable<Warehouse>();
+                    db.CreateTable<Manufacturer>();
+                    db.CreateTable<Customer>();
+                    db.CreateTable<Product>();
 
-                    await db.InsertItemAsync(warehouse1);
-                    await db.InsertItemAsync(warehouse2);
+                    db.InsertItem(warehouse1);
+                    db.InsertItem(warehouse2);
 
-                    await db.InsertItemAsync(manufacturer1);
-                    await db.InsertItemAsync(manufacturer2);
-                    await db.InsertItemAsync(manufacturer3);
+                    db.InsertItem(manufacturer1);
+                    db.InsertItem(manufacturer2);
+                    db.InsertItem(manufacturer3);
 
-                    await db.InsertItemAsync(customer1);
-                    await db.InsertItemAsync(customer2);
-                    await db.InsertItemAsync(customer3);
+                    db.InsertItem(customer1);
+                    db.InsertItem(customer2);
+                    db.InsertItem(customer3);
 
-                    await db.InsertItemAsync(product1);
-                    await db.InsertItemAsync(product2);
-                    await db.InsertItemAsync(product3);
-                    await db.InsertItemAsync(product4);
-                    await db.InsertItemAsync(product5);
+                    db.InsertItem(product1);
+                    db.InsertItem(product2);
+                    db.InsertItem(product3);
+                    db.InsertItem(product4);
+                    db.InsertItem(product5);
 
-                    var twoJoinedTablesResult = await db.JoinAsync<Product, Customer, JoinedTables>(null, (p, c) => p.CustomerId == c.Id, (t1, t2) => new JoinedTables { Product = t1, Customer = t2 });
+                    var twoJoinedTablesResult = db.Join<Product, Customer, JoinedTables>(null, (p, c) => p.CustomerId == c.Id, (t1, t2) => new JoinedTables { Product = t1, Customer = t2 });
 
                     var twoJoinedTables = twoJoinedTablesResult.ToArray();
 
@@ -184,7 +183,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3));
 
-                    var threeJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, JoinedTables>(null,
+                    var threeJoinedTablesResult = db.Join<Product, Customer, Manufacturer, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
                         (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
                         (product, customer, manufacturer) =>
@@ -207,7 +206,7 @@ namespace CryptoSQLite.CrossTests
                     Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
                     Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3));
 
-                    var fourJoinedTablesResult = await db.JoinAsync<Product, Customer, Manufacturer, Warehouse, JoinedTables>(null,
+                    var fourJoinedTablesResult = db.Join<Product, Customer, Manufacturer, Warehouse, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
                         (product, manufacturer) => product.ManufacturerId == manufacturer.Id,
                         (product, warehouse) => product.WarehouseId == warehouse.Id,

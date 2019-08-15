@@ -3,6 +3,9 @@ using System.Threading;
 
 namespace CryptoSQLite
 {
+    /// <summary>
+    /// Represent entry point for working with crypto connection
+    /// </summary>
     public class CryptoSQLiteFactory
     {
         private static readonly Lazy<CryptoSQLiteFactory> Implementation =
@@ -46,6 +49,10 @@ namespace CryptoSQLite
             return new CryptoSQLite(dataBaseFilePath, cryptoAlgorithm);
         }
 
+        /// <summary>
+        /// Initializes <see cref="ICryptoSQLite"/> factory. Must be called from platform specific project e.g. Android or iOS.
+        /// </summary>
+        /// <exception cref="System.NotImplementedException">You must call \'Init\' method in a platform specific project, e.g. iOS or Android.</exception>
         public void Init()
         {
 #if NETSTANDARD2_0
