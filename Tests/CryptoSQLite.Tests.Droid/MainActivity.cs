@@ -25,6 +25,7 @@ using System;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using CryptoSQLite.Tests;
 
 namespace CryptoSQLite.CrossTests.Droid
 {
@@ -32,13 +33,12 @@ namespace CryptoSQLite.CrossTests.Droid
          ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
     {
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             try
             {
-                CryptoSQLiteFactory.Current.Init();
+                CryptoSQLiteFactory.Current.Init(Android.OS.Environment.ExternalStorageDirectory.Path);
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace CryptoSQLite.CrossTests.Droid
             nunit.AutoRun = true;
 
             // If you want to add tests in another assembly
-            nunit.AddTestAssembly(typeof(CryptoSQLite.Tests.InsertItemTests).Assembly);
+            nunit.AddTestAssembly(typeof(BaseTest).Assembly);
 
             // Do you want to automatically run tests when the app starts?
 

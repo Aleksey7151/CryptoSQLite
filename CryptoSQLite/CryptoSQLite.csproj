@@ -8,6 +8,10 @@
     <DocumentationFile>bin\Release\netstandard2.0\CryptoSQLite.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702; NU1701</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CryptoSQLite.Abstractions\CryptoSQLite.Abstractions.csproj" />
   </ItemGroup>

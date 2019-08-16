@@ -49,10 +49,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CryptoSQLite.Abstractions, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.1\lib\MonoAndroid10\CryptoSQLite.Abstractions.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.2\lib\MonoAndroid10\CryptoSQLite.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="CryptoSQLite.Droid, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.1\lib\MonoAndroid10\CryptoSQLite.Droid.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.2\lib\MonoAndroid10\CryptoSQLite.Droid.dll</HintPath>
     </Reference>
     <Reference Include="FormsViewGroup, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xamarin.Forms.2.3.3.193\lib\MonoAndroid10\FormsViewGroup.dll</HintPath>
@@ -148,7 +148,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImplementationOfIDatabaseFolderPath.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

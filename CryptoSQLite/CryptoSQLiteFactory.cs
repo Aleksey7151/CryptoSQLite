@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 
 namespace CryptoSQLite
@@ -12,6 +13,7 @@ namespace CryptoSQLite
             new Lazy<CryptoSQLiteFactory>(CreateCryptoSQLiteFactory, LazyThreadSafetyMode.PublicationOnly);
 
         private bool _initialized;
+        private string _dataBaseFolder;
 
         private CryptoSQLiteFactory()
         {
@@ -25,20 +27,25 @@ namespace CryptoSQLite
         /// <summary>
         ///     Creates <see cref="ICryptoSQLite"/> database with specified full file path.
         /// </summary>
-        /// <param name="dataBaseFilePath">The data base file path.</param>
+        /// <param name="dataBaseFilePath">The data base file path or file name if Init(string) method was used for initialization.</param>
         /// <returns></returns>
         public ICryptoSQLite Create(string dataBaseFilePath)
         {
             if (!_initialized)
                 throw new NotImplementedException("You must call \'CryptoSQLiteFactory.Current.Init()\' method in a platform specific project, e.g. iOS or Android.");
 
-            return new CryptoSQLite(dataBaseFilePath);
+            if (string.IsNullOrEmpty(_dataBaseFolder))
+            {
+                return new CryptoSQLite(dataBaseFilePath);
+            }
+
+            return new CryptoSQLite(Path.Combine(_dataBaseFolder, dataBaseFilePath));
         }
 
         /// <summary>
         ///     Creates <see cref="ICryptoSQLite"/> database with specified full file path.
         /// </summary>
-        /// <param name="dataBaseFilePath">The data base file path.</param>
+        /// <param name="dataBaseFilePath">The data base file path or file name if Init(string) method was used for initialization.</param>
         /// <param name="cryptoAlgorithm">The crypto algorithm</param>
         /// <returns></returns>
         public ICryptoSQLite Create(string dataBaseFilePath, CryptoAlgorithms cryptoAlgorithm)
@@ -46,7 +53,12 @@ namespace CryptoSQLite
             if (!_initialized)
                 throw new NotImplementedException("You must call \'CryptoSQLiteFactory.Current.Init()\' method in a platform specific project, e.g. iOS or Android.");
 
-            return new CryptoSQLite(dataBaseFilePath, cryptoAlgorithm);
+            if (string.IsNullOrEmpty(_dataBaseFolder))
+            {
+                return new CryptoSQLite(dataBaseFilePath, cryptoAlgorithm);
+            }
+
+            return new CryptoSQLite(Path.Combine(_dataBaseFolder, dataBaseFilePath), cryptoAlgorithm);
         }
 
         /// <summary>
@@ -55,6 +67,23 @@ namespace CryptoSQLite
         /// <exception cref="System.NotImplementedException">You must call \'Init\' method in a platform specific project, e.g. iOS or Android.</exception>
         public void Init()
         {
+#if NETSTANDARD2_0
+            throw new NotImplementedException("You must call \'Init\' method in a platform specific project, e.g. iOS or Android.");
+#else
+            SQLitePCL.Batteries_V2.Init();
+            _initialized = true;
+#endif
+        }
+
+        /// <summary>
+        /// Initializes <see cref="ICryptoSQLite"/> factory. Must be called from platform specific project e.g. Android or iOS.
+        /// If you call this method, then you do not need to provide full path to database in 'Create()' method, just file name.
+        /// </summary>
+        /// <param name="dataBaseFolderPath">Platform specific the data base folder path.</param>
+        /// <exception cref="System.NotImplementedException">You must call \'Init\' method in a platform specific project, e.g. iOS or Android.</exception>
+        public void Init(string dataBaseFolderPath)
+        {
+            _dataBaseFolder = dataBaseFolderPath;
 #if NETSTANDARD2_0
             throw new NotImplementedException("You must call \'Init\' method in a platform specific project, e.g. iOS or Android.");
 #else

@@ -14,51 +14,44 @@ namespace CryptoSQLite.Tests
         public const string DesDbFile = "TestDes.db3";
         public const string TripleDesDbFile = "TestTripleDes.db3";
 
-        private static readonly IDatabaseFolderPathGetter Folder;
-
-        static BaseTest()
-        {
-            Folder = DependencyService.Get<IDatabaseFolderPathGetter>();
-        }
-
         public ICryptoSQLite GetAes256Connection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Aes256DbFile, CryptoAlgorithms.AesWith256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public ICryptoSQLite GetAes192Connection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Aes192DbFile, CryptoAlgorithms.AesWith192BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public ICryptoSQLite GetAes128Connection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(Aes128DbFile, CryptoAlgorithms.AesWith128BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public ICryptoSQLite GetGostConnection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(GostDbFile, CryptoAlgorithms.Gost28147With256BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public ICryptoSQLite GetDesConnection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(DesDbFile, CryptoAlgorithms.DesWith56BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
 
         public ICryptoSQLite GetTripleDesConnection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey);
+            var conn = CryptoSQLiteFactory.Current.Create(TripleDesDbFile, CryptoAlgorithms.TripleDesWith168BitsKey);
             conn.SetEncryptionKey(_key);
             return conn;
         }
@@ -72,12 +65,12 @@ namespace CryptoSQLite.Tests
         {
             return new[]
             {
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes256DbFile), CryptoAlgorithms.AesWith256BitsKey),
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes192DbFile), CryptoAlgorithms.AesWith192BitsKey),
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(Aes128DbFile), CryptoAlgorithms.AesWith128BitsKey),
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(GostDbFile), CryptoAlgorithms.Gost28147With256BitsKey),
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(DesDbFile), CryptoAlgorithms.DesWith56BitsKey),
-                CryptoSQLiteFactory.Current.Create(Folder.GetDatabaseFolderPath(TripleDesDbFile), CryptoAlgorithms.TripleDesWith168BitsKey)
+                CryptoSQLiteFactory.Current.Create(Aes256DbFile, CryptoAlgorithms.AesWith256BitsKey),
+                CryptoSQLiteFactory.Current.Create(Aes192DbFile, CryptoAlgorithms.AesWith192BitsKey),
+                CryptoSQLiteFactory.Current.Create(Aes128DbFile, CryptoAlgorithms.AesWith128BitsKey),
+                CryptoSQLiteFactory.Current.Create(GostDbFile, CryptoAlgorithms.Gost28147With256BitsKey),
+                CryptoSQLiteFactory.Current.Create(DesDbFile, CryptoAlgorithms.DesWith56BitsKey),
+                CryptoSQLiteFactory.Current.Create(TripleDesDbFile, CryptoAlgorithms.TripleDesWith168BitsKey)
             };
         }
 
