@@ -1,14 +1,13 @@
 ﻿using System;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
-using TableWithoutCryptoTableAttribute = CryptoSQLite.Tests.TableWithoutCryptoTableAttribute;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class CheckTableStructureTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void TableMustContainCryptoTableAttribute()
         {
             using (var db = GetGostConnection())
@@ -17,11 +16,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithoutCryptoTableAttribute>();
                 });
-                Assert.That(ex.Message, Contains.Substring($"Table {typeof(TableWithoutCryptoTableAttribute)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}"));
+                Assert.Contains($"Table {typeof(TableWithoutCryptoTableAttribute)} doesn't have Custom Attribute: {nameof(CryptoTableAttribute)}", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableNameCanNotBeNull()
         {
             using (var db = GetGostConnection())
@@ -30,11 +29,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithNullName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Table name can't be null or empty."));
+                Assert.Contains("Table name can't be null or empty.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableNameCanNotBeEmpty()
         {
             using (var db = GetGostConnection())
@@ -43,11 +42,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithEmptyName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Table name can't be null or empty."));
+                Assert.Contains("Table name can't be null or empty.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnNameCanNotBeNull()
         {
             using (var db = GetGostConnection())
@@ -56,11 +55,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithNullColumnName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Column name can't be null."));
+                Assert.Contains("Column name can't be null.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnNameCanNotBeEmpty()
         {
             using (var db = GetGostConnection())
@@ -69,11 +68,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithEmptyColumnName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Column name can't be empty."));
+                Assert.Contains("Column name can't be empty.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableCanNotContainSoltColumn_v1()
         {
             using (var db = GetGostConnection())
@@ -82,11 +81,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithSoltColumnNameFirst>();
                 });
-                Assert.That(ex.Message, Contains.Substring("This name is reserved for CryptoSQLite needs."));
+                Assert.Contains("This name is reserved for CryptoSQLite needs.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableCanNotContainSoltColumn_v2()
         {
             using (var db = GetGostConnection())
@@ -95,11 +94,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithSoltColumnNameSecond>();
                 });
-                Assert.That(ex.Message, Contains.Substring("This name is reserved for CryptoSQLite needs."));
+                Assert.Contains("This name is reserved for CryptoSQLite needs.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableCanNotBeWithoutPrimaryKeyColumn()
         {
             using (var db = GetGostConnection())
@@ -108,11 +107,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithoutPrimaryKeyColumn>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Crypto table must contain at least one PrimaryKey column."));
+                Assert.Contains("Crypto table must contain at least one PrimaryKey column.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void TableCanNotContainTwoPrimaryKeyColumns()
         {
             using (var db = GetGostConnection())
@@ -121,11 +120,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithTwoPrimaryKeyColumns>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Crypto Table can't contain more that one PrimaryKey column."));
+                Assert.Contains("Crypto Table can't contain more that one PrimaryKey column.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void PrimaryKeyColumnCanNotBeEncrypted()
         {
             using (var db = GetGostConnection())
@@ -134,11 +133,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithEncryptedPrimaryKey>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Column with PrimaryKey Attribute can't be Encrypted."));
+                Assert.Contains("Column with PrimaryKey Attribute can't be Encrypted.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void AutoIncrementalColumnCanNotBeEncrypted()
         {
             using (var db = GetGostConnection())
@@ -147,11 +146,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithEncryptedAutoIncrementalKey>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Column with AutoIncremental Attribute can't be Encrypted."));
+                Assert.Contains("Column with AutoIncremental Attribute can't be Encrypted.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void EncryptedColumnCanNotHaveDefaultValue()
         {
             using (var db = GetGostConnection())
@@ -160,32 +159,21 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithEncryptedDefaultValue>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Encrypted columns can't have default value, but they can be Not Null"));
+                Assert.Contains("Encrypted columns can't have default value, but they can be Not Null", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void EncryptedColumnCanBeNotNull()
         {
             using (var db = GetGostConnection())
             {
-                try
-                {
-                    db.CreateTable<TableWithEncryptedNotNullValue>();
-                    db.DeleteTable<TableWithEncryptedNotNullValue>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
-                }
+                db.CreateTable<TableWithEncryptedNotNullValue>();
+                db.DeleteTable<TableWithEncryptedNotNullValue>();
             }
         }
 
-        [Test]
+        [Fact]
         public void TableCanNotContainTwoColumnsWithSameNames()
         {
             using (var db = GetGostConnection())
@@ -194,7 +182,7 @@ namespace CryptoSQLite.Tests
                 {
                     db.CreateTable<TableWithTwoEqualColumnNames>();
                 });
-                Assert.That(ex.ProbableCause, Contains.Substring("Table can't contain two columns with same names."));
+                Assert.Contains("Table can't contain two columns with same names.", ex.ProbableCause);
             }
         }
     }

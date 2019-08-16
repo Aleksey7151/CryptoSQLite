@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CryptoSQLite.ORM" Version="3.0.2" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

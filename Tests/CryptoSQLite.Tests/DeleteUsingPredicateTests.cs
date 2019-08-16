@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class DeleteUsingPredicateTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void Predicate_Can_Not_Be_Null()
         {
             var item = ULongNumbers.GetDefault();
@@ -21,11 +21,11 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(item);
                     db.Delete<ULongNumbers>(null);
                 });
-                Assert.That(ex.Message, Contains.Substring("Predicate can't be null"));
+                Assert.Contains("Predicate can't be null", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Whet_Table_Does_Not_Exist()
         {
             using (var db = GetAes256Connection())
@@ -35,11 +35,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<ULongNumbers>();
                     db.Delete<ULongNumbers>(i => i.Id == 1);
                 });
-                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name:"));
+                Assert.Contains("Database doesn't contain table with name:", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void Encrypted_Columns_Can_Not_Be_Used_In_Predicate()
         {
             var accounts = GetAccounts();
@@ -53,11 +53,11 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(accounts[0]);
                     db.Delete<AccountsData>(a => a.Password == "Pass");
                 });
-                Assert.That(ex.Message, Contains.Substring("You can't use Encrypted columns for finding elements in database. Colum"));
+                Assert.Contains("You can't use Encrypted columns for finding elements in database. Colum", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ULong_Forbidden_In_Predicate()
         {
             var item = ULongNumbers.GetDefault();
@@ -70,11 +70,11 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(item);
                     db.Delete<ULongNumbers>(i => i.ULongMaxVal == 1900);
                 });
-                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
+                Assert.Contains("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void Long_Forbidden_In_Predicate()
         {
             var item = LongNumbers.GetDefault();
@@ -87,11 +87,11 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(item);
                     db.Delete<LongNumbers>(i => i.LongMaxVal == 1900);
                 });
-                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
+                Assert.Contains("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void DateTime_Forbidden_In_Predicate()
         {
             var now = DateTime.Now;
@@ -106,11 +106,11 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(item);
                     db.Delete<DateTimeTable>(i => i.Date == now);
                 });
-                Assert.That(ex.Message, Contains.Substring("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements."));
+                Assert.Contains("Properties with types 'UInt64', 'Int64', 'DateTime', 'Decimal' can't be used in Predicates for finding elements.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Equal_To_Null_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -132,16 +132,8 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(st3));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 1);
+                    Assert.True(table[0].Equal(st3));
                 }
                 finally
                 {
@@ -150,7 +142,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Not_Equal_To_Null_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -171,16 +163,8 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(st1));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 1);
+                    Assert.True(table[0].Equal(st1));
                 }
                 finally
                 {
@@ -189,7 +173,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Equal_To_True_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -211,16 +195,8 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equal(st2));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 1);
+                    Assert.True(table[0].Equal(st2));
                 }
                 finally
                 {
@@ -229,7 +205,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Equal_To_False_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -251,17 +227,9 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<SecretTask>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 2);
-                    Assert.IsTrue(table[0].Equal(st1));
-                    Assert.IsTrue(table[1].Equal(st3));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 2);
+                    Assert.True(table[0].Equal(st1));
+                    Assert.True(table[1].Equal(st3));
                 }
                 finally
                 {
@@ -270,7 +238,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Equal_To_Explicit_String_Predicate()
         {
             var accounts = GetAccounts();
@@ -288,20 +256,12 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 5);
-                    Assert.IsTrue(table[0].Equals(accounts[1]));
-                    Assert.IsTrue(table[1].Equals(accounts[2]));
-                    Assert.IsTrue(table[2].Equals(accounts[4]));
-                    Assert.IsTrue(table[3].Equals(accounts[5]));
-                    Assert.IsTrue(table[4].Equals(accounts[7]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 5);
+                    Assert.True(table[0].Equals(accounts[1]));
+                    Assert.True(table[1].Equals(accounts[2]));
+                    Assert.True(table[2].Equals(accounts[4]));
+                    Assert.True(table[3].Equals(accounts[5]));
+                    Assert.True(table[4].Equals(accounts[7]));
                 }
                 finally
                 {
@@ -310,7 +270,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_LessThan_Predicate()
         {
             var accounts = GetAccounts();
@@ -328,18 +288,10 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equals(accounts[3]));
-                    Assert.IsTrue(table[1].Equals(accounts[4]));
-                    Assert.IsTrue(table[2].Equals(accounts[7]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equals(accounts[3]));
+                    Assert.True(table[1].Equals(accounts[4]));
+                    Assert.True(table[2].Equals(accounts[7]));
                 }
                 finally
                 {
@@ -348,7 +300,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_GreaterThan_Or_Equal_Predicate()
         {
             var accounts = GetAccounts();
@@ -366,19 +318,11 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 4);
-                    Assert.IsTrue(table[0].Equals(accounts[0]));
-                    Assert.IsTrue(table[1].Equals(accounts[1]));
-                    Assert.IsTrue(table[2].Equals(accounts[2]));
-                    Assert.IsTrue(table[3].Equals(accounts[5]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 4);
+                    Assert.True(table[0].Equals(accounts[0]));
+                    Assert.True(table[1].Equals(accounts[1]));
+                    Assert.True(table[2].Equals(accounts[2]));
+                    Assert.True(table[3].Equals(accounts[5]));
                 }
                 finally
                 {
@@ -387,7 +331,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Inclusive_Between_Two_Values_Predicate()
         {
             var accounts = GetAccounts();
@@ -406,18 +350,10 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equals(accounts[3]));
-                    Assert.IsTrue(table[1].Equals(accounts[4]));
-                    Assert.IsTrue(table[2].Equals(accounts[7]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equals(accounts[3]));
+                    Assert.True(table[1].Equals(accounts[4]));
+                    Assert.True(table[2].Equals(accounts[7]));
                 }
                 finally
                 {
@@ -426,7 +362,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Inclusive_LessThan_Or_GreaterThan_Predicate()
         {
             var accounts = GetAccounts();
@@ -445,18 +381,10 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equals(accounts[0]));
-                    Assert.IsTrue(table[1].Equals(accounts[1]));
-                    Assert.IsTrue(table[2].Equals(accounts[5]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equals(accounts[0]));
+                    Assert.True(table[1].Equals(accounts[1]));
+                    Assert.True(table[2].Equals(accounts[5]));
                 }
                 finally
                 {
@@ -465,7 +393,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Delete_Using_Double_Greater_Than_Explicit_Value_Predicate()
         {
             var accounts = GetAccounts();
@@ -484,18 +412,10 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equals(accounts[1]));
-                    Assert.IsTrue(table[1].Equals(accounts[2]));
-                    Assert.IsTrue(table[2].Equals(accounts[7]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equals(accounts[1]));
+                    Assert.True(table[1].Equals(accounts[2]));
+                    Assert.True(table[2].Equals(accounts[7]));
                 }
                 finally
                 {
@@ -504,7 +424,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void NullableULong_And_UShort_Equal_To_NUll_And_LessThan_Predicate()
         {
             var accounts = GetAccounts();
@@ -523,18 +443,10 @@ namespace CryptoSQLite.Tests
                     var result =  db.Table<AccountsData>();
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equals(accounts[1]));
-                    Assert.IsTrue(table[1].Equals(accounts[2]));
-                    Assert.IsTrue(table[2].Equals(accounts[6]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equals(accounts[1]));
+                    Assert.True(table[1].Equals(accounts[2]));
+                    Assert.True(table[2].Equals(accounts[6]));
                 }
                 finally
                 {

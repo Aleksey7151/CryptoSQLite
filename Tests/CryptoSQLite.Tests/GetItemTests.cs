@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class GetItemTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void GetAllItems()
         {
             var tasks = GetTasks();
@@ -25,18 +24,11 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Table<SecretTask>().ToArray();
 
-                    Assert.IsNotNull(elements);
-                    Assert.IsTrue(tasks.Length == elements.Length);
+                    Assert.NotNull(elements);
+                    Assert.True(tasks.Length == elements.Length);
+
                     for (var i = 0; i < elements.Length; i++)
-                        Assert.IsTrue(tasks[i].Equal(elements[i]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                        Assert.True(tasks[i].Equal(elements[i]));
                 }
                 finally
                 {

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class DifferentKeysForDifferentTables : BaseTest
     {
-        [Test]
+        [Fact]
         public void DifferentKeysForThreeTablesWithOneDefaultKey()
         {
             var t1 = IntEncryptedNumbers.GetDefault();
@@ -55,34 +55,26 @@ namespace CryptoSQLite.Tests
                     var result = db.Find<IntEncryptedNumbers>(i => i.Id == 1);
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 1);
-                    Assert.IsTrue(table[0].Equals(t1));
+                    Assert.True(table.Length == 1);
+                    Assert.True(table[0].Equals(t1));
 
                     var result1 = db.Find<DoubleEncryptedNumbers>(i => i.Id == 1);
                     Assert.NotNull(result);
                     var table1 = result1.ToArray();
-                    Assert.IsTrue(table1.Length == 1);
-                    Assert.IsTrue(table1[0].Equals(t2));
+                    Assert.Single(table1);
+                    Assert.Equal(t2, table1[0]);
 
                     var result2 = db.Find<LongEncryptedNumbers>(i => i.Id == 1);
                     Assert.NotNull(result);
                     var table2 = result2.ToArray();
-                    Assert.IsTrue(table2.Length == 1);
-                    Assert.IsTrue(table2[0].Equals(t3));
+                    Assert.Single(table2);
+                    Assert.Equal(t3, table2[0]);
 
                     var result3 = db.Find<FloatEncryptedNumbers>(i => i.Id == 1);
                     Assert.NotNull(result);
                     var table3 = result3.ToArray();
-                    Assert.IsTrue(table3.Length == 1);
-                    Assert.IsTrue(table3[0].Equals(t4));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.Single(table3);
+                    Assert.Equal(t4, table3[0]);
                 }
                 finally
                 {

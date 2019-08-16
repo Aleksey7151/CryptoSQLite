@@ -1,38 +1,38 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class InsertItemTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void CreateCryptoTableInDatabase()
         {
             foreach (var db in GetConnections())
             {
+                Exception notExpectedException = null;
+
                 try
                 {
                     db.CreateTable<AccountsData>();
                 }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
                 catch (Exception ex)
                 {
-                    Assert.Fail(ex.Message);
+                    notExpectedException = ex;
                 }
                 finally
                 {
                     db.Dispose();
                 }
+
+                Assert.Null(notExpectedException);
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertElementInTableThatDoNotExistInDatabaseFile()
         {
             foreach (var db in GetConnections())
@@ -42,12 +42,12 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<AccountsData>();
                     db.InsertItem(new AccountsData());
                 });
-                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name"));
+                Assert.Contains("Database doesn't contain table with name", ex.Message);
                 db.Dispose();
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertShortsNumbers()
         {
             var item = ShortNumbers.GetDefault();
@@ -62,16 +62,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ShortNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -80,7 +72,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertEncryptedShortsNumbers()
         {
             var item = ShortEncryptedNumbers.GetDefault();
@@ -95,16 +87,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ShortEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -113,7 +97,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertUnsignedShortsNumbers()
         {
             var item = UShortNumbers.GetDefault();
@@ -128,16 +112,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UShortNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -146,7 +122,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertUnsignedEncryptedShortsNumbers()
         {
             var item = UShortEncryptedNumbers.GetDefault();
@@ -161,16 +137,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UShortEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -179,7 +147,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertIntNumbers()
         {
             var item = IntNumbers.GetDefault();
@@ -194,16 +162,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<IntNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -212,7 +172,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertIntEncryptedNumbers()
         {
             var item = IntEncryptedNumbers.GetDefault();
@@ -227,16 +187,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<IntEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -245,7 +197,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertUIntNumbers()
         {
             var item = UIntNumbers.GetDefault();
@@ -260,16 +212,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UIntNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -278,7 +222,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertUIntEncryptedNumbers()
         {
             var item = UIntEncryptedNumbers.GetDefault();
@@ -293,16 +237,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UIntEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -311,7 +247,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertLongNumbers()
         {
             var item = LongNumbers.GetDefault();
@@ -326,16 +262,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<LongNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -344,7 +272,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertLongEncryptedNumbers()
         {
             var item = LongEncryptedNumbers.GetDefault();
@@ -359,16 +287,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<LongEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -377,7 +297,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertULongNumbers()
         {
             var item = ULongNumbers.GetDefault();
@@ -392,16 +312,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ULongNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -410,7 +322,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertULongEncryptedNumbers()
         {
             var item = ULongEncryptedNumbers.GetDefault();
@@ -425,16 +337,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ULongEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -443,7 +347,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDateTimeValues()
         {
             var items = new[]
@@ -483,18 +387,10 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Table<DateTimeTable>().ToArray();
 
-                    Assert.IsNotNull(elements);
+                    Assert.NotNull(elements);
 
                     for (var i = 0; i < elements.Length; i++)
-                        Assert.IsTrue(elements[i].Equals(items[i]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                        Assert.True(elements[i].Equals(items[i]));
                 }
                 finally
                 {
@@ -503,7 +399,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDateTimeEncryptedValues()
         {
             var items = new[]
@@ -542,18 +438,10 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Table<DateTimeEncryptedTable>().ToArray();
 
-                    Assert.IsNotNull(elements);
+                    Assert.NotNull(elements);
 
                     for (var i = 0; i < elements.Length; i++)
-                        Assert.IsTrue(elements[i].Equals(items[i]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                        Assert.True(elements[i].Equals(items[i]));
                 }
                 finally
                 {
@@ -562,7 +450,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertFloatNumbers()
         {
             var item = FloatNumbers.GetDefault();
@@ -577,16 +465,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<FloatNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -595,7 +475,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertFloatEncryptedNumbers()
         {
             var item = FloatEncryptedNumbers.GetDefault();
@@ -610,16 +490,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<FloatEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -628,7 +500,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertBoolEncryptedValues()
         {
             var item = BoolEncryptedNumbers.GetDefault();
@@ -643,16 +515,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<BoolEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -661,7 +525,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertByteEncryptedValues()
         {
             var item = ByteEncryptedNumbers.GetDefault();
@@ -676,16 +540,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ByteEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -694,7 +550,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertByteValues()
         {
             var item = ByteNumbers.GetDefault();
@@ -709,16 +565,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ByteNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -727,7 +575,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDoubleNumbers()
         {
             var item = DoubleNumbers.GetDefault();
@@ -742,16 +590,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DoubleNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -760,7 +600,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDoubleEncryptedNumbers()
         {
             var item = DoubleEncryptedNumbers.GetDefault();
@@ -775,16 +615,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DoubleEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -793,7 +625,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDecimalNumbers()
         {
             var item = DecimalNumbers.GetDefault();
@@ -808,16 +640,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DecimalNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -826,7 +650,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertDecimalEncryptedNumbers()
         {
             var item = DecimalEncryptedNumbers.GetDefault();
@@ -841,16 +665,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
                 }
                 finally
                 {
@@ -859,7 +675,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InserdBlobData()
         {
             var item = new BlobData
@@ -881,19 +697,11 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<BlobData>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
+                    Assert.NotNull(element);
 
-                    Assert.IsTrue(item.OpenBlob.MemCmp(element.OpenBlob) == 0 && item.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
+                    Assert.True(item.OpenBlob.MemCmp(element.OpenBlob) == 0 && item.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
 
-                    Assert.IsTrue(element.SingleByte == item.SingleByte);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(element.SingleByte == item.SingleByte);
                 }
                 finally
                 {
@@ -902,7 +710,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertNormalElementInCryptoTable()
         {
             var account1 = new AccountsData
@@ -939,16 +747,8 @@ namespace CryptoSQLite.Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
-                    Assert.IsTrue(table.Any(e => e.Equals(account2)));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.Contains(table, e => e.Equals(account1));
+                    Assert.Contains(table, e => e.Equals(account2));
                 }
                 finally
                 {
@@ -957,7 +757,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertNormalElementInCryptoTableThatHasNullValues()
         {
             var account1 = new AccountsData
@@ -983,15 +783,7 @@ namespace CryptoSQLite.Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.Contains(table, e => e.Equals(account1));
                 }
                 finally
                 {
@@ -1000,7 +792,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertNormalElementInCryptoTableThatHasEncryptedColumnsWithNullValues()
         {
             var account1 = new AccountsData
@@ -1026,15 +818,7 @@ namespace CryptoSQLite.Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.Contains(table, e => e.Equals(account1));
                 }
                 finally
                 {

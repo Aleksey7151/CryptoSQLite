@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
@@ -433,10 +433,10 @@ namespace CryptoSQLite.Tests
 
 
 
-    [TestFixture]
+    
     public class ForeignKeyTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void ForeignKeyNameCanNotBeNull()
         {
             using (var db = GetGostConnection())
@@ -446,11 +446,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyNullName>();
                     db.CreateTable<TableForeignKeyNullName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Foreign Key Attribute in property '"));
+                Assert.Contains("Foreign Key Attribute in property '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyNameCanNotBeEmpty()
         {
             using (var db = GetGostConnection())
@@ -460,11 +460,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyEmptyName>();
                     db.CreateTable<TableForeignKeyEmptyName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Foreign Key Attribute in property '"));
+                Assert.Contains("Foreign Key Attribute in property '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyCanBeAppliedOnlyToIntTypes()
         {
             using (var db = GetGostConnection())
@@ -474,11 +474,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyNotIntType>();
                     db.CreateTable<TableForeignKeyNotIntType>();
                 });
-                Assert.That(ex.Message, Contains.Substring("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTabl"));
+                Assert.Contains("ForeignKey attribute can be applied only to 'Int32', 'UInt32', 'Int16', 'UInt16' properties, or to property, Type of which has CryptoTable", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyCanNotBeEncrypted()
         {
             using (var db = GetGostConnection())
@@ -488,11 +488,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyCanNotBeEncrypted>();
                     db.CreateTable<TableForeignKeyCanNotBeEncrypted>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and Encrypted attributes simultaneously."));
+                Assert.Contains("Property can't have ForeignKey and Encrypted attributes simultaneously.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyCanNotBePrimaryKey()
         {
             using (var db = GetGostConnection())
@@ -502,11 +502,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyAndPrimaryKey>();
                     db.CreateTable<TableForeignKeyAndPrimaryKey>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and PrimaryKey attributes simultaneously."));
+                Assert.Contains("Property can't have ForeignKey and PrimaryKey attributes simultaneously.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyCanNotBeAutoIncrement()
         {
             using (var db = GetGostConnection())
@@ -516,11 +516,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyAndAutoIncrement>();
                     db.CreateTable<TableForeignKeyAndAutoIncrement>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Property can't have ForeignKey and AutoIncrement attributes simultaneously."));
+                Assert.Contains("Property can't have ForeignKey and AutoIncrement attributes simultaneously.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyCanNotHaveDefaultValue()
         {
             using (var db = GetGostConnection())
@@ -530,11 +530,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyWithDefaultValue>();
                     db.CreateTable<TableForeignKeyWithDefaultValue>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Property with ForeignKey attribute can't have Default Value."));
+                Assert.Contains("Property with ForeignKey attribute can't have Default Value.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyNameDoesNotPointToNavigationProperty()
         {
             using (var db = GetGostConnection())
@@ -544,11 +544,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyWithIncorrectName>();
                     db.CreateTable<TableForeignKeyWithIncorrectName>();
                 });
-                Assert.That(ex.Message, Contains.Substring("Can't find Navigation Property for '"));
+                Assert.Contains("Can't find Navigation Property for '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyReferencedTableWithoutCryptoTableAttribute()
         {
             using (var db = GetGostConnection())
@@ -558,11 +558,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyReferencedTableWithoutCryptoTableAttr>();
                     db.CreateTable<TableForeignKeyReferencedTableWithoutCryptoTableAttr>();
                 });
-                Assert.That(ex.Message, Contains.Substring("doesn't have Custom Attribute:"));
+                Assert.Contains("doesn't have Custom Attribute:", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ForeignKeyReferencedTableWithoutPrimaryKeyAttribute()
         {
             using (var db = GetGostConnection())
@@ -572,11 +572,11 @@ namespace CryptoSQLite.Tests
                     db.DeleteTable<TableForeignKeyReferencedTableWithoutPrimaryKey>();
                     db.CreateTable<TableForeignKeyReferencedTableWithoutPrimaryKey>();
                 });
-                Assert.That(ex.Message, Contains.Substring("doesn't contain property with PrimaryKey Attribute."));
+                Assert.Contains("doesn't contain property with PrimaryKey Attribute.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SequenceOfReferencedTables()
         {
             foreach (var db in GetConnections())
@@ -624,37 +624,29 @@ namespace CryptoSQLite.Tests
                     var orders = db.Find<Order>(o => o.Id == 1).ToArray();
 
                     Assert.NotNull(orders);
-                    Assert.IsTrue(orders.Length == 1);
-                    Assert.IsTrue(orders[0].Equal(order1));
-                    Assert.IsTrue(orders[0].PersonNavigation.Equal(person2));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.Equal(request2));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data1));
+                    Assert.True(orders.Length == 1);
+                    Assert.True(orders[0].Equal(order1));
+                    Assert.True(orders[0].PersonNavigation.Equal(person2));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.Equal(request2));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data1));
 
                     orders = null;
                     orders = db.Find<Order>(o => o.Id == 2).ToArray();
                     Assert.NotNull(orders);
-                    Assert.IsTrue(orders.Length == 1);
-                    Assert.IsTrue(orders[0].Equal(order2));
-                    Assert.IsTrue(orders[0].PersonNavigation.Equal(person3));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.Equal(request2));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data1));
+                    Assert.True(orders.Length == 1);
+                    Assert.True(orders[0].Equal(order2));
+                    Assert.True(orders[0].PersonNavigation.Equal(person3));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.Equal(request2));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data1));
 
                     orders = null;
                     orders = db.Find<Order>(o => o.Id == 3).ToArray();
                     Assert.NotNull(orders);
-                    Assert.IsTrue(orders.Length == 1);
-                    Assert.IsTrue(orders[0].Equal(order3));
-                    Assert.IsTrue(orders[0].PersonNavigation.Equal(person1));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.Equal(request1));
-                    Assert.IsTrue(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data2));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(orders.Length == 1);
+                    Assert.True(orders[0].Equal(order3));
+                    Assert.True(orders[0].PersonNavigation.Equal(person1));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.Equal(request1));
+                    Assert.True(orders[0].PersonNavigation.RequestNav.DataNavigation.Equal(data2));
                 }
                 finally
                 {
@@ -663,7 +655,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void MultipleReferencedTables()
         {
             foreach (var db in GetConnections())
@@ -735,33 +727,25 @@ namespace CryptoSQLite.Tests
                     var manyRefs = db.Find<ManyRefTables>(mrt => mrt.Id == 1).ToArray();
 
                     Assert.NotNull(manyRefs);
-                    Assert.IsTrue(manyRefs.Length == 1);
-                    Assert.IsTrue(manyRefs[0].Equal(manyRefTables1));
-                    Assert.IsTrue(manyRefs[0].Account.Equal(acc2));
-                    Assert.IsTrue(manyRefs[0].Account.Job.Equal(job1));
-                    Assert.IsTrue(manyRefs[0].Info.Equal(info1));
-                    Assert.IsTrue(manyRefs[0].Client.Equal(client2));
-                    Assert.IsTrue(manyRefs[0].Client.Count.Equal(count2));
+                    Assert.True(manyRefs.Length == 1);
+                    Assert.True(manyRefs[0].Equal(manyRefTables1));
+                    Assert.True(manyRefs[0].Account.Equal(acc2));
+                    Assert.True(manyRefs[0].Account.Job.Equal(job1));
+                    Assert.True(manyRefs[0].Info.Equal(info1));
+                    Assert.True(manyRefs[0].Client.Equal(client2));
+                    Assert.True(manyRefs[0].Client.Count.Equal(count2));
 
                     manyRefs = null;
                     manyRefs = db.Find<ManyRefTables>(mrt => mrt.Id == 2).ToArray();
 
                     Assert.NotNull(manyRefs);
-                    Assert.IsTrue(manyRefs.Length == 1);
-                    Assert.IsTrue(manyRefs[0].Equal(manyRefTables2));
-                    Assert.IsTrue(manyRefs[0].Account.Equal(acc1));
-                    Assert.IsTrue(manyRefs[0].Account.Job.Equal(job2));
-                    Assert.IsTrue(manyRefs[0].Info.Equal(info2));
-                    Assert.IsTrue(manyRefs[0].Client.Equal(client1));
-                    Assert.IsTrue(manyRefs[0].Client.Count.Equal(count1));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(manyRefs.Length == 1);
+                    Assert.True(manyRefs[0].Equal(manyRefTables2));
+                    Assert.True(manyRefs[0].Account.Equal(acc1));
+                    Assert.True(manyRefs[0].Account.Job.Equal(job2));
+                    Assert.True(manyRefs[0].Info.Equal(info2));
+                    Assert.True(manyRefs[0].Client.Equal(client1));
+                    Assert.True(manyRefs[0].Client.Count.Equal(count1));
                 }
                 finally
                 {
@@ -770,7 +754,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void ReferencedRowInTableDoesNotExist()
         {
             foreach (var db in GetConnections())
@@ -794,11 +778,11 @@ namespace CryptoSQLite.Tests
 
                     db.InsertItem(simpleRef1);
                 });
-                Assert.That(ex.ProbableCause, Contains.Substring("Column with ForeignKey constrait has invalid value or table doesn't exist in database."));
+                Assert.Contains("Column with ForeignKey constrait has invalid value or table doesn't exist in database.", ex.ProbableCause);
             }
         }
 
-        [Test]
+        [Fact]
         public void ReferencedTableDoesNotExistInDataBase()
         {
             foreach (var db in GetConnections())
@@ -811,11 +795,11 @@ namespace CryptoSQLite.Tests
                     // db.CreateTable<Simple>();
                     db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
                 });
-                Assert.That(ex.Message, Contains.Substring("Database doesn't contain table with name: Simple."));
+                Assert.Contains("Database doesn't contain table with name: Simple.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void DeleteTableWhenItIsForeignKeyDependencyForOtherTables()
         {
             foreach (var db in GetConnections())
@@ -840,11 +824,11 @@ namespace CryptoSQLite.Tests
 
                     db.DeleteTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
                 });
-                Assert.That(ex.Message, Contains.Substring("because other tables referenced on her, using ForeignKey Constrait."));
+                Assert.Contains("because other tables referenced on her, using ForeignKey Constraint.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void ClearTableWhenItIsForeignKeyDependencyForOtherTables()
         {
             foreach (var db in GetConnections())
@@ -869,11 +853,11 @@ namespace CryptoSQLite.Tests
 
                     db.ClearTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
                 });
-                Assert.That(ex.Message, Contains.Substring("because other tables referenced on her, using ForeignKey Constrait."));
+                Assert.Contains("because other tables referenced on her, using ForeignKey Constraint.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void AutoResolveReferenceEqualsToFalse()
         {
             foreach (var db in GetConnections())
@@ -898,17 +882,9 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(simpleRef1);
 
                     var item = db.Table<SimpleReferenceWithoutAutoResolve>().ToArray();
-                    Assert.IsTrue(item.Length == 1);
-                    Assert.IsNull(item[0].Simple);
+                    Assert.True(item.Length == 1);
+                    Assert.Null(item[0].Simple);
                     db.DeleteTable<SimpleReferenceWithoutAutoResolve>();
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {

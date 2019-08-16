@@ -1,13 +1,13 @@
 ﻿using System;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class EncryptionKeySetTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void SetNullKey()
         {
             using (var db = GetGostConnection())
@@ -16,11 +16,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.SetEncryptionKey(null);
                 });
-                Assert.That(ex.ParamName, Contains.Substring("key"));
+                Assert.Contains("key", ex.ParamName);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToGost()
         {
             using (var db = GetGostConnection())
@@ -30,11 +30,11 @@ namespace CryptoSQLite.Tests
                     var smallKey = new byte[31];
                     db.SetEncryptionKey(smallKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for AES with 256 bit key and GOST must be 32 bytes."));
+                Assert.Contains("Key length for AES with 256 bit key and GOST must be 32 bytes.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToAes256()
         {
             using (var db = GetAes256Connection())
@@ -44,11 +44,11 @@ namespace CryptoSQLite.Tests
                     var smallKey = new byte[31];
                     db.SetEncryptionKey(smallKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for AES with 256 bit key and GOST must be 32 bytes."));
+                Assert.Contains("Key length for AES with 256 bit key and GOST must be 32 bytes.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToAes192()
         {
             using (var db = GetAes192Connection())
@@ -58,11 +58,11 @@ namespace CryptoSQLite.Tests
                     var bigKey = new byte[23];
                     db.SetEncryptionKey(bigKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for AES with 192 bit key must be 24 bytes."));
+                Assert.Contains("Key length for AES with 192 bit key must be 24 bytes.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToAes128()
         {
             using (var db = GetAes128Connection())
@@ -72,11 +72,11 @@ namespace CryptoSQLite.Tests
                     var bigKey = new byte[15];
                     db.SetEncryptionKey(bigKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for AES with 128 bit key must be 16 bytes."));
+                Assert.Contains("Key length for AES with 128 bit key must be 16 bytes.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToDes()
         {
             using (var db = GetDesConnection())
@@ -86,11 +86,11 @@ namespace CryptoSQLite.Tests
                     var smallKey = new byte[7];
                     db.SetEncryptionKey(smallKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for DES must be at least 8 bytes"));
+                Assert.Contains("Key length for DES must be at least 8 bytes", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void SetWrongKeyToTripleDes()
         {
             using (var db = GetTripleDesConnection())
@@ -100,11 +100,11 @@ namespace CryptoSQLite.Tests
                     var smallKey = new byte[23];
                     db.SetEncryptionKey(smallKey);
                 });
-                Assert.That(ex.Message, Contains.Substring("Key length for 3DES must be at least 24 bytes."));
+                Assert.Contains("Key length for 3DES must be at least 24 bytes.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void InsertItemFunctionIsForbiddenWhenEncryptionKeyIsNotSetted()
         {
             var tasks = GetTasks();
@@ -117,11 +117,11 @@ namespace CryptoSQLite.Tests
                     db.CreateTable<SecretTask>();
                     db.InsertItem(tasks[0]);
                 });
-                Assert.That(ex.Message, Contains.Substring("Encryption key has not been installed."));
+                Assert.Contains("Encryption key has not been installed.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void GetItemFunctionIsForbiddenWhenEncryptionKeyIsNotSetted()
         {
             var tasks = GetTasks();
@@ -137,14 +137,6 @@ namespace CryptoSQLite.Tests
                         db.InsertItem(task);
 
                 }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
                 finally
                 {
                     db.Dispose();
@@ -158,11 +150,11 @@ namespace CryptoSQLite.Tests
                 {
                     db.Find<SecretTask>(st => st.Id == 1);
                 });
-                Assert.That(ex.Message, Contains.Substring("Encryption key has not been installed."));
+                Assert.Contains("Encryption key has not been installed.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void DeleteItemFunctionIs_Allowed_WhenEncryptionKeyIsNotSetted()
         {
             var task = new SecretTask { Description = "Some descriptionen 1", Price = 99.45, IsDone = false, SecretToDo = "Some Secret Info" };
@@ -175,14 +167,6 @@ namespace CryptoSQLite.Tests
 
                     db.InsertItem(task);
                 }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
-                }
                 finally
                 {
                     db.Dispose();
@@ -194,14 +178,6 @@ namespace CryptoSQLite.Tests
                 try
                 {
                     db.Delete<SecretTask>(st => st.Id == 1);       // delete function is allowed
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {

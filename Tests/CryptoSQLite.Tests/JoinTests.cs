@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using NUnit.Framework;
+﻿using System.Linq;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
@@ -108,10 +107,10 @@ namespace CryptoSQLite.Tests
     }
 
     #endregion
-    [TestFixture]
+    
     public class JoinTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void JoinTwoTables()
         {
 
@@ -169,19 +168,19 @@ namespace CryptoSQLite.Tests
                     var twoJoinedTables = twoJoinedTablesResult.ToArray();
 
                     Assert.NotNull(twoJoinedTables);
-                    Assert.IsTrue(twoJoinedTables.Length == 3);
+                    Assert.True(twoJoinedTables.Length == 3);
 
                     var joined = twoJoinedTables[0];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product1) && joined.Customer.Equals(customer2));
 
                     joined = twoJoinedTables[1];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product3) && joined.Customer.Equals(customer1));
 
                     joined = twoJoinedTables[2];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer == null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product5) && joined.Customer.Equals(customer3));
 
                     var threeJoinedTablesResult = db.Join<Product, Customer, Manufacturer, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
@@ -192,19 +191,19 @@ namespace CryptoSQLite.Tests
                     var threeJoinedTables = threeJoinedTablesResult.ToArray();
 
                     Assert.NotNull(threeJoinedTables);
-                    Assert.NotNull(threeJoinedTables.Length == 3);
+                    Assert.Equal(3, threeJoinedTables.Length);
 
                     joined = threeJoinedTables[0];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1));
 
                     joined = threeJoinedTables[1];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3));
 
                     joined = threeJoinedTables[2];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
-                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse == null);
+                    Assert.True(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3));
 
                     var fourJoinedTablesResult = db.Join<Product, Customer, Manufacturer, Warehouse, JoinedTables>(null,
                         (product, customer) => product.CustomerId == customer.Id,
@@ -216,28 +215,19 @@ namespace CryptoSQLite.Tests
                     var fourJoinedTables = fourJoinedTablesResult.ToArray();
 
                     Assert.NotNull(fourJoinedTables);
-                    Assert.NotNull(fourJoinedTables.Length == 3);
+                    Assert.Equal(3, fourJoinedTables.Length);
 
                     joined = fourJoinedTables[0];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
-                    Assert.IsTrue(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1) && joined.Warehouse.Equals(warehouse1));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.True(joined.Product.Equals(product1) && joined.Customer.Equals(customer2) && joined.Manufacturer.Equals(manufacturer1) && joined.Warehouse.Equals(warehouse1));
 
                     joined = fourJoinedTables[1];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
-                    Assert.IsTrue(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.True(joined.Product.Equals(product3) && joined.Customer.Equals(customer1) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
 
                     joined = fourJoinedTables[2];
-                    Assert.IsTrue(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
-                    Assert.IsTrue(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
-
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(joined.Product != null && joined.Customer != null && joined.Manufacturer != null && joined.Warehouse != null);
+                    Assert.True(joined.Product.Equals(product5) && joined.Customer.Equals(customer3) && joined.Manufacturer.Equals(manufacturer3) && joined.Warehouse.Equals(warehouse2));
                 }
                 finally
                 {

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class ClearTableTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void ClearTableContent()
         {
             var account1 = new AccountsData
@@ -45,22 +44,14 @@ namespace CryptoSQLite.Tests
 
                     var table = db.Table<AccountsData>().ToArray();
 
-                    Assert.IsTrue(table.Any(e => e.Equals(account1)));
-                    Assert.IsTrue(table.Any(e => e.Equals(account2)));
+                    Assert.Contains(table, e => e.Equals(account1));
+                    Assert.Contains(table, e => e.Equals(account2));
 
                     db.ClearTable<AccountsData>();
 
                     table = db.Table<AccountsData>().ToArray();
-                    Assert.IsTrue(table != null);
-                    Assert.IsTrue(table.Length == 0);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table != null);
+                    Assert.True(table.Length == 0);
                 }
                 finally
                 {

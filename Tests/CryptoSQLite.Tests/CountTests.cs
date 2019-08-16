@@ -1,13 +1,13 @@
 ﻿using System;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class CountTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void CountOfAllRecordsInTable()
         {
             var item1 = IntNumbers.GetDefault();
@@ -29,39 +29,31 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 4);
+                    Assert.True(cnt == 4);
 
                     db.Delete<IntNumbers>(i => i.Id == 4);
 
                     cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 3);
+                    Assert.True(cnt == 3);
 
                     db.Delete<IntNumbers>(i => i.Id == 3);
 
                     cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 2);
+                    Assert.True(cnt == 2);
 
                     db.Delete<IntNumbers>(i => i.Id == 2);
 
                     cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 1);
+                    Assert.True(cnt == 1);
 
                     db.Delete<IntNumbers>(i => i.Id == 1);
 
                     cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 0);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 0);
                 }
                 finally
                 {
@@ -70,7 +62,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void CountOfRecordsInTableForSpecifiedColumn()
         {
             var item1 = IntNumbers.GetDefault();
@@ -94,39 +86,31 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.Count<IntNumbers>("NullAble1");
 
-                    Assert.IsTrue(cnt == 2);
+                    Assert.True(cnt == 2);
 
                     db.Delete<IntNumbers>(i => i.Id == 4);
 
                     cnt = db.Count<IntNumbers>("NullAble1");
 
-                    Assert.IsTrue(cnt == 1);
+                    Assert.True(cnt == 1);
 
                     db.Delete<IntNumbers>(i => i.Id == 3);
 
                     cnt = db.Count<IntNumbers>("NullAble1");
 
-                    Assert.IsTrue(cnt == 1);
+                    Assert.True(cnt == 1);
 
                     db.Delete<IntNumbers>(i => i.Id == 2);
 
                     cnt = db.Count<IntNumbers>("NullAble1");
 
-                    Assert.IsTrue(cnt == 0);
+                    Assert.True(cnt == 0);
 
                     db.Delete<IntNumbers>(i => i.Id == 1);
 
                     cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 0);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 0);
                 }
                 finally
                 {
@@ -135,7 +119,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void CountOfDistinctRecordsInTableForSpecifiedColumn()
         {
             var item1 = IntNumbers.GetDefault();
@@ -158,15 +142,7 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.CountDistinct<IntNumbers>("NullAble1");
 
-                    Assert.IsTrue(cnt == 1);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 1);
                 }
                 finally
                 {
@@ -175,7 +151,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void CountOfRecordsWithCondition()
         {
             var item1 = IntNumbers.GetDefault();
@@ -201,23 +177,15 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.Count<IntNumbers>(t => t.IntMaxVal < 10);
 
-                    Assert.IsTrue(cnt == 3);
+                    Assert.True(cnt == 3);
 
                     cnt = db.Count<IntNumbers>(t => t.IntMaxVal > 10);
 
-                    Assert.IsTrue(cnt == 1);
+                    Assert.True(cnt == 1);
 
                     cnt = db.Count<IntNumbers>(t => t.IntMaxVal == 7);
 
-                    Assert.IsTrue(cnt == 2);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 2);
                 }
                 finally
                 {

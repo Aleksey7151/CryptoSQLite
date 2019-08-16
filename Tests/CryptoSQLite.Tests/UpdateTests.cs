@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
+
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class UpdateTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void Update_Using_Not_Equal_To_Null_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -33,16 +34,8 @@ namespace CryptoSQLite.Tests
 
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(newItem) && table[1].Equal(st2) && table[2].Equal(newItem));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.Equal(3, table.Length);
+                    Assert.True(table[0].Equal(newItem) && table[1].Equal(st2) && table[2].Equal(newItem));
                 }
                 finally
                 {
@@ -51,7 +44,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Update_Using_Composite_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 1.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -83,16 +76,8 @@ namespace CryptoSQLite.Tests
 
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 6);
-                    Assert.IsTrue(table[0].Equal(newItem) && table[1].Equal(st2) && table[2].Equal(st3) && table[3].Equal(st4) && table[4].Equal(st5) && table[5].Equal(st6));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 6);
+                    Assert.True(table[0].Equal(newItem) && table[1].Equal(st2) && table[2].Equal(st3) && table[3].Equal(st4) && table[4].Equal(st5) && table[5].Equal(st6));
                 }
                 finally
                 {
@@ -101,7 +86,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Update_Using_LessThan_Predicate()
         {
             var st1 = new SecretTask { IsDone = true, Price = 1.99, Description = null, SecretToDo = "Some Secret Task" };
@@ -127,16 +112,8 @@ namespace CryptoSQLite.Tests
 
                     Assert.NotNull(result);
                     var table = result.ToArray();
-                    Assert.IsTrue(table.Length == 3);
-                    Assert.IsTrue(table[0].Equal(newItem) && table[1].Equal(newItem) && table[2].Equal(st3));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(table.Length == 3);
+                    Assert.True(table[0].Equal(newItem) && table[1].Equal(newItem) && table[2].Equal(st3));
                 }
                 finally
                 {

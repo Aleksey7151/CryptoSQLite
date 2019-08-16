@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class SelectTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void ReturnsOnlyValuesForColumnsWhictsPropertyNamesDetermined_V1_UsingMemberAccess()
         {
             var item1 = new IntNumbers
@@ -39,25 +39,17 @@ namespace CryptoSQLite.Tests
                         db.Select<IntNumbers>(i => i.IntMaxVal == 837498273, i => i.NullAble1, i => i.IntMinVal).ToArray();
 
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 2);
+                    Assert.True(elements.Length == 2);
 
-                    Assert.IsTrue(elements[0].NullAble2 == null &&
+                    Assert.True(elements[0].NullAble2 == null &&
                                   elements[0].IntMaxVal == 0 &&
                                   elements[0].NullAble1 == item1.NullAble1 &&
                                   elements[0].IntMinVal == item1.IntMinVal);
 
-                    Assert.IsTrue(elements[1].NullAble2 == null &&
+                    Assert.True(elements[1].NullAble2 == null &&
                                   elements[1].IntMaxVal == 0 &&
                                   elements[1].NullAble1 == item2.NullAble1 &&
                                   elements[1].IntMinVal == item2.IntMinVal);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {
@@ -66,7 +58,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void ReturnsOnlyValuesForColumnsWhictsPropertyNamesDetermined_V2_UsingMemberAccess()
         {
             var item1 = new AccountsData
@@ -105,9 +97,9 @@ namespace CryptoSQLite.Tests
                         db.Select<AccountsData>(i => i.Age == 23, a => a.Password, a => a.Age, a => a.Posts, a => a.Salary).ToArray();
 
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 2);
+                    Assert.True(elements.Length == 2);
 
-                    Assert.IsTrue(elements[0].Name == null &&
+                    Assert.True(elements[0].Name == null &&
                                   elements[0].Productivity == null &&
                                   elements[0].SocialSecureId == null &&
                                   elements[0].Password == item1.Password &&
@@ -115,21 +107,13 @@ namespace CryptoSQLite.Tests
                                   elements[0].Posts == item1.Posts &&
                                   elements[0].Salary == item1.Salary);
 
-                    Assert.IsTrue(elements[1].Name == null &&
+                    Assert.True(elements[1].Name == null &&
                                   elements[1].Productivity == null &&
                                   elements[1].SocialSecureId == null &&
                                   elements[1].Password == item2.Password &&
                                   elements[1].Age == item2.Age &&
                                   elements[1].Posts == item2.Posts &&
                                   elements[1].Salary == item2.Salary);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {
@@ -138,7 +122,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SelectReferencedTableIfNavigationPropertyNamePassedUsingMemberAccess()
         {
             foreach (var db in GetConnections())
@@ -164,16 +148,8 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Select<SimpleReference>(s => s.Id == 0, s => s.InfoRefId).ToArray();
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(elements[0].SomeData == null && elements[0].Simple.Equal(simple1));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(elements[0].SomeData == null && elements[0].Simple.Equal(simple1));
                 }
                 finally
                 {
@@ -182,7 +158,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void NotSelectReferencedTableIfNavigationPropertyNameNotPassedUsingMemberAccess()
         {
             foreach (var db in GetConnections())
@@ -208,16 +184,8 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Select<SimpleReference>(s => s.Id == 0, s => s.SomeData).ToArray();
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(elements[0].SomeData == "Some Data Descriptionen 1" && elements[0].Simple == null);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(elements[0].SomeData == "Some Data Descriptionen 1" && elements[0].Simple == null);
                 }
                 finally
                 {
@@ -230,7 +198,7 @@ namespace CryptoSQLite.Tests
         /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
         /// column must be correctly decrypted. 
         /// </summary>
-        [Test]
+        [Fact]
         public void SelectOnlyOneEncryptedColumnWhenTableContainsSeveralEncryptedColumnsUsingMemberAccess()
         {
             var item = SeveralColumns.GetDefault();
@@ -245,16 +213,8 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Select<SeveralColumns>(s => s.Id == 1, s => s.Str2).ToArray();
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == null);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == null);
                 }
                 finally
                 {
@@ -267,7 +227,7 @@ namespace CryptoSQLite.Tests
         /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
         /// column must be correctly decrypted. 
         /// </summary>
-        [Test]
+        [Fact]
         public void SelectTwoEncryptedColumnWhenTableContainsSeveralEncryptedColumnsUsingMemberAccess()
         {
             var item = SeveralColumns.GetDefault();
@@ -282,16 +242,8 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Select<SeveralColumns>(s => s.Id == 1, s => s.Str2, s => s.Str4).ToArray();
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == item.Str4);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == null && elements[0].Str4 == item.Str4);
                 }
                 finally
                 {
@@ -304,7 +256,7 @@ namespace CryptoSQLite.Tests
         /// When table contains several encrypted tables, and we want to get only one [Encrypted] column
         /// column must be correctly decrypted. 
         /// </summary>
-        [Test]
+        [Fact]
         public void SelectThreeEncryptedColumnWhenTableContainsSeveralEncryptedColumnsUsingMemberAccess()
         {
             var item = SeveralColumns.GetDefault();
@@ -319,16 +271,8 @@ namespace CryptoSQLite.Tests
 
                     var elements = db.Select<SeveralColumns>(s => s.Id == 1, s => s.Str2, s => s.Str4, s => s.Str3).ToArray();
                     Assert.NotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == item.Str3 && elements[0].Str4 == item.Str4);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(elements[0].Str2 == item.Str2 && elements[0].Str1 == null && elements[0].Str3 == item.Str3 && elements[0].Str4 == item.Str4);
                 }
                 finally
                 {
@@ -337,7 +281,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SelectTop_Items_From_Table()
         {
             var item1 = IntNumbers.GetDefault();
@@ -363,18 +307,10 @@ namespace CryptoSQLite.Tests
 
                     var result = db.SelectTop<IntNumbers>(2).ToArray();
 
-                    Assert.IsTrue(result.Length == 2);
+                    Assert.True(result.Length == 2);
 
-                    Assert.IsTrue(result[0].Equals(item1));
-                    Assert.IsTrue(result[1].Equals(item2));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(result[0].Equals(item1));
+                    Assert.True(result[1].Equals(item2));
                 }
                 finally
                 {

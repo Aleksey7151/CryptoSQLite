@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class InsertOrReplaceItemTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void UpdateShortNumbers()
         {
             var item = ShortNumbers.GetDefault();
@@ -23,8 +23,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ShortNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.ShortMaxVal = 21379;
                     element.ShortMinVal = -1234;
@@ -34,16 +34,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<ShortNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -52,7 +44,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateUnsignedShortNumbers()
         {
             var item = UShortNumbers.GetDefault();
@@ -67,8 +59,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UShortNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.UShortMaxVal = 21379;
                     element.UShortMinVal = 1234;
@@ -78,16 +70,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<UShortNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -96,7 +80,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateIntNumbers()
         {
             var item = IntNumbers.GetDefault();
@@ -111,8 +95,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<IntNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.IntMaxVal = 144221379;
                     element.IntMinVal = -1231134;
@@ -122,16 +106,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<IntNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -140,7 +116,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateUnsignedIntNumbers()
         {
             var item = UIntNumbers.GetDefault();
@@ -155,8 +131,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UIntNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.UIntMaxVal = 144221379;
                     element.UIntMinVal = 1231134;
@@ -166,16 +142,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<UIntNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -184,7 +152,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateLongNumbers()
         {
             var item = LongNumbers.GetDefault();
@@ -199,8 +167,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<LongNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.LongMaxVal = 785144221379;
                     element.LongMinVal = -9621231134;
@@ -210,16 +178,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<LongNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -228,7 +188,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateUnsignedLongNumbers()
         {
             var item = ULongNumbers.GetDefault();
@@ -243,8 +203,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ULongNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.ULongMaxVal = 7851442321379;
                     element.ULongMinVal = 9621442231134;
@@ -254,16 +214,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<ULongNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -272,7 +224,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateDoubleNumbers()
         {
             var item = DoubleNumbers.GetDefault();
@@ -287,8 +239,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DoubleNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.DoubleMaxVal = 485421379.23413511;
                     element.DoubleMinVal = -96212314.15145344;
@@ -298,16 +250,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<DoubleNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -316,7 +260,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateDecimalNumbers()
         {
             var item = DecimalNumbers.GetDefault();
@@ -331,8 +275,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DecimalNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.MaxVal = 485425757831379.23413511m;
                     element.MinVal = -962123383783414.15145344m;
@@ -342,16 +286,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<DecimalNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -360,7 +296,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateFloatNumbers()
         {
             var item = FloatNumbers.GetDefault();
@@ -375,8 +311,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<FloatNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.FloatMaxVal = 422179.23422f;
                     element.FloatMinVal = -962123.12341f;
@@ -386,16 +322,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<FloatNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -404,7 +332,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateEncryptedStrings()
         {
             var item = new EncryptedStrings { Str1 = "Hello, world!", Str2 = "Good buy, world!" };
@@ -419,8 +347,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<EncryptedStrings>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Str1 == item.Str1 && element.Str2 == item.Str2);
+                    Assert.NotNull(element);
+                    Assert.True(element.Str1 == item.Str1 && element.Str2 == item.Str2);
 
                     element.Str1 = "Gendalf Gray";
                     element.Str2 = "Gendalf White";
@@ -428,17 +356,9 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<EncryptedStrings>().ToArray()[0];
-                    Assert.IsNotNull(updated);
+                    Assert.NotNull(updated);
 
-                    Assert.IsTrue(element.Str1 == updated.Str1 && element.Str2 == updated.Str2);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(element.Str1 == updated.Str1 && element.Str2 == updated.Str2);
                 }
                 finally
                 {
@@ -447,7 +367,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateBlobs()
         {
             var item = new BlobData
@@ -470,9 +390,9 @@ namespace CryptoSQLite.Tests
                     var element = db.Table<BlobData>().ToArray()[0];    // read inserted element from database
 
                     //checking equals
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(item.OpenBlob.MemCmp(element.OpenBlob) == 0 && item.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
-                    Assert.IsTrue(element.SingleByte == item.SingleByte);
+                    Assert.NotNull(element);
+                    Assert.True(item.OpenBlob.MemCmp(element.OpenBlob) == 0 && item.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
+                    Assert.True(element.SingleByte == item.SingleByte);
 
                     // update element values
                     element.OpenBlob.MemSet(0xEE);
@@ -484,17 +404,9 @@ namespace CryptoSQLite.Tests
                     var updated = db.Table<BlobData>().ToArray()[0];    // read updated element from database
 
                     // checking equals
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(updated.OpenBlob.MemCmp(element.OpenBlob) == 0 && updated.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
-                    Assert.IsTrue(element.SingleByte == updated.SingleByte);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(updated.OpenBlob.MemCmp(element.OpenBlob) == 0 && updated.ClosedBlob.MemCmp(element.ClosedBlob) == 0);
+                    Assert.True(element.SingleByte == updated.SingleByte);
                 }
                 finally
                 {
@@ -503,7 +415,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateShortEncryptedNumbers()
         {
             var item = ShortEncryptedNumbers.GetDefault();
@@ -518,8 +430,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<ShortEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.ShortMaxVal = 21379;
                     element.ShortMinVal = -1234;
@@ -529,16 +441,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<ShortEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -547,7 +451,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateUnsignedShortEncryptedNumbers()
         {
             var item = UShortEncryptedNumbers.GetDefault();
@@ -562,8 +466,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UShortEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.UShortMaxVal = 21379;
                     element.UShortMinVal = 1234;
@@ -573,16 +477,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<UShortEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -591,7 +487,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateIntEncryptedNumbers()
         {
             var item = IntEncryptedNumbers.GetDefault();
@@ -606,8 +502,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<IntEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.IntMaxVal == item.IntMaxVal && element.IntMinVal == item.IntMinVal);
+                    Assert.NotNull(element);
+                    Assert.True(element.IntMaxVal == item.IntMaxVal && element.IntMinVal == item.IntMinVal);
 
                     element.IntMaxVal = 144221379;
                     element.IntMinVal = -12331134;
@@ -617,16 +513,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<IntEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -635,7 +523,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateUsignedIntEncryptedNumbers()
         {
             var item = UIntEncryptedNumbers.GetDefault();
@@ -650,8 +538,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<UIntEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.UIntMaxVal = 144221379;
                     element.UIntMinVal = 1231134;
@@ -661,16 +549,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<UIntEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -679,7 +559,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateLongEncryptedNumbers()
         {
             var item = LongEncryptedNumbers.GetDefault();
@@ -694,8 +574,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<LongEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.LongMaxVal = 785144221379;
                     element.LongMinVal = -9621231134;
@@ -705,16 +585,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<LongEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -723,7 +595,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateDoubleEncryptedNumbers()
         {
             var item = DoubleEncryptedNumbers.GetDefault();
@@ -738,8 +610,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DoubleEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.DoubleMaxVal = 485421379.23413511;
                     element.DoubleMinVal = -96212314.15145344;
@@ -749,16 +621,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<DoubleEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -767,7 +631,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateFloatEncryptedNumbers()
         {
             var item = FloatEncryptedNumbers.GetDefault();
@@ -782,8 +646,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<FloatEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.FloatMaxVal = 422179.23422f;
                     element.FloatMinVal = -962123.12341f;
@@ -793,16 +657,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<FloatEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {
@@ -811,7 +667,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void UpdateDecimalEncryptedNumbers()
         {
             var item = DecimalEncryptedNumbers.GetDefault();
@@ -826,8 +682,8 @@ namespace CryptoSQLite.Tests
 
                     var element = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
 
-                    Assert.IsNotNull(element);
-                    Assert.IsTrue(element.Equals(item));
+                    Assert.NotNull(element);
+                    Assert.True(element.Equals(item));
 
                     element.MaxVal = 48539333421379.23413511m;
                     element.MinVal = -96212314.1514558555344m;
@@ -837,16 +693,8 @@ namespace CryptoSQLite.Tests
                     db.InsertOrReplaceItem(element);
 
                     var updated = db.Table<DecimalEncryptedNumbers>().ToArray()[0];
-                    Assert.IsNotNull(updated);
-                    Assert.IsTrue(element.Equals(updated));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(updated);
+                    Assert.True(element.Equals(updated));
                 }
                 finally
                 {

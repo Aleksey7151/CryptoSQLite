@@ -1,13 +1,13 @@
 ﻿using System;
 using CryptoSQLite.Tests.Tables;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    [TestFixture]
+    
     public class SQLiteFunctionsTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void SQLite_COUNT_WithPredicate_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -33,15 +33,7 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.Count<IntNumbers>(i => i.IntMinVal < 40);
 
-                    Assert.IsTrue(cnt == 3);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 3);
                 }
                 finally
                 {
@@ -50,7 +42,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SQLite_TOTAL_COUNT_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -76,15 +68,7 @@ namespace CryptoSQLite.Tests
 
                     var cnt = db.Count<IntNumbers>();
 
-                    Assert.IsTrue(cnt == 6);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(cnt == 6);
                 }
                 finally
                 {
@@ -93,7 +77,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SQLite_MAX_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -115,19 +99,11 @@ namespace CryptoSQLite.Tests
 
                     var max = db.Max<IntNumbers>("IntMinVal");
 
-                    Assert.IsTrue(Math.Abs(max - 83) < 0.0000001);
+                    Assert.True(Math.Abs(max - 83) < 0.0000001);
 
                     var maxPrid = db.Max<IntNumbers>("IntMinVal", t => t.Id < 3);
 
-                    Assert.IsTrue(Math.Abs(maxPrid - 44) < 0.0000001);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(Math.Abs(maxPrid - 44) < 0.0000001);
                 }
                 finally
                 {
@@ -136,7 +112,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SQLite_MIN_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -158,19 +134,11 @@ namespace CryptoSQLite.Tests
 
                     var min = db.Min<IntNumbers>("IntMinVal");
 
-                    Assert.IsTrue(Math.Abs(min - 7) < 0.0000001);
+                    Assert.True(Math.Abs(min - 7) < 0.0000001);
 
                     var minPrid = db.Min<IntNumbers>("IntMinVal", t => t.Id > 1 && t.Id < 4);
 
-                    Assert.IsTrue(Math.Abs(minPrid - 13) < 0.0000001);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(Math.Abs(minPrid - 13) < 0.0000001);
                 }
                 finally
                 {
@@ -179,7 +147,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SQLite_SUM_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -201,19 +169,11 @@ namespace CryptoSQLite.Tests
 
                     var max = db.Sum<IntNumbers>("IntMinVal");
 
-                    Assert.IsTrue(Math.Abs(max - 147) < 0.0000001);
+                    Assert.True(Math.Abs(max - 147) < 0.0000001);
 
                     var maxPrid = db.Sum<IntNumbers>("IntMinVal", t => t.Id > 1 && t.Id < 4);
 
-                    Assert.IsTrue(Math.Abs(maxPrid - 96) < 0.0000001);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(Math.Abs(maxPrid - 96) < 0.0000001);
                 }
                 finally
                 {
@@ -222,7 +182,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void SQLite_AVG_Function()
         {
             var item1 = new IntNumbers { IntMinVal = 44 };
@@ -244,19 +204,11 @@ namespace CryptoSQLite.Tests
 
                     var max = db.Avg<IntNumbers>("IntMinVal");
 
-                    Assert.IsTrue(Math.Abs(max - 36.75) < 0.0000001);
+                    Assert.True(Math.Abs(max - 36.75) < 0.0000001);
 
                     var maxPrid = db.Avg<IntNumbers>("IntMinVal", t => t.Id > 1 && t.Id < 4);
 
-                    Assert.IsTrue(Math.Abs(maxPrid - 48) < 0.0000001);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(Math.Abs(maxPrid - 48) < 0.0000001);
                 }
                 finally
                 {

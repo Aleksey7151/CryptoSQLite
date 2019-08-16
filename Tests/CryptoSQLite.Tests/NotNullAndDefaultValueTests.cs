@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
@@ -57,11 +57,11 @@ namespace CryptoSQLite.Tests
         public double? NotNullDouble { get; set; }
     }
 
-    [TestFixture]
+    
     public class NotNullAndDefaultValueTests : BaseTest
     {
 
-        [Test]
+        [Fact]
         public void ErrorWhenPassingNullForNotNullColumn()
         {
             using (var db = GetGostConnection())
@@ -73,11 +73,11 @@ namespace CryptoSQLite.Tests
                     db.CreateTable<TableWithNotNullAttrs>();
                     db.InsertItem(item);
                 });
-                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column "));
+                Assert.Contains("You are trying to pass NULL-value for Column ", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void NotNullAttribute_Without_DefaultValue_Doing_Nothing()
         {
             foreach (var db in GetConnections())
@@ -90,17 +90,9 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                     var elements = db.Find<TableWithNotNullAttrs>(i => i.NotNullInt == 5).ToArray();
-                    Assert.IsNotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(item1.Equal(elements[0]));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.NotNull(elements);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(item1.Equal(elements[0]));
                 }
                 finally
                 {
@@ -109,7 +101,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void NotNullAttribute_Without_DefaultValueForIntegers()
         {
             foreach (var db in GetConnections())
@@ -121,11 +113,11 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithNotNullAttrs {/*NotNullInt = 5,*/ NotNullString = "Hello", NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                 });
-                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
+                Assert.Contains("You are trying to pass NULL-value for Column '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void NotNullAttribute_Without_DefaultValueForText()
         {
             foreach (var db in GetConnections())
@@ -137,11 +129,11 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, /*NotNullString = "Hello",*/ NotNullBytes = new byte[8], NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                 });
-                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
+                Assert.Contains("You are trying to pass NULL-value for Column '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void NotNullAttribute_Without_DefaultValueForBlob()
         {
             foreach (var db in GetConnections())
@@ -153,11 +145,11 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", /*NotNullBytes = new byte[8],*/ NotNullDouble = 4578783.23882 };
                     db.InsertItem(item1);
                 });
-                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
+                Assert.Contains("You are trying to pass NULL-value for Column '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void NotNullAttribute_Without_DefaultValueForReal()
         {
             foreach (var db in GetConnections())
@@ -169,11 +161,11 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithNotNullAttrs { NotNullInt = 5, NotNullString = "Hello", NotNullBytes = new byte[8]/*,NotNullDouble = 4578783.23882*/ };
                     db.InsertItem(item1);
                 });
-                Assert.That(ex.Message, Contains.Substring("You are trying to pass NULL-value for Column '"));
+                Assert.Contains("You are trying to pass NULL-value for Column '", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void String_NotNullAttribute_With_DefaultValue()
         {
             foreach (var db in GetConnections())
@@ -186,20 +178,12 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullInt = 1234567 };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
-                    Assert.IsNotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(Math.Abs(elements[0].NotNullDouble.Value - 1234.1231) <
+                    Assert.NotNull(elements);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(Math.Abs(elements[0].NotNullDouble.Value - 1234.1231) <
                                   0.000001 &&
                                   elements[0].NotNullInt == 1234567 &&
                                   elements[0].NotNullString == TableWithDefaultValue.DefaultString);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {
@@ -208,7 +192,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Int_NotNullAttribute_With_DefaultValue()
         {
             foreach (var db in GetConnections())
@@ -221,20 +205,12 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithDefaultValue { NotNullDouble = 1234.1231, NotNullString = "Frodo" };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
-                    Assert.IsNotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(Math.Abs(elements[0].NotNullDouble.Value - 1234.1231) <
+                    Assert.NotNull(elements);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(Math.Abs(elements[0].NotNullDouble.Value - 1234.1231) <
                                   0.000001 &&
                                   elements[0].NotNullInt == TableWithDefaultValue.DefaultInt &&
                                   elements[0].NotNullString == "Frodo");
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {
@@ -243,7 +219,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void Double_NotNullAttribute_With_DefaultValue()
         {
             foreach (var db in GetConnections())
@@ -256,19 +232,11 @@ namespace CryptoSQLite.Tests
                     var item1 = new TableWithDefaultValue { NotNullInt = 123441, NotNullString = "Frodo" };
                     db.InsertItem(item1);
                     var elements = db.Table<TableWithDefaultValue>().ToArray();
-                    Assert.IsNotNull(elements);
-                    Assert.IsTrue(elements.Length == 1);
-                    Assert.IsTrue(Math.Abs(elements[0].NotNullDouble.Value - TableWithDefaultValue.DefaultDouble) < 0.000001 &&
+                    Assert.NotNull(elements);
+                    Assert.True(elements.Length == 1);
+                    Assert.True(Math.Abs(elements[0].NotNullDouble.Value - TableWithDefaultValue.DefaultDouble) < 0.000001 &&
                                   elements[0].NotNullInt == 123441 &&
                                   elements[0].NotNullString == "Frodo");
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
                 }
                 finally
                 {

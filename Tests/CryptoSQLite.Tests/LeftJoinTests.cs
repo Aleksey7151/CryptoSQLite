@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace CryptoSQLite.Tests
 {
@@ -70,10 +70,10 @@ namespace CryptoSQLite.Tests
 
     #endregion
 
-    [TestFixture]
+    
     public class LeftJoinTests : BaseTest
     {
-        [Test]
+        [Fact]
         public void CanNotUseEncryptedColumnsInJoiningConditions()
         {
             foreach (var db in GetConnections())
@@ -86,11 +86,11 @@ namespace CryptoSQLite.Tests
                     var leftJoin = db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.SomeData/*Has Encrypted Attribute*/ == right.SomeData,
                                 (left, right) => new LeftJoinResult(left, right));
                 });
-                Assert.That(ex.Message, Contains.Substring("Columns that are used in joining expressions can't be Encrypted"));
+                Assert.Contains("Columns that are used in joining expressions can't be Encrypted", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void CanNotJoinSameTables()
         {
             foreach (var db in GetConnections())
@@ -102,11 +102,11 @@ namespace CryptoSQLite.Tests
                     var leftJoin = db.LeftJoin<LeftTable, LeftTable, LeftJoinResult>(null, (left, right) => left.SomeData/*Has Encrypted Attribute*/ == right.SomeData,
                                 (left, right) => null);
                 });
-                Assert.That(ex.Message, Contains.Substring("You can't join table with itself."));
+                Assert.Contains("You can't join table with itself.", ex.Message);
             }
         }
 
-        [Test]
+        [Fact]
         public void LeftJoinTablesUsingInt()
         {
 
@@ -151,40 +151,32 @@ namespace CryptoSQLite.Tests
                     var leftJoin =  db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.IntJoinKey == right.IntJoinKey,
                                 (left, right) => new LeftJoinResult(left, right));
 
-                    Assert.IsTrue(leftJoin != null);
+                    Assert.True(leftJoin != null);
 
                     var result = leftJoin.ToArray();
 
-                    Assert.IsTrue(result.Length == 7);
+                    Assert.True(result.Length == 7);
 
-                    Assert.IsTrue(result[0].Left.Equals(leftTable1));
-                    Assert.IsTrue(result[0].Right.Equals(rightTable1));
+                    Assert.True(result[0].Left.Equals(leftTable1));
+                    Assert.True(result[0].Right.Equals(rightTable1));
 
-                    Assert.IsTrue(result[1].Left.Equals(leftTable2));
-                    Assert.IsTrue(result[1].Right == null);
+                    Assert.True(result[1].Left.Equals(leftTable2));
+                    Assert.True(result[1].Right == null);
 
-                    Assert.IsTrue(result[2].Left.Equals(leftTable3));
-                    Assert.IsTrue(result[2].Right == null);
+                    Assert.True(result[2].Left.Equals(leftTable3));
+                    Assert.True(result[2].Right == null);
 
-                    Assert.IsTrue(result[3].Left.Equals(leftTable4));
-                    Assert.IsTrue(result[3].Right.Equals(rightTable3));
+                    Assert.True(result[3].Left.Equals(leftTable4));
+                    Assert.True(result[3].Right.Equals(rightTable3));
 
-                    Assert.IsTrue(result[4].Left.Equals(leftTable5));
-                    Assert.IsTrue(result[4].Right.Equals(rightTable2));
+                    Assert.True(result[4].Left.Equals(leftTable5));
+                    Assert.True(result[4].Right.Equals(rightTable2));
 
-                    Assert.IsTrue(result[5].Left.Equals(leftTable6));
-                    Assert.IsTrue(result[5].Right.Equals(rightTable1));
+                    Assert.True(result[5].Left.Equals(leftTable6));
+                    Assert.True(result[5].Right.Equals(rightTable1));
 
-                    Assert.IsTrue(result[6].Left.Equals(leftTable7));
-                    Assert.IsTrue(result[6].Right == null);
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(result[6].Left.Equals(leftTable7));
+                    Assert.True(result[6].Right == null);
                 }
                 finally
                 {
@@ -193,7 +185,7 @@ namespace CryptoSQLite.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void LeftJoinTablesUsingStringKey()
         {
 
@@ -238,40 +230,32 @@ namespace CryptoSQLite.Tests
                     var leftJoin =  db.LeftJoin<LeftTable, RightTable, LeftJoinResult>(null, (left, right) => left.StringJoinKey == right.StringJoinKey,
                                 (left, right) => new LeftJoinResult(left, right));
 
-                    Assert.IsTrue(leftJoin != null);
+                    Assert.True(leftJoin != null);
 
                     var result = leftJoin.ToArray();
 
-                    Assert.IsTrue(result.Length == 7);
+                    Assert.True(result.Length == 7);
 
-                    Assert.IsTrue(result[0].Left.Equals(leftTable1));
-                    Assert.IsTrue(result[0].Right == null);
+                    Assert.True(result[0].Left.Equals(leftTable1));
+                    Assert.True(result[0].Right == null);
 
-                    Assert.IsTrue(result[1].Left.Equals(leftTable2));
-                    Assert.IsTrue(result[1].Right.Equals(rightTable2));
+                    Assert.True(result[1].Left.Equals(leftTable2));
+                    Assert.True(result[1].Right.Equals(rightTable2));
 
-                    Assert.IsTrue(result[2].Left.Equals(leftTable3));
-                    Assert.IsTrue(result[2].Right == null);
+                    Assert.True(result[2].Left.Equals(leftTable3));
+                    Assert.True(result[2].Right == null);
 
-                    Assert.IsTrue(result[3].Left.Equals(leftTable4));
-                    Assert.IsTrue(result[3].Right.Equals(rightTable1));
+                    Assert.True(result[3].Left.Equals(leftTable4));
+                    Assert.True(result[3].Right.Equals(rightTable1));
 
-                    Assert.IsTrue(result[4].Left.Equals(leftTable5));
-                    Assert.IsTrue(result[4].Right.Equals(rightTable3));
+                    Assert.True(result[4].Left.Equals(leftTable5));
+                    Assert.True(result[4].Right.Equals(rightTable3));
 
-                    Assert.IsTrue(result[5].Left.Equals(leftTable6));
-                    Assert.IsTrue(result[5].Right == null);
+                    Assert.True(result[5].Left.Equals(leftTable6));
+                    Assert.True(result[5].Right == null);
 
-                    Assert.IsTrue(result[6].Left.Equals(leftTable7));
-                    Assert.IsTrue(result[6].Right.Equals(rightTable2));
-                }
-                catch (CryptoSQLiteException cex)
-                {
-                    Assert.Fail(cex.Message + cex.ProbableCause);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message);
+                    Assert.True(result[6].Left.Equals(leftTable7));
+                    Assert.True(result[6].Right.Equals(rightTable2));
                 }
                 finally
                 {

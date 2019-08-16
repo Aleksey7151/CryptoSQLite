@@ -144,7 +144,7 @@ namespace CryptoSQLite
             {
                 if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
                     throw new CryptoSQLiteException(
-                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.", ex);
+                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.", ex);
 
                 throw;
             }
@@ -171,7 +171,7 @@ namespace CryptoSQLite
             {
                 if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
                     throw new CryptoSQLiteException(
-                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constrait.", ex);
+                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.", ex);
 
                 throw;
             }
