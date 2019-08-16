@@ -430,10 +430,7 @@ namespace CryptoSQLite.Tests
 
     #endregion //Multiple Referenced Tables
 
-
-
-
-    
+    [Collection("Sequential")]
     public class ForeignKeyTests : BaseTest
     {
         [Fact]

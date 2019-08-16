@@ -46,7 +46,7 @@ namespace CryptoSQLite
         /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
         public CryptoSQLite(string dbFilename, CryptoAlgorithms cryptoAlgorithm) : this(cryptoAlgorithm)
         {
-            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
+            _connection = SQLiteDatabaseConnectionBuilder.Create(dbFilename).Build();
         }
 
         private CryptoSQLite(CryptoAlgorithms cryptoAlgorithm)

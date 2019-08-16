@@ -57,7 +57,7 @@ namespace CryptoSQLite.Tests
         public double? NotNullDouble { get; set; }
     }
 
-    
+    [Collection("Sequential")]
     public class NotNullAndDefaultValueTests : BaseTest
     {
 

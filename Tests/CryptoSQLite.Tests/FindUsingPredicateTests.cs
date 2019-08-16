@@ -5,7 +5,7 @@ using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    
+    [Collection("Sequential")]
     public class FindUsingPredicateTests : BaseTest
     {
 

@@ -1,10 +1,9 @@
-﻿using System;
-using CryptoSQLite.Tests.Tables;
+﻿using CryptoSQLite.Tests.Tables;
 using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    
+    [Collection("Sequential")]
     public class CountTests : BaseTest
     {
         [Fact]

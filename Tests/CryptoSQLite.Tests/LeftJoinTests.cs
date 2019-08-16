@@ -70,7 +70,7 @@ namespace CryptoSQLite.Tests
 
     #endregion
 
-    
+    [Collection("Sequential")]
     public class LeftJoinTests : BaseTest
     {
         [Fact]

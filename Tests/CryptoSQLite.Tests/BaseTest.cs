@@ -1,5 +1,8 @@
 ﻿using System;
 using CryptoSQLite.Tests.Tables;
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]   // We disable all Parallel execution of tests
 
 namespace CryptoSQLite.Tests
 {

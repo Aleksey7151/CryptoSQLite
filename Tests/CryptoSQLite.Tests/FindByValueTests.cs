@@ -1,11 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using CryptoSQLite.Tests.Tables;
 using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    
+    [Collection("Sequential")]
     public class FindByValueTests : BaseTest
     {
         [Fact]

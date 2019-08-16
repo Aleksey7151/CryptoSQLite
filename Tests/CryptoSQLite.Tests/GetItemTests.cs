@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CryptoSQLite.Tests
 {
-    
+    [Collection("Sequential")]
     public class GetItemTests : BaseTest
     {
         [Fact]

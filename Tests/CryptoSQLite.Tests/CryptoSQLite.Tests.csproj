@@ -7,7 +7,7 @@
     <NoWarn>1701;1702; NU1701;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CryptoSQLite.ORM" Version="3.0.7" />
+    <PackageReference Include="CryptoSQLite.ORM" Version="3.0.8" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
