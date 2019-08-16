@@ -115,6 +115,12 @@ namespace CryptoSQLite.Tests
                     Assert.True(table.Length == 3);
                     Assert.True(table[0].Equal(newItem) && table[1].Equal(newItem) && table[2].Equal(st3));
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("=======================");
+                    Console.WriteLine(ex.InnerException?.ToString());
+                    Console.WriteLine(ex.ToString());
+                }
                 finally
                 {
                     db.Dispose();

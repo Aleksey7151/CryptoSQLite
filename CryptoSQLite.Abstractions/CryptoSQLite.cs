@@ -1357,7 +1357,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = column.ToBlob();
+                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1419,7 +1419,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = column.ToBlob();
+                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1494,7 +1494,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = column.ToBlob();
+                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1576,7 +1576,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = column.ToBlob();
+                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values

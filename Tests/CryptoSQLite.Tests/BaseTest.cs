@@ -23,9 +23,18 @@ namespace CryptoSQLite.Tests
 
         public ICryptoSQLite GetAes192Connection()
         {
-            var conn = CryptoSQLiteFactory.Current.Create(Aes192DbFile, CryptoAlgorithms.AesWith192BitsKey);
-            conn.SetEncryptionKey(_key);
-            return conn;
+            try
+            {
+                var conn = CryptoSQLiteFactory.Current.Create(Aes192DbFile, CryptoAlgorithms.AesWith192BitsKey);
+                conn.SetEncryptionKey(_key);
+
+                return conn;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public ICryptoSQLite GetAes128Connection()
