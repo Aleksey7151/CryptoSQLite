@@ -137,15 +137,23 @@ namespace CryptoSQLite
 
             try
             {
-                _connection.Execute(SqlCommands.CmdDeleteTable(tableName));
+                var cmd = SqlCommands.CmdDeleteTable(tableName);
+                cmd = cmd.Replace('\"', '\'');
+                _connection.Execute(cmd);
                 // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
             }
             catch (SQLiteException ex)
             {
                 if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
                     throw new CryptoSQLiteException(
-                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.", ex);
+                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.",
+                        ex);
 
+                throw;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
                 throw;
             }
 
