@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CryptoSQLite;
@@ -18,24 +19,21 @@ namespace Blank
     [Register("AppDelegate")]
     public partial class AppDelegate : RunnerAppDelegate
     {
+        private readonly byte[] _key = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal); // Documents folder
             var libraryPath = Path.Combine(documentsPath, "..", "Library");                    // Library folder
             CryptoSQLiteFactory.Current.Init(libraryPath);
 
-            try
-            {
-                var connection = CryptoSQLiteFactory.Current.Create("test_db");
-                ClearTableContent(connection);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            /*
+            var connection = CryptoSQLiteFactory.Current.Create("MyDbSQLite.db3");
+            connection.SetEncryptionKey(_key);
 
-
+            Strings_Find_Using_Equal_To_Null_Predicate(connection);
+            */
             // We need this to ensure the execution assembly is part of the app bundle
             AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
 
@@ -50,6 +48,52 @@ namespace Blank
 			TerminateAfterExecution = true;
 #endif
             return base.FinishedLaunching(app, options);
+        }
+
+        private void RunUnitTests()
+        {
+            var tests = new FindUsingPredicateTests();
+            var methods = tests.GetType().GetMethods();
+            foreach (var method in methods)
+            {
+                if (method.GetCustomAttributes(typeof(FactAttribute), false).Length > 0)
+                {
+                    method.Invoke(tests, null);
+                }
+            }
+        }
+
+        public void Strings_Find_Using_Equal_To_Null_Predicate(ICryptoSQLite connection)
+        {
+            var st1 = new SecretTask { IsDone = true, Price = 99.99, Description = null, SecretToDo = "Some Secret Task" };
+            var st2 = new SecretTask { IsDone = false, Price = 19.99, Description = "Description 1", SecretToDo = "Some Secret Task" };
+            var st3 = new SecretTask { IsDone = true, Price = 9.99, Description = "Description 2", SecretToDo = "Some Secret Task" };
+            foreach (var db in new List<ICryptoSQLite>{connection})
+            {
+                try
+                {
+                    db.DeleteTable<SecretTask>();
+                    db.CreateTable<SecretTask>();
+
+                    db.InsertItem(st1);
+                    db.InsertItem(st2);
+                    db.InsertItem(st3);
+
+                    var result = db.Find<SecretTask>(a => a.Description == null);
+
+                    var table = result.ToArray();
+                    Assert.Single(table);
+                    Assert.True(st1.Equal(table[0]));
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.Message;
+                }
+                finally
+                {
+                    db.Dispose();
+                }
+            }
         }
 
         public void ClearTableContent(ICryptoSQLite connection)

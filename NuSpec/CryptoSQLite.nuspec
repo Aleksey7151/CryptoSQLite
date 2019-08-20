@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>3.0.8</version>
+    <version>3.0.10</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -23,14 +23,14 @@
     <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid monotouch key encrypt aes des gost linq2sql linqtosql linq</tags>
     <dependencies>
       <group targetFramework="netstandard2.0">
-        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.0" />
+        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.1" />
       </group>
       <group targetFramework="MonoAndroid10">
-        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.0" />
+        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.1" />
         <dependency id="SQLitePCLRaw.bundle_green" version="2.0.0" />
       </group>
       <group targetFramework="Xamarin.iOS10">
-        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.0" />
+        <dependency id="SQLitePCL.pretty.netstandard" version="2.0.1" />
         <dependency id="SQLitePCLRaw.bundle_green" version="2.0.0" />
       </group>
     </dependencies>

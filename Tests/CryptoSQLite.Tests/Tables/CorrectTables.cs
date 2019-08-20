@@ -590,10 +590,21 @@ namespace CryptoSQLite.Tests.Tables
         {
             if (o == null) return false;
 
+            var equal1 = true;
+            if (NullAble1.HasValue && o.NullAble1.HasValue)
+            {
+                equal1 = Math.Abs(NullAble1.Value - o.NullAble1.Value) < 0.0001;
+            }
+
+            var equal2 = true;
+            if (NullAble2.HasValue && o.NullAble2.HasValue)
+            {
+                equal2 = Math.Abs(NullAble2.Value - o.NullAble2.Value) < 0.0001;
+            }
+
             return Math.Abs(FloatMaxVal - o.FloatMaxVal) < 0.0001 &&
                    Math.Abs(FloatMinVal - o.FloatMinVal) < 0.0001 &&
-                   NullAble1 == o.NullAble1 &&
-                   NullAble2 == o.NullAble2;
+                   equal1 && equal2;
         }
     }
 
@@ -626,10 +637,22 @@ namespace CryptoSQLite.Tests.Tables
         {
             if (o == null) return false;
 
+            var equal1 = true;
+            if (NullAble1.HasValue && o.NullAble1.HasValue)
+            {
+                equal1 = Math.Abs(NullAble1.Value - o.NullAble1.Value) < 0.0001;
+            }
+
+            var equal2 = true;
+            if (NullAble2.HasValue && o.NullAble2.HasValue)
+            {
+                equal2 = Math.Abs(NullAble2.Value - o.NullAble2.Value) < 0.0001;
+            }
+
             return Math.Abs(DoubleMaxVal - o.DoubleMaxVal) < 0.000001 &&
                    Math.Abs(DoubleMinVal - o.DoubleMinVal) < 0.000001 &&
-                   NullAble1 == o.NullAble1 &&
-                   NullAble2 == o.NullAble2;
+                   equal1 &&
+                   equal2;
         }
     }
 
@@ -666,10 +689,21 @@ namespace CryptoSQLite.Tests.Tables
         {
             if (o == null) return false;
 
+            var equal1 = true;
+            if (NullAble1.HasValue && o.NullAble1.HasValue)
+            {
+                equal1 = Math.Abs(NullAble1.Value - o.NullAble1.Value) < 0.0001;
+            }
+
+            var equal2 = true;
+            if (NullAble2.HasValue && o.NullAble2.HasValue)
+            {
+                equal2 = Math.Abs(NullAble2.Value - o.NullAble2.Value) < 0.0001;
+            }
+
             return Math.Abs(DoubleMaxVal - o.DoubleMaxVal) < 0.000001 &&
                    Math.Abs(DoubleMinVal - o.DoubleMinVal) < 0.000001 &&
-                   NullAble1 == o.NullAble1 &&
-                   NullAble2 == o.NullAble2;
+                   equal1 && equal2;
         }
     }
 
@@ -914,13 +948,10 @@ namespace CryptoSQLite.Tests.Tables
 
         public bool Equal(SecretTask s)
         {
-            return SecretToDo == s.SecretToDo && Description == s.Description && Math.Abs(Price - s.Price) < 0.000001 &&
+            return SecretToDo == s.SecretToDo && Description.Compare(s.Description) && Math.Abs(Price - s.Price) < 0.000001 &&
                    IsDone == s.IsDone;
         }
-
     }
-
-
 
     [CryptoTable("AccountsData")]
     public class AccountsData
@@ -951,11 +982,9 @@ namespace CryptoSQLite.Tests.Tables
 
         public bool Equals(AccountsData ac)
         {
-            return IsAdministrator == ac.IsAdministrator && Name == ac.Name && Password == ac.Password &&
+            return IsAdministrator == ac.IsAdministrator && Name.Compare(ac.Name) && Password.Compare(ac.Password) &&
                    Age == ac.Age &&
                    SocialSecureId == ac.SocialSecureId;
         }
     }
-
-   
 }

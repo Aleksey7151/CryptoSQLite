@@ -34,19 +34,18 @@ namespace CryptoSQLite
         /// Creates connection to SQLite database file with data encryption.
         /// </summary>
         /// <param name="dbFilename">Path to SQLite database file.</param>
-        public CryptoSQLite(string dbFilename) : this(CryptoAlgorithms.AesWith256BitsKey)
+        public CryptoSQLite(string dbFilename) : this(dbFilename, CryptoAlgorithms.AesWith256BitsKey)
         {
-            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
         }
 
         /// <summary>
-        /// Constructor. Creates connection to SQLite datebase file with data encryption.
+        /// Creates connection to SQLite database file with data encryption.
         /// </summary>
         /// <param name="dbFilename">Path to database file</param>
         /// <param name="cryptoAlgorithm">Type of crypto algorithm that will be used for data encryption</param>
         public CryptoSQLite(string dbFilename, CryptoAlgorithms cryptoAlgorithm) : this(cryptoAlgorithm)
         {
-            _connection = SQLiteDatabaseConnectionBuilder.Create(dbFilename).Build();
+            _connection = SQLite3.Open(dbFilename, ConnectionFlags.ReadWrite | ConnectionFlags.Create, null);
         }
 
         private CryptoSQLite(CryptoAlgorithms cryptoAlgorithm)
@@ -126,7 +125,7 @@ namespace CryptoSQLite
 
             var cmd = SqlCommands.CmdCreateTable(tableMap);
 
-            _connection.Execute(cmd);
+            _connection.ExecuteAll(cmd);
         }
 
         /// <inheritdoc />
@@ -135,28 +134,8 @@ namespace CryptoSQLite
             var table = typeof(TTable);
             var tableName = table.TableName();
 
-            try
-            {
-                var cmd = SqlCommands.CmdDeleteTable(tableName);
-                cmd = cmd.Replace('\"', '\'');
-                _connection.Execute(cmd);
-                // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
-            }
-            catch (SQLiteException ex)
-            {
-                if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
-                    throw new CryptoSQLiteException(
-                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.",
-                        ex);
-
-                throw;
-            }
-            catch (Exception ex)
-            {
-                var msg = ex.Message;
-                throw;
-            }
-
+            var cmd = SqlCommands.CmdDeleteTable(tableName);
+            _connection.ExecuteAll(cmd);
 
             if (_tables.ContainsKey(table))
             {
@@ -170,19 +149,7 @@ namespace CryptoSQLite
             var tableMap = CheckTable<TTable>();
             var tableName = tableMap.Name;
 
-            try
-            {
-                _connection.Execute(SqlCommands.CmdClearTable(tableName));
-                // it doesn't matter if name wrong or correct and it doesn't matter if table name contains symbols like @#$%^
-            }
-            catch (SQLiteException ex)
-            {
-                if (ex.ErrorCode == ErrorCode.Constraint && ex.ExtendedErrorCode == ErrorCode.ConstraintForeignKey)
-                    throw new CryptoSQLiteException(
-                        $"Can't remove table {tableName} because other tables referenced on her, using ForeignKey Constraint.", ex);
-
-                throw;
-            }
+            _connection.ExecuteAll(SqlCommands.CmdClearTable(tableName));
         }
 
         /// <inheritdoc />
@@ -406,7 +373,7 @@ namespace CryptoSQLite
 
             if (columnValue == null)
             {
-                _connection.Execute(cmd);
+                _connection.ExecuteAll(cmd);
             }
             else
             {
@@ -1365,7 +1332,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
+                                tmp.SqlValue = column.ToBlob().ToArray();
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1427,7 +1394,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
+                                tmp.SqlValue = column.ToBlob().ToArray();
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1502,7 +1469,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
+                                tmp.SqlValue = column.ToBlob().ToArray();
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values
@@ -1584,7 +1551,7 @@ namespace CryptoSQLite
                         switch (column.ColumnInfo.DeclaredType)
                         {
                             case "BLOB":
-                                tmp.SqlValue = Encoding.UTF8.GetBytes(column.ToString());
+                                tmp.SqlValue = column.ToBlob().ToArray();
                                 break;
                             case "REAL":
                                 if (column.SQLiteType == SQLiteType.Text)   // for default double values

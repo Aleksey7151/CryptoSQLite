@@ -80,13 +80,13 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CryptoSQLite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.8\lib\Xamarin.iOS10\CryptoSQLite.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.10\lib\Xamarin.iOS10\CryptoSQLite.dll</HintPath>
     </Reference>
     <Reference Include="CryptoSQLite.Abstractions, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.8\lib\Xamarin.iOS10\CryptoSQLite.Abstractions.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.10\lib\Xamarin.iOS10\CryptoSQLite.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCL.pretty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SQLitePCL.pretty.netstandard.2.0.0\lib\netstandard2.0\SQLitePCL.pretty.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCL.pretty.netstandard.2.0.1\lib\netstandard2.0\SQLitePCL.pretty.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2, Version=2.0.0.581, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SQLitePCLRaw.bundle_green.2.0.0\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using SQLitePCL.pretty;
 using Xunit;
 
 namespace CryptoSQLite.Tests
@@ -752,11 +753,11 @@ namespace CryptoSQLite.Tests
         }
 
         [Fact]
-        public void ReferencedRowInTableDoesNotExist()
+        public void ReferencedRowInTableDoesNotExist_Passes()
         {
             foreach (var db in GetConnections())
             {
-                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                using (db)
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
@@ -774,8 +775,7 @@ namespace CryptoSQLite.Tests
                     };
 
                     db.InsertItem(simpleRef1);
-                });
-                Assert.Contains("Column with ForeignKey constrait has invalid value or table doesn't exist in database.", ex.ProbableCause);
+                }
             }
         }
 
@@ -784,24 +784,34 @@ namespace CryptoSQLite.Tests
         {
             foreach (var db in GetConnections())
             {
-                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                using (db)
                 {
-                    db.DeleteTable<SimpleReference>();
-                    db.DeleteTable<Simple>();
+                    Exception expectedException = null;
 
-                    // db.CreateTable<Simple>();
-                    db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
-                });
-                Assert.Contains("Database doesn't contain table with name: Simple.", ex.Message);
+                    try
+                    {
+                        db.DeleteTable<SimpleReference>();
+                        db.DeleteTable<Simple>();
+
+                        // db.CreateTable<Simple>();
+                        db.CreateTable<SimpleReference>();  // SimpleReference has ForeignKey constrait, referenced to Simple
+                    }
+                    catch (Exception e)
+                    {
+                        expectedException = e;
+                    }
+
+                    Assert.NotNull(expectedException);
+                }
             }
         }
 
         [Fact]
-        public void DeleteTableWhenItIsForeignKeyDependencyForOtherTables()
+        public void DeleteTableWhenItIsForeignKeyDependencyForOtherTables_Passes()
         {
             foreach (var db in GetConnections())
             {
-                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                using (db)
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
@@ -819,18 +829,17 @@ namespace CryptoSQLite.Tests
                     };
                     db.InsertItem(simpleRef1);
 
-                    db.DeleteTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
-                });
-                Assert.Contains("because other tables referenced on her, using ForeignKey Constraint.", ex.Message);
+                    db.DeleteTable<Simple>();
+                }
             }
         }
 
         [Fact]
-        public void ClearTableWhenItIsForeignKeyDependencyForOtherTables()
+        public void ClearTableWhenItIsForeignKeyDependencyForOtherTables_Passes()
         {
             foreach (var db in GetConnections())
             {
-                var ex = Assert.Throws<CryptoSQLiteException>(() =>
+                using (db)
                 {
                     db.DeleteTable<SimpleReference>();
                     db.DeleteTable<Simple>();
@@ -849,8 +858,7 @@ namespace CryptoSQLite.Tests
                     db.InsertItem(simpleRef1);
 
                     db.ClearTable<Simple>();   //But SimpleReference Has ForeignKey Constrait referenced to Simple!
-                });
-                Assert.Contains("because other tables referenced on her, using ForeignKey Constraint.", ex.Message);
+                }
             }
         }
 
