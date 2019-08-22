@@ -28,6 +28,8 @@
       <group targetFramework="MonoAndroid10">
         <dependency id="SQLitePCL.pretty.netstandard" version="2.0.1" />
         <dependency id="SQLitePCLRaw.bundle_green" version="2.0.0" />
+        <dependency id="SQLitePCLRaw.core" version="2.0.0" />
+        <dependency id="SQLitePCLRaw.lib.e_sqlite3.android" version="2.0.0" />
       </group>
       <group targetFramework="Xamarin.iOS10">
         <dependency id="SQLitePCL.pretty.netstandard" version="2.0.1" />
