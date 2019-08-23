@@ -30,7 +30,7 @@ namespace CryptoSQLite.Tests
             {
                 var conn = CryptoSQLiteFactory.Current.Create(Aes192DbFile, CryptoAlgorithms.AesWith192BitsKey);
                 conn.SetEncryptionKey(_key);
-
+                
                 return conn;
             }
             catch (Exception e)

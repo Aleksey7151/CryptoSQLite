@@ -80,10 +80,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CryptoSQLite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.10\lib\Xamarin.iOS10\CryptoSQLite.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.20\lib\Xamarin.iOS10\CryptoSQLite.dll</HintPath>
     </Reference>
     <Reference Include="CryptoSQLite.Abstractions, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.10\lib\Xamarin.iOS10\CryptoSQLite.Abstractions.dll</HintPath>
+      <HintPath>..\..\packages\CryptoSQLite.ORM.3.0.20\lib\Xamarin.iOS10\CryptoSQLite.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCL.pretty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SQLitePCL.pretty.netstandard.2.0.1\lib\netstandard2.0\SQLitePCL.pretty.dll</HintPath>

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CryptoSQLite.ORM</id>
-    <version>3.0.10</version>
+    <version>3.0.2</version>
     <title>CryptoSQLite.ORM</title>
     <authors>Alexei Safonov</authors>
     <projectUrl>https://github.com/Aleksey7151/CryptoSQLite</projectUrl>
@@ -18,7 +18,7 @@
       2. Generate your own personal encryption key, and pass it to CryptoSQLite library.
       3. CryptoSQLite will encrypt all properties that have '[Encrypted]' attribute automatically when you are adding (updating) elements to your Table and decrypt all [Encrypted] properties when you are getting elements from a Table in the database file.
       Last updates:
-      In 3.0.0 version .NET Standard compatibility added
+      In 3.0.2 version .NET Standard compatibility added and fixed minor issues
     </description>
     <tags>crypt orm sql sqlite ios xamarin android droid encryption monoandroid monotouch key encrypt aes des gost linq2sql linqtosql linq</tags>
     <dependencies>
