@@ -17,7 +17,7 @@ This package is released and considered as stable.
 
 ## Quick Start
 
-This package is constructed in a Cross way, so in any project (platform-independent or any platform-specific) you can just write:
+This package is constructed in a Cross way:
 
 ```C#
 // ============================================================= //
@@ -101,8 +101,10 @@ Android:
 * SQLitePCLRaw.bundle_green version 2.0.0
 * SQLitePCLRaw.core version 2.0.0
 * SQLitePCLRaw.lib.e_sqlite3.android version 2.0.0
+
 iOS:
 * SQLitePCL.pretty.netstandard version 2.0.1
 * SQLitePCLRaw.bundle_green version 2.0.0
+
 NET Standard:
 * SQLitePCL.pretty.netstandard version 2.0.1
