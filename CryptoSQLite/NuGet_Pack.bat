@@ -1,1 +1,0 @@
-start e:\SOFT\NUGET\nuget.exe pack CryptoSQLite.nuspec

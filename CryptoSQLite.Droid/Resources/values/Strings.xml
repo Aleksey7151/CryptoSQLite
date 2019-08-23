@@ -1,0 +1,4 @@
+<resources>
+    <string name="hello">Hello World, Click Me!</string>
+    <string name="app_name">CryptoSQLite.Droid</string>
+</resources>
